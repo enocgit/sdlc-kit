@@ -1,0 +1,58 @@
+# Machine-readable manifest of every skill the sdlc pipeline routes to.
+#
+# kind:
+#   local       - shipped in this kit (skills/), installed by install.sh
+#   community   - install from a registry into your skills dir (e.g. ~/.agents/skills, symlinked
+#                 into ~/.claude/skills); vet before adopting
+#   claude-code - a capability named after Claude Code's native command (not a file, not installable).
+#                 On another runtime, use that runtime's EQUIVALENT (e.g. Codex `review` ≈ code-review);
+#                 only if it has no equivalent, use `fallback` (do it by hand).
+#
+# source/ref: best-effort. Exact registry slugs and version pinning depend on the registry —
+#      confirm at skills.sh. Vendor (commit) installed community skills into your repo so builds
+#      are reproducible and don't depend on a registry staying up.
+
+version: 1
+
+skills:
+  # --- local (this kit) ---
+  - { name: sdlc,                      kind: local, path: skills/sdlc,                      stage: conductor }
+  - { name: feature-start,             kind: local, path: skills/feature-start,             stage: 4 }
+  - { name: project-status,            kind: local, path: skills/project-status,            stage: "3,7" }
+  - { name: definition-of-done-review, kind: local, path: skills/definition-of-done-review, stage: 6 }
+  - { name: address-review,            kind: local, path: skills/address-review,            stage: manual, note: "standalone, user-invoked — triages external PR review comments (human + bots), not bound to a stage" }
+
+  # --- community (install + vet) ---
+  # note: borrow the technique, override the workflow — the conductor owns where artifacts land
+  # and what runs next. See skills/sdlc/SKILL.md "Borrow the technique, not the workflow".
+  - { name: brainstorming,                 kind: community, source: obra/superpowers,        ref: main, stage: 1,      note: "method only — land a Stage-1 brief in docs/briefs/; do NOT write docs/superpowers/specs/ or auto-run writing-plans", fallback: "ask clarifying questions and draft the brief by hand" }
+  - { name: documentation-and-adrs,        kind: community, source: addyosmani/agent-skills, ref: main, stage: "0b,2", note: "ADRs go to docs/adr/NNNN-slug.md, never docs/decisions/", fallback: "use docs/adr/TEMPLATE.md + docs/contracts/README.md by hand" }
+  - { name: writing-plans,                 kind: community, source: obra/superpowers,        ref: main, stage: 3,      fallback: "decompose into issues manually" }
+  - { name: using-git-worktrees,           kind: community, source: obra/superpowers,        ref: main, stage: 4,      note: "opt-in — only when isolation is critical; default is a feature branch via feature-start", fallback: "feature-start runs its built-in branch hygiene guards" }
+  - { name: executing-plans,               kind: community, source: obra/superpowers,        ref: main, stage: 4,      fallback: "implement the approved plan task by task" }
+  - { name: test-driven-development,       kind: community, source: obra/superpowers,        ref: main, stage: 5,      fallback: "write tests first per docs/test-strategy.md" }
+  - { name: webapp-testing,                kind: community, source: anthropics/skills,        ref: main, stage: 5,      note: "UI/browser checks only — skip for backend-only projects", fallback: "drive the app manually / Playwright via the runner" }
+  - { name: improve-codebase-architecture, kind: community, source: mattpocock/skills,        ref: main, stage: 0,      fallback: "reverse-engineer context/architecture by reading the code" }
+
+  # --- community (install + vet) — these live in your skills dir; on this machine: ~/.agents/skills ---
+  - { name: to-prd,          kind: community, source: mattpocock/skills, ref: main, stage: 1,  fallback: "write the PRD from docs/prd/TEMPLATE.md" }
+  - { name: grill-me,        kind: community, source: mattpocock/skills, ref: main, stage: 1,  note: "stress-test folded into Spec — harden the PRD before the gate", fallback: "interrogate the PRD's open questions yourself" }
+  - { name: frontend-design, kind: community, source: anthropics/skills, ref: main, stage: 4,  note: "UI work only — skip for backend-only projects", fallback: "build the UI normally" }
+
+  # --- claude-code (native CLI commands; not installable, not portable) ---
+  - { name: init,            kind: claude-code, stage: 0, fallback: "summarize the codebase into docs/context.md + architecture.md" }
+  - { name: run,             kind: claude-code, stage: 5, fallback: "start the app and exercise the change" }
+  - { name: verify,          kind: claude-code, stage: 5, fallback: "manually confirm the change behaves as intended" }
+  - { name: code-review,     kind: claude-code, stage: 6, fallback: "review the diff for bugs by hand" }
+  - { name: simplify,        kind: claude-code, stage: 6, fallback: "clean up the diff by hand" }
+  - { name: security-review, kind: claude-code, stage: 6, note: "mandatory when a sensitive area is touched — not agent-discretion", fallback: "review sensitive-area changes against docs/security.md" }
+
+  # --- companion (optional; NOT part of the pipeline, not gated, no stage) ---
+  # A read-only advisor at the portfolio altitude — good to run standalone AFTER an epic closes.
+  # Recon ingests docs/adr, PRDs, and context.md, so it composes with this kit's docs/. Default
+  # `improve` AUDITS the code (bugs/debt/perf/tests) → self-contained fix plans in plans/; `--issues`
+  # can publish those as tracker issues. `improve next` — treat as INFORMATIONAL: decline its
+  # plan-writing step (it writes design/spike plans only for suggestions you select) and hand the
+  # chosen direction to Stage 1 (brief → PRD → issues) instead. It never edits code, merges, or
+  # pushes. Distinct from improve-codebase-architecture above (the one-time Stage-0 adopt reverse-engineer).
+  - { name: improve, kind: community, source: shadcn/skills, ref: main, stage: none, note: "optional companion — install user-scoped, run after an epic closes. Audit → plans/ (land as dependency-ordered PRs; human merges each, no auto-merge). `improve next`: treat as informational — decline its plan-writing step and hand the chosen direction to Stage 1 (it writes design/spike plans only if you let it)." }

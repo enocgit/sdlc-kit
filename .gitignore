@@ -1,0 +1,27 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Node (if you add tooling to this kit)
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# Env / secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Skill install artifacts — the kit ships skills as SOURCE under skills/.
+.agents/
+.claude/skills/
+skills-lock.json
+
+# Scratch
+*.log
+tmp/
+scratch/

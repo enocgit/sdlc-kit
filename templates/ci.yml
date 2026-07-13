@@ -1,0 +1,57 @@
+# Enforces the mechanical half of the Definition of Done on every PR, so "CI green" is a real
+# gate and not just agent discipline. Adjust the stack/commands to your project.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        # version is optional if package.json has a "packageManager": "pnpm@x.y.z" field;
+        # otherwise pin it here:
+        # with:
+        #   version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm # or npm / yarn
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test --run
+
+      - name: Build
+        run: pnpm build
+
+      # Optional but recommended for this workflow:
+      # - name: Contract check (types generated from the contract are up to date)
+      #   run: pnpm generate && git diff --exit-code
+      # - name: Dependency advisory scan
+      #   run: pnpm audit --audit-level=high
+      # - name: E2E (Playwright — no MCP needed)
+      #   run: pnpm exec playwright test
