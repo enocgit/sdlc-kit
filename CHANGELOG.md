@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-18
+
 ### Added
 - Stage 8 (Retro) closes every retro with a concrete line surfacing the optional `improve`
   companion — scoped to what the epic touched, or `improve next` — plus the next-feature command,
