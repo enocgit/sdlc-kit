@@ -33,10 +33,19 @@
 
 - {thing we are deliberately not doing}
 
-## Learnings (append from retros)
+## Learnings (curated at retros)
 
-<!-- Durable gotchas discovered while building. Dated. Appended at Stage 8 — but **curate**: fold
-     resolved/obsolete learnings into the doc they belong in (ADR, architecture, contract) and
-     delete them here, so this file doesn't grow unbounded (it loads every session). -->
+<!-- Durable gotchas ONLY: things a future agent would get wrong without this line. This file loads
+     every session, so each line is a permanent tax — curation, not a changelog.
 
-- YYYY-MM-DD — {learning}
+     Format: one dated bullet, <=3 lines. Flat list — no per-feature headings or
+     "What shipped / Keep doing / Process" sections (that's a retro report, not context).
+     Budget: 0-3 bullets per retro; writing nothing is normal and common.
+
+     Does NOT go here: what shipped (git/PR has it), why we chose X (ADR), system shape
+     (architecture.md), what's next (the tracker), test approach (test-strategy.md), process meta.
+
+     Prune when you append: delete fixed gotchas, fold covered ones into their ADR/doc, rewrite
+     superseded bullets in place. Keep under ~30 bullets — at the cap, remove one to add one. -->
+
+- YYYY-MM-DD — {the trap, and the rule that avoids it}

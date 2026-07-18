@@ -55,12 +55,12 @@ ADRs and contracts are feature-driven and should emerge as you build, not be gue
   Versioned, diffable, survives tool changes.
 - **GitHub Issues / Projects (default)** — the live *what's happening*: epics, tasks, progress.
 
-The tracker is the single source of truth — there is **no in-repo mirror to sync**; the
-`project-status` skill reports status live from it (read-only). The kit is **GitHub-first,
+The tracker is the single source of truth — there is **no in-repo mirror to sync**;
+`project-status` reports external trackers read-only. The kit is **GitHub-first,
 tracker-adaptable** — a small manual port, not a config toggle: `project-status` assumes `gh`, but
 you can retarget it to Linear/Jira by swapping the tracker commands in three skills — a well-scoped
 job you can hand the agent to port cleanly (see [INSTALL.md §4](./INSTALL.md#4-tool-specific-nuances)),
-or run "local-only" with `docs/progress.md` as the tracker itself (the one mode where that file is used).
+or run "local-only" with `docs/progress.md` as the tracker itself, which `project-status` maintains.
 
 ## The pipeline
 
@@ -73,7 +73,7 @@ or run "local-only" with `docs/progress.md` as the tracker itself (the one mode 
 | 4 | Implement | code on a `feat/*` branch | `feature-start`, `executing-plans` (`frontend-design` for UI work) | ✅ per task |
 | 5 | QA | tests green, app runs, CI green | `test-driven-development`, `run` / `verify` (`webapp-testing` for UI) | — |
 | 6 | Review | clean diff (`security-review` if sensitive) | `code-review`, `simplify`, `definition-of-done-review` | inline |
-| 7 | Land & track | PR opened; tracker updated (issue closed) | `project-status` | ✅ human merges |
+| 7 | Land & track | PR opened where hosting supports it. Otherwise, push if a remote exists, run any available CI, and the human merges directly; with no remote, the human merges the local branch. **GitHub:** carries `Closes #N`, issue closes on merge. **Any other tracker / local-only:** no keyword — task → *In review*, completed after the merge | `project-status` | ✅ human merges |
 | 8 | Retro | `context.md` Learnings (+ optional agent memory) | reflect + write (native) | — |
 
 ### Right-size the process (don't run all 9 stages for a typo)
@@ -200,7 +200,7 @@ sdlc/
 ├── skills/
 │   ├── sdlc/                 ← the conductor (routing + gates)
 │   ├── feature-start/        ← custom: open feature branch (worktree if isolation needed) + load context, enter plan mode
-│   ├── project-status/       ← custom: read-only status report from the tracker
+│   ├── project-status/       ← custom: external status report / local tracker maintainer
 │   ├── definition-of-done-review/  ← custom: team DoD reviewer
 │   └── address-review/       ← custom: triage + address external PR review comments (standalone)
 └── templates/                ← everything you copy into a project

@@ -144,6 +144,53 @@ else
   echo "  skip (python3 + pyyaml required for a reformat-proof manifest parse)"
 fi
 
+echo "[8] Stage 7 closing-keyword scoping"
+# `Closes #N` is GitHub-only. Every Stage 7 pipeline row must scope it, or the summaries drift
+# back to implying it works on Linear/Jira/local-only (where it closes an unrelated issue).
+for f in AGENTS.md README.md CHEATSHEET.md skills/sdlc/SKILL.md; do
+  row="$(grep -m1 '^| 7 ' "$KIT/$f" || true)"
+  if [ -z "$row" ]; then
+    fail "$f: no Stage 7 pipeline row found"
+  elif printf '%s' "$row" | grep -q 'Closes #' && ! printf '%s' "$row" | grep -q 'GitHub'; then
+    fail "$f: Stage 7 row mentions 'Closes #' without scoping it to GitHub"
+  else
+    pass "$f: Stage 7 closing keyword scoped"
+  fi
+done
+# The canonical statement must exist for the pointers to resolve.
+grep -q '^## Task completion by tracker' "$KIT/skills/sdlc/SKILL.md" \
+  && pass "canonical 'Task completion by tracker' section present" \
+  || fail "skills/sdlc/SKILL.md: canonical 'Task completion by tracker' section missing"
+
+echo "[9] Stage 7 capability separation"
+for f in AGENTS.md README.md skills/sdlc/SKILL.md; do
+  row="$(grep -m1 '^| 7 ' "$KIT/$f" || true)"
+  if printf '%s' "$row" | grep -Eq 'if a remote exists|iff a remote exists'; then
+    pass "$f: Stage 7 push is conditional on a remote"
+  else
+    fail "$f: Stage 7 must not require a push when no remote exists"
+  fi
+done
+for mode in \
+  '**PR workflow available**' \
+  '**No PR workflow, CI workflow available**' \
+  '**No PR or CI workflow**'; do
+  grep -Fq "$mode" "$KIT/skills/sdlc/SKILL.md" \
+    && pass "skills/sdlc/SKILL.md: documents $mode" \
+    || fail "skills/sdlc/SKILL.md: missing independent landing mode $mode"
+done
+if grep -Fq '`project-status` (reads only)' "$KIT/skills/sdlc/SKILL.md"; then
+  fail "skills/sdlc/SKILL.md: Stage 7 incorrectly makes local-only tracker handling read-only"
+else
+  pass "skills/sdlc/SKILL.md: local-only tracker write is not suppressed"
+fi
+push_prereq="$(grep -m1 'git push.*must work non-interactively' "$KIT/INSTALL.md" || true)"
+if printf '%s' "$push_prereq" | grep -q 'projects with a remote'; then
+  pass "INSTALL.md: non-interactive push prerequisite is conditional on a remote"
+else
+  fail "INSTALL.md: non-interactive push must not be required for no-remote projects"
+fi
+
 echo
 [ "$FAIL" -eq 0 ] && echo "ALL CHECKS PASSED" || echo "SOME CHECKS FAILED"
 exit "$FAIL"

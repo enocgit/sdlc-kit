@@ -3,21 +3,24 @@
 ## Prerequisites
 
 - **`git`** — required (branches, commits; the pipeline is GitHub-Flow based).
-- **`gh` (GitHub CLI), authenticated** — the default tracker path. Issue creation at Decompose,
-  PR opening at Land, and the `project-status` report (Stages 3 & 7) all shell out to `gh` — not to
-  any runtime's built-in GitHub tools, so it must be installed and logged in. Run `gh auth login` with the
-  **`repo`** scope, plus **`project`** if you use GitHub Projects (`gh project item-list` needs it;
-  add later with `gh auth refresh -s project`). Skip only if you run local-only or swap the tracker
-  (see [Tool-specific nuances](#4-tool-specific-nuances)). Not needed for Stage 0–2 planning.
-- **`git push` must work non-interactively** — the agent pushes the branch at Land (Stage 7), in a
-  shell with no interactive prompt. After `gh auth login`, run **`gh auth setup-git`** so git
-  authenticates GitHub over HTTPS with the `gh` token (no SSH key needed). **If your remotes are SSH**
-  (`git@github.com:…`), route this repo over HTTPS — scope it to the project so you're not rewriting
-  SSH globally: `git config --local url."https://github.com/".insteadOf "git@github.com:"` (run from
-  inside the repo; or simply `git remote set-url origin https://github.com/OWNER/REPO.git` for a
-  single remote). Use `--global` only if you deliberately want *every* repo rewritten. (Teams
-  standardizing on SSH instead just need a working ssh-agent in the shell the agent runs in.) Skip
-  this and the push fails.
+- **`gh` (GitHub CLI), authenticated** — required when GitHub provides the tracker or PR workflow.
+  Issue creation at Decompose, PR opening at Land, and external `project-status` reports shell out
+  to `gh` — not to any runtime's built-in GitHub tools. Run `gh auth login` with the **`repo`**
+  scope, plus **`project`** if you use GitHub Projects (`gh project item-list` needs it; add later
+  with `gh auth refresh -s project`). Skip only when neither the tracker nor landing workflow uses
+  GitHub, such as a local-only project with no remote (see
+  [Tool-specific nuances](#4-tool-specific-nuances)). Not needed for Stage 0–2 planning.
+- **For projects with a remote, `git push` must work non-interactively** — the agent pushes the
+  branch at Land (Stage 7) in a shell with no interactive prompt. After `gh auth login`, run
+  **`gh auth setup-git`** so git authenticates GitHub over HTTPS with the `gh` token (no SSH key
+  needed). **If your remotes are SSH** (`git@github.com:…`), route this repo over HTTPS — scope it
+  to the project so you're not rewriting SSH globally:
+  `git config --local url."https://github.com/".insteadOf "git@github.com:"` (run from inside the
+  repo; or use `git remote set-url origin https://github.com/OWNER/REPO.git` for a single remote).
+  Use `--global` only if you deliberately want *every* repo rewritten. Teams standardizing on SSH
+  instead just need a working ssh-agent in the shell the agent runs in. Without this setup, a
+  remote-backed push fails. A project with no remote skips this prerequisite; at Land, the human
+  merges the local feature branch directly.
 - **An agent that loads `SKILL.md` files** (Claude Code, Codex, Cursor, etc.) with shell access.
 
 ## 1. Copy the substrate into your project
@@ -138,9 +141,10 @@ Recommended:
   rules dir). Put the `skills/` contents where _your_ agent loads `SKILL.md` files.
 - **`AGENTS.md` support varies.** If your tool doesn't read it natively, keep the one-line
   `CLAUDE.md`/`.cursorrules` pointer so the manual is still discovered.
-- **Tracker is swappable (GitHub-first).** The tracker is the single source of truth — there is
-  **no in-repo mirror**; `project-status` only *reads* it (via `gh`) to report status. Retargeting
-  to **Linear/Jira** is a *small manual port, not a config toggle* — the coupling is deliberately
+- **Tracker is swappable (GitHub-first).** The tracker is the single source of truth. Against an
+  external tracker there is **no in-repo mirror** and `project-status` only reads it; in local-only
+  mode, `docs/progress.md` is the tracker and `project-status` maintains it. Retargeting to
+  **Linear/Jira** is a *small manual port, not a config toggle* — the coupling is deliberately
   shallow (three skills + a couple of conventions), and the skill *logic* is tracker-agnostic, so
   you swap commands, not reasoning. **This is a good job to hand the agent:** point it at the
   touchpoints below and ask it to port them to your tracker's CLI/API cleanly — the shallow,
@@ -153,14 +157,16 @@ Recommended:
     fetch line changes; the Now/Next/Blocked grouping stays.
   - **Auto-close on merge (Stage 7)** — the `Closes #N` convention in PRs/commits. This is the
     fiddly one: GitHub closes natively, but Linear/Jira do it through *their* Git integration keyed
-    on the issue ID (`ENG-123`, `PROJ-45`) or explicit close at Land — not a 1:1 command swap.
+    on the issue ID (`ENG-123`, `PROJ-45`) — not a 1:1 command swap. With no such integration,
+    close the task **after the human confirms the merge** (the conductor's post-merge step), never
+    at Land — an abandoned or rejected PR must not leave the tracker reading done.
   - **Issue shape & branch names** — `.github/ISSUE_TEMPLATE/{epic,task}.md` and `feat/{issue#}-{slug}`
     → the tracker's native issue types/templates and its key (`feat/ENG-123-slug`, which also drives
     the auto-link above).
   - **Auth** — swap the `gh auth` prerequisite for that tracker's CLI auth / API token.
 
-  For **solo/offline**, run "local-only": keep `docs/progress.md` as the tracker itself
-  (hand-maintained) — otherwise **delete `docs/progress.md`**, since the tracker holds task status.
+  For **solo/offline**, run "local-only": keep `docs/progress.md` as the tracker itself — otherwise
+  **delete `docs/progress.md`**, since the external tracker holds task status.
 - **CI enforces the mechanical DoD.** Copy `templates/ci.yml` → `.github/workflows/ci.yml` and
   adjust commands to your stack. "CI green" is then a real Stage-5 (QA) check, not just agent discipline.
 - **E2E / Playwright (Stage 5 — QA):** agents run the suite directly via the test runner

@@ -2,7 +2,11 @@
 
 ## What & why
 
-<!-- One or two lines. Link the PRD and the issue. -->
+<!-- One or two lines. Link the PRD and the task.
+     `Closes #N` is GitHub-only. On ANY other tracker (Linear/Jira) or in local-only mode, DELETE
+     the line below: that id isn't a GitHub issue, so it either fails to close the real task or
+     closes an unrelated repo issue of that number. Reference the task by its own key/row instead
+     and close it after the merge. -->
 Closes #
 
 - PRD: `docs/prd/...`
@@ -24,7 +28,7 @@ Closes #
 - [ ] Tests at the right layer; suite green
 - [ ] App run / change observed working
 - [ ] CI green (lint, typecheck, test, build)
-- [ ] DB changes follow expand/contract (or N/A)
+- [ ] DB changes follow expand/contract — N/A if no real data and nothing deployed reads/writes it
 - [ ] Docs updated (`architecture.md` / ADR) as needed
 
 ## Security
