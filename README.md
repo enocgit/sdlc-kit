@@ -115,8 +115,8 @@ It self-locates the kit and takes the target as an argument, so either invocatio
 /path/to/sdlc/install.sh
 
 # preview without writing:        ./install.sh --dry-run /path/to/your/project
-# skills go to {project}/.claude/skills by default; override with:
-# SKILLS_DIR=/path/to/your/project/.agent/skills ./install.sh /path/to/your/project
+# skills go to {project}/.agents/skills by default; for Claude Code, override with:
+# SKILLS_DIR=/path/to/your/project/.claude/skills ./install.sh /path/to/your/project
 ```
 
 **Option B — manual.** Copy into your project:
@@ -128,7 +128,7 @@ It self-locates the kit and takes the target as an argument, so either invocatio
 | `templates/docs/` | `docs/` |
 | `templates/ci.yml` | `.github/workflows/ci.yml` |
 | `templates/github/` | `.github/` (PR + epic/task issue templates) |
-| `skills/` | your agent's skills dir (`.claude/skills/`, `.agent/skills/`, …) |
+| `skills/` | your agent's skills dir (`.agents/skills/` by default; `.claude/skills/` alternative) |
 
 Then install the community skills ([`INSTALL.md`](./INSTALL.md)) and invoke the **conductor**:
 ask the agent to "start the sdlc" (or `/sdlc`). It reads `AGENTS.md`, figures out the current

@@ -233,8 +233,10 @@ section under ~30 bullets — at the cap, earn each new line by removing one.
 exists.** Whether or not a learning qualified, end Stage 8 with one concrete line naming the
 options, so the choice is the human's, not a guess:
 
-> Epic done. Optional: `improve`, scoped to what epic #{N} touched (audit what just shipped), or
-> `improve next` (surface direction) — or start the next feature with `/sdlc {feature}`.
+> Epic done. Optional:
+> 1. `improve`, scoped to what epic #{N} touched, to audit what just shipped.
+> 2. `improve next` to surface direction.
+> 3. Start the next feature with `sdlc {feature}`.
 
 This is disclosure, not a gate. `improve` is an optional third-party companion skill (see
 `required-skills.yml`) — never required, never auto-run; naming it here just removes the guesswork.

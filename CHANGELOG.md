@@ -6,6 +6,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-20
+
+### Changed
+- Kit skills now install to `.agents/skills` by default; `.claude/skills` remains available via
+  the `SKILLS_DIR` override for runtimes that use it.
+- The Stage 8 completion prompt presents its follow-up choices as a numbered list and uses the
+  runtime-neutral `sdlc {feature}` form.
+
 ## [0.2.0] - 2026-07-18
 
 ### Added

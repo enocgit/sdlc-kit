@@ -34,8 +34,8 @@ The fastest path is `./install.sh /path/to/your/project` (merge-aware, never ove
 - `templates/docs/` → project `docs/`
 - `templates/ci.yml` → `.github/workflows/ci.yml`
 - `templates/github/` → `.github/` (PR + issue templates aligned to the pipeline)
-- `skills/` → your agent's skills directory (e.g. `.claude/skills/`, `.agent/skills/`, or
-  wherever your runtime loads `SKILL.md` files)
+- `skills/` → your agent's skills directory (`.agents/skills/` by default; `.claude/skills/` or
+  wherever your runtime loads `SKILL.md` files as an alternative)
 
 Add a one-line `CLAUDE.md` (and `.cursorrules` if you use Cursor) at the project root:
 
@@ -43,14 +43,13 @@ Add a one-line `CLAUDE.md` (and `.cursorrules` if you use Cursor) at the project
 See AGENTS.md for how we work on this project.
 ```
 
-> **Where skills land.** The installer copies kit skills as **real directories** into `.claude/skills`
-> (override with `SKILLS_DIR=...`). Real copies are portable and can't break. If you'd rather keep a
-> single tool-agnostic source — e.g. alongside community skills the `skills` CLI installs into
-> `.agents/skills` — point `SKILLS_DIR` at `.agents/skills` and symlink `.claude/skills → ../.agents/skills`
-> yourself; the installer writes transparently through an existing symlink. **Caveat:** a symlink
-> **dangles silently** if you ever delete its target (`.agents/skills`), and committed symlinks don't
-> survive Windows-without-dev-mode, some CI checkouts, or Docker bind mounts — so the robust default is
-> real copies.
+> **Where skills land.** The installer copies kit skills as **real directories** into `.agents/skills`
+> (override with `SKILLS_DIR=...`). For example, use `SKILLS_DIR=.claude/skills` when Claude Code
+> should own the project-local copies. Real copies are portable and can't break. To keep the default
+> tool-agnostic source while supporting a runtime that only discovers `.claude/skills`, you can
+> symlink `.claude/skills → ../.agents/skills` yourself. **Caveat:** a symlink dangles silently if you
+> delete its target, and committed symlinks don't survive Windows-without-dev-mode, some CI checkouts,
+> or Docker bind mounts — so real copies remain the robust option.
 
 ## 2. Install community skills (portable SKILL.md, via skills.sh)
 
@@ -137,8 +136,8 @@ Recommended:
 
 ## 4. Tool-specific nuances
 
-- **Skills directory** differs per runtime (e.g. `.claude/skills/`, `.agent/skills/`, Cursor's
-  rules dir). Put the `skills/` contents where _your_ agent loads `SKILL.md` files.
+- **Skills directory** differs per runtime. The installer defaults to `.agents/skills/`; override
+  with `SKILLS_DIR=.claude/skills` or another path when your runtime loads `SKILL.md` elsewhere.
 - **`AGENTS.md` support varies.** If your tool doesn't read it natively, keep the one-line
   `CLAUDE.md`/`.cursorrules` pointer so the manual is still discovered.
 - **Tracker is swappable (GitHub-first).** The tracker is the single source of truth. Against an

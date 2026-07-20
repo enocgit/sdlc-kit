@@ -7,9 +7,9 @@
 # required-skills.yml parses, and every `kind: local` manifest path exists.
 set -uo pipefail
 
-# The kit's install target-skills go to .claude/skills by default; if the maintainer exports
+# The kit's install target-skills go to .agents/skills by default; if the maintainer exports
 # SKILLS_DIR, every install.sh invocation below would inherit it — writing kit skills outside the
-# mktemp sandbox (never cleaned) and then failing the .claude/skills expectations on a healthy kit.
+# mktemp sandbox (never cleaned) and then failing the .agents/skills expectations on a healthy kit.
 # The validator owns its own expectations, so it always tests the default layout.
 unset SKILLS_DIR
 
@@ -46,7 +46,7 @@ if bash "$KIT/install.sh" "$TMP" >/dev/null 2>&1; then
   done < <(find "$KIT/templates/github" -type f -print0)
   # every kit skill must land in the skills dir
   for d in "$KIT"/skills/*/; do
-    check_installed ".claude/skills/$(basename "$d")/SKILL.md"
+    check_installed ".agents/skills/$(basename "$d")/SKILL.md"
   done
   [ "$MISS" -eq 0 ] && pass "all kit templates + skills landed ($(find "$TMP" -type f | wc -l) files)"
 else

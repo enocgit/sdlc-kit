@@ -4,7 +4,7 @@
 # does not block missing files inside it from being added.
 #
 # Usage:   ./install.sh [--dry-run] [TARGET_DIR]      (TARGET_DIR default: current directory)
-# Env:     SKILLS_DIR=path   where custom skills go (default: TARGET/.claude/skills)
+# Env:     SKILLS_DIR=path   where custom skills go (default: TARGET/.agents/skills)
 set -euo pipefail
 
 KIT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -53,10 +53,10 @@ else
   TARGET="$(normalize_path "$TARGET_ARG")"
 fi
 
-# Skills default to .claude/skills; a RELATIVE SKILLS_DIR override is resolved against the TARGET
-# project, not the installer's CWD, so `SKILLS_DIR=.agents/skills` lands inside the project (not in
+# Skills default to .agents/skills; a RELATIVE SKILLS_DIR override is resolved against the TARGET
+# project, not the installer's CWD, so `SKILLS_DIR=.claude/skills` lands inside the project (not in
 # the kit checkout) — see INSTALL.md.
-SKILLS_DIR="${SKILLS_DIR:-$TARGET/.claude/skills}"
+SKILLS_DIR="${SKILLS_DIR:-$TARGET/.agents/skills}"
 case "$SKILLS_DIR" in
   /*) ;;
   *)  SKILLS_DIR="$TARGET/$SKILLS_DIR" ;;
