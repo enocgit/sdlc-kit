@@ -1,34 +1,24 @@
 # Contributing to sdlc
 
-Thanks for helping improve this workflow kit. It's a set of portable markdown templates and
-`SKILL.md` files — no build step.
+Thanks for helping improve this workflow kit. This repository contains portable Markdown templates and `SKILL.md` files. It has no build step.
 
-## What this repo is (and isn't)
+## Rules
 
-- **Is:** a tool-agnostic, plan-gated pipeline (templates + skills + docs) teams drop into their
-  projects.
-- **Isn't:** a runtime or framework. Keep everything portable — plain markdown, no lock-in to a
-  specific agent.
+- Keep the kit runtime-neutral. Agent-specific shortcuts must remain optional and have a manual
+  fallback.
+- Keep `skills/sdlc/SKILL.md` focused on routing and gates; put stage detail in its skill or
+  template.
+- Use `{placeholder}`, not `<placeholder>`, because angle brackets break Markdown previews. Keep
+  comments in `<!-- ... -->`.
+- Strengthen existing stages before adding one. Preserve the right-sized paths for fixes and
+  chores.
+- Optionally use `skill-creator` for substantial skill changes. Regardless of tooling, validate
+  frontmatter, match each skill's `name` to its directory, and give it a clear trigger description.
 
-## Ground rules
+## Pull requests
 
-- **Stay tool-agnostic.** No hard dependency on one agent runtime. Agent-specific accelerators
-  are fine only as *optional* conveniences with a documented manual fallback.
-- **Keep the conductor lean.** Stage detail belongs in the referenced skills/templates, not in
-  `skills/sdlc/SKILL.md`.
-- **Templates render cleanly.** Use `{placeholder}` (not `<placeholder>` — that's parsed as HTML
-  and breaks markdown preview). Keep comments as `<!-- ... -->`.
-- **Don't add stages lightly.** Nine (0–8) is already a lot; prefer strengthening an existing stage.
-  Every addition must respect the right-sizing/fast-path principle.
-
-## Editing skills
-
-Use `skill-creator` to scaffold/validate `SKILL.md` frontmatter. Each skill's `name` must match
-its directory; keep `description` specific and trigger-rich (it drives auto-activation).
-
-## PRs
-
-- One focused change per PR; reference the issue.
-- Update `CHANGELOG.md` (Unreleased section).
-- If you change the pipeline, update **all** of: `README.md`, `AGENTS.md`, the conductor skill,
-  and `EXAMPLE.md` so stage numbers stay consistent.
+1. Keep the change focused and reference its issue.
+2. Update the `Unreleased` section of `CHANGELOG.md`.
+3. When pipeline behavior changes, update `README.md`, `AGENTS.md`, `skills/sdlc/SKILL.md`, and
+   `EXAMPLE.md` together.
+4. Run `./scripts/validate-kit.sh`.

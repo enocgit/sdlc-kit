@@ -191,6 +191,24 @@ else
   fail "INSTALL.md: non-interactive push must not be required for no-remote projects"
 fi
 
+echo "[10] onboarding documentation boundaries"
+grep -Fq '**Gate:** context filled.' "$KIT/EXAMPLE.md" \
+  && pass "EXAMPLE.md: Stage 0a context gate preserved" \
+  || fail "EXAMPLE.md: Stage 0a must stop at the context-filled gate before foundation"
+if grep -Fq 'Install only the **community** rows with `npx skills add`.' "$KIT/INSTALL.md" \
+  && grep -Fq 'For **runtime-native** rows' "$KIT/INSTALL.md"; then
+  pass "INSTALL.md: registry and runtime-native skills distinguished"
+else
+  fail "INSTALL.md: registry installation must be limited to community skills"
+fi
+for f in skills/sdlc/SKILL.md INSTALL.md CHEATSHEET.md; do
+  if grep -Fq 'sdlc {chosen direction}' "$KIT/$f"; then
+    pass "$f: improve-next handoff returns through sdlc"
+  else
+    fail "$f: improve next must return the chosen direction through sdlc"
+  fi
+done
+
 echo
 [ "$FAIL" -eq 0 ] && echo "ALL CHECKS PASSED" || echo "SOME CHECKS FAILED"
 exit "$FAIL"

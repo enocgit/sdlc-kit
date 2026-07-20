@@ -235,13 +235,16 @@ options, so the choice is the human's, not a guess:
 
 > Epic done. Optional:
 > 1. `improve`, scoped to what epic #{N} touched, to audit what just shipped.
-> 2. `improve next` to surface direction.
+> 2. `improve next` to surface directions only; after choosing one, decline its planning step and
+>    start `sdlc {chosen direction}`.
 > 3. Start the next feature with `sdlc {feature}`.
 
 This is disclosure, not a gate. `improve` is an optional third-party companion skill (see
 `required-skills.yml`) — never required, never auto-run; naming it here just removes the guesswork.
 State the scope in prose, as above: `next` is a real invocation variant, but there is **no
 epic/issue flag** — don't advertise one, or you promise scoping the skill won't honor.
+When a chosen direction returns to `sdlc`, route it through Stage 1; never accept an `improve`
+design or spike plan as a substitute for this pipeline's PRD path.
 
 ## Rules
 

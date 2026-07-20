@@ -6,6 +6,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-07-20
+
+### Changed
+- Simplified the first-time-user guides so README, installation, walkthrough, cheatsheet, and
+  contribution content each have a distinct purpose with less duplication.
+- Clarified that `skill-creator` is optional and that projects may freeze contracts in OpenAPI,
+  tRPC, ts-rest, schemas, or other project-specific interface definitions.
+- Made the `improve next` handoff explicit: use it for direction discovery only, decline its
+  planning step, then start `sdlc {chosen direction}` so the feature enters Stage 1.
+
+### Fixed
+- Restored the separate Stage 0a context-filled gate in the walkthrough.
+- Limited registry installation instructions to community skills; runtime-native capabilities use
+  the agent's equivalent or the fallback in `required-skills.yml`.
+- Added validation checks for the Stage 0a gate, skill-installation boundary, and `improve next`
+  handoff.
+
 ## [0.3.0] - 2026-07-20
 
 ### Changed

@@ -1,101 +1,73 @@
-# SDLC pipeline — team cheatsheet
+# SDLC cheatsheet
 
-A one-page field guide to how we build. Not the install steps — the pieces to keep in your head
-while working. Depth lives in `AGENTS.md`; the conductor (`sdlc` skill) drives it.
+Use this during a run. `AGENTS.md` holds the full rules; the `sdlc` skill drives the stages.
 
-## The pipeline (0 → 8)
+## Pipeline
 
-| # | Stage | You produce | Gate? |
-|---|-------|-------------|-------|
-| 0 | **Context + Foundation** | filled `docs/context.md`; product PRD + foundational ADRs + architecture skeleton + core contract | ✅ approve foundation |
-| 1 | **Spec** | brief → hardened PRD in `docs/prd/` (no issues yet) | ✅ approve PRD |
-| 2 | **Architecture + Contract** | ADR(s), updated `architecture.md`, `security.md`, **frozen** contract | ✅ approve + freeze |
-| 3 | **Decompose** | tracker issues (GitHub by default; tracker is the record) | disclose |
-| 4 | **Implement** | code on a `feat/*` branch, one task at a time | ✅ plan per task |
-| 5 | **QA** | tests green, app runs, CI green | — |
-| 6 | **Review** | clean diff, findings fixed | inline (security-review if sensitive) |
-| 7 | **Land** | PR if supported; otherwise push iff a remote exists, run CI if available, and the human merges directly. **GitHub:** PR carries `Closes #N`, closes on merge. **Other trackers / local-only:** no `#N` keyword — task → *In review*, then closed/*Done* after the merge | ✅ **human merges** |
-| 8 | **Retro** | learnings appended to `context.md` | — |
+| # | Stage | Output | Gate |
+|---|-------|--------|------|
+| 0 | Context + Foundation | context, product PRD, foundational ADRs, architecture, core contract | approve foundation |
+| 1 | Spec | optional brief, hardened PRD; no issues yet | approve PRD |
+| 2 | Architecture + Contract | ADRs, architecture/security updates, frozen contract | approve and freeze |
+| 3 | Decompose | tracker issues | disclose |
+| 4 | Implement | one task on a `feat/*` branch | approve task plan |
+| 5 | QA | tests, running app, CI | - |
+| 6 | Review | clean diff; security review when required | inline |
+| 7 | Land | PR if supported; otherwise push if a remote exists, run available CI, and merge directly. **GitHub:** `Closes #N`. **Other trackers/local-only:** no keyword; complete after merge | **human merges** |
+| 8 | Retro | up to three durable context learnings | - |
 
-## The 5 hard gates — STOP and get a human "yes"
+Five hard gates: foundation, PRD, architecture and contract, each task plan, and merge. Stop for a
+human “yes” at each gate. At other stages, do the work, disclose decisions, and continue.
 
-Foundation · Spec (PRD) · Architecture+Contract · per-task Implement plan · **merge**.
-Everything else is **proceed-with-disclosure**: do the work, say what you did + any call worth
-overriding, keep moving. Never skip a ✅ to save time. Merge is *always* the human's call.
+## Choose the path
 
-## Right-size the path — don't run all 9 for everything
+- **Feature, user-facing, or risky:** full pipeline, 0–8.
+- **Bug fix or small enhancement:** Implement → QA → Review.
+- **Chore, docs, or dependency update:** Implement → Review.
+- Use the full pipeline when a change affects a contract, sensitive area, or decision.
 
-- **Feature / user-facing / risky** → full pipeline `0 → 8`.
-- **Bug fix / small enhancement** → `4 Implement → 5 QA → 6 Review` (reference an issue).
-- **Chore / docs / dep bump** → `4 → 6`, trivial diff, CI green.
-- Graduates to full path the moment it touches a **contract**, a **sensitive area**, or makes a
-  **decision**. When unsure, ask.
+## Core rules
 
-## Two altitudes — don't conflate them
+- **Foundation versus feature:** establish only the project-wide PRD, ADRs, architecture, and core
+  contract at Stage 0. Let feature artifacts emerge per feature.
+- **Contract first:** define and freeze the interface before implementation. Generate shared types.
+  Changing a shipped contract requires a versioning or deprecation ADR.
+- **Sensitive areas:** authentication, authorization, payments, PII/KYC, uploads, and privileged
+  surfaces require a Stage 2 threat model and Stage 6 `security-review`.
+- **Ask instead of guessing:** stop on ambiguous PRDs, ADRs, and contracts.
 
-- **Foundation (project-level, set once at Stage 0):** product PRD, cross-cutting ADRs
-  (stack/repo/auth/datastore/API style), architecture skeleton, core contract. Lock only what a
-  first feature can't start without.
-- **Feature-level (per feature, Stages 1–8):** brief, feature PRD, feature ADR(s), a contract *slice*.
-- Don't design every feature up front — let the rest emerge as you build.
+## Ready and done
 
-## Contract-first — the rule that keeps FE/BE in sync
+**Ready:** testable acceptance criteria, frozen contract, no open questions, and about one day of
+work.
 
-1. Define/extend the contract **before** implementing (Stage 2).
-2. **Freeze** it at the gate → FE and BE build against it in parallel.
-3. **Generate** types from it; never hand-duplicate on each side.
-4. Changing a **shipped** contract = a decision → new ADR (versioning/deprecation). No silent breaks.
+**Done:** acceptance criteria met; contract honored; expand/contract used once real data or deployed
+readers/writers exist; tests and app verified; available CI green; reviews clean; focused diff;
+architecture, ADRs, and tracker current. Unreachable CI blocks. Tracker closure happens after merge.
 
-## Sensitive areas → threat-model + security-review are mandatory
+## Git
 
-The canonical list lives in **`AGENTS.md` → Sensitive areas**. Any change touching one gets a
-threat-model pass at Stage 2 (`docs/security.md`) AND a `security-review` at Stage 6 before merge.
-Not agent-discretion — mandatory.
+- Keep `main` deployable. Use short-lived `feat/{id}-{slug}` or `fix/*` branches.
+- Use `type(scope): summary` Conventional Commits, imperative and at most 72 characters.
+- Reference GitHub issues with `Refs #N` or `Closes #N`; use native keys for other trackers and no
+  issue syntax for local-only IDs.
+- Commit approved Stage 0–2 artifacts to `main` before branching. If `main` is protected, merge a
+  `plan/*` PR first.
+- Keep commits and PRs focused. The human always merges.
 
-## Definition of Ready (before Implement)
+## Artifact map
 
-Acceptance criteria written & testable · contract frozen · no open questions · task ships in ~a day.
+| Artifact | Location |
+|----------|----------|
+| Domain and durable learnings | `docs/context.md` |
+| Product and feature PRDs | `docs/prd/` |
+| Decisions | `docs/adr/` |
+| Current system shape | `docs/architecture.md` |
+| Integration truth | contract source named in `docs/contracts/README.md` |
+| Threat model | `docs/security.md` |
+| Test policy | `docs/test-strategy.md` |
+| Task status | external tracker, or `docs/progress.md` in local-only mode |
 
-## Definition of Done (every task)
-
-Meets AC · implements the frozen contract · expand/contract migrations (once the table holds real
-data or any deployed process reads or writes it) · tests green at the right layer · app observed ·
-**CI green** (N/A only where no CI workflow exists — unreachable CI blocks, not exempts) ·
-`code-review` + `simplify` clean (+ `security-review` if sensitive) ·
-docs updated (`architecture.md` / ADR) · issue links the PR, closes on merge (local-only:
-`progress.md`).
-
-## Git & commits
-
-- **GitHub Flow:** `main` always deployable. Short-lived `feat/{issue#}-{slug}` → PR → merge → deploy.
-  Environments are deploy targets, not long-lived branches. **Default to a branch** (worktree only
-  when isolation is genuinely critical).
-- **Conventional Commits:** `type(scope): summary` (imperative, ≤72 chars). Types: `feat` `fix`
-  `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the issue (`Refs #123` /
-  `Closes #123`) — GitHub only; another tracker uses its key, and local-only ids aren't issues.
-- Small logical commits, not one blob. PRs small & reviewable, one feature per branch, squash-merge.
-- **Where planning commits land:** Stage 0–2 docs (PRD, ADRs, frozen contract) are
-  gated decisions → commit to **`main`** at their gate. Cut `feat/*` from a clean `main` that already
-  holds the frozen contract (so FE/BE build against it in parallel); only *code* lives on the branch.
-  PR-protected `main`? Use a `plan/*` branch → PR → merge, then branch `feat/*`.
-
-## Where things live
-
-`docs/context.md` (domain) · `docs/prd/0000-product.md` (product) · `docs/prd/NNNN-*` (features) ·
-`docs/adr/NNNN-*` (decisions) · `docs/architecture.md` (current shape) · `docs/contracts/` (integration
-truth) · `docs/security.md` · `docs/test-strategy.md`. Task status → your tracker (no in-repo mirror).
-
-## Beyond the pipeline (optional)
-
-After an **epic closes**, the `improve` companion skill (read-only, standalone, not gated) surveys
-what you built. **Audit** (default) writes *fix* plans to `plans/` (bugs/debt/perf/tests; ephemeral —
-gitignore or delete after); land them as **dependency-ordered PRs — human still merges each**.
-**`improve next`** → treat as **informational**: decline its plan-writing step and hand the chosen
-direction to **Stage 1** (it writes design/spike plans only if you let it). Never merges. A companion
-to the pipeline, not part of it.
-
-## Reflexes
-
-- Ambiguous PRD/ADR → **stop and ask**, don't guess.
-- Keep the relevant doc (`architecture.md` / ADR) current as you go; task status lives in the tracker.
-- Watch the conductor's status header — `SDLC ▸ Stage {N}/8 {Name} · {next gate}` — to know where you are.
+After an epic, optionally run `improve` for an audit or `improve next` for future directions. After
+choosing a direction, decline its planning step and start `sdlc {chosen direction}`. `improve` is
+read-only, outside the pipeline, and never replaces Stage 1.

@@ -1,82 +1,88 @@
-# Walkthroughs
+# Workflow example
 
-Two runs of the same pipeline: a new project and an existing one. The only difference is the
-on-ramp (Stage 0).
+This walkthrough follows a new project through the full pipeline, then shows how adoption differs
+for an existing codebase.
 
----
+## New project: TenantPay
 
-## A. New project (greenfield) — "TenantPay"
+The idea: let tenants pay rent online through verified property listings.
 
-**Stage 0a — Context (bootstrap).** Agent scaffolds `AGENTS.md` and fills `docs/context.md`
-(domain: landlords, tenants, online rent payments, identity verification (KYC); glossary; constraints). No code yet.
-→ gate: context filled (STATUS marker removed).
+### 0a. Context
 
-**Stage 0b — Foundation.** Agent writes the **project-level** artifacts: `docs/prd/0000-product.md`
-(vision: in-app rent payments + verified listings), the foundational ADRs (`0002-stack`,
-`0003-postgres-datastore`, `0004-cookie-auth`, `0005-rest-openapi`) in `docs/adr/`, a skeleton
-`docs/architecture.md` (React web + Node API + Postgres), and a core `api/openapi.yaml` scaffold
-(with `docs/contracts/README.md` trimmed to the real paths). → **GATE: approve foundation.**
-(Per-feature ADRs/contracts come later, not here.)
+The agent fills `docs/context.md` with users, domain terms, and constraints. No feature code exists
+yet.
 
-**Stage 1 — Spec.** Discovery → PRD → stress-test, in one movement:
+**Gate:** context filled. The agent waits before starting foundation work.
 
-- `brainstorming` (**method only**): you say "tenants should pay rent online"; the agent
-  explores **one question at a time** and lands a brief at `docs/briefs/0001-rent-payment.md`
-  (problem, users, success metric: ≥80% of rent paid in-app within 2 months). Discovery is
-  exploratory — **no code**, and it does **not** jump to `writing-plans`.
-- `to-prd`: brief → `docs/prd/0001-rent-payment.md`.
-- `grill-me`: hardens it — partial payments? failed payment callback? refunds?
+### 0b. Foundation
 
-→ **GATE: approve PRD.** (No GitHub issues yet — those come at Decompose.)
+The agent creates the project PRD, foundational ADRs, architecture skeleton, and core contract.
 
-**Stage 2 — Architecture + Contract.** `docs/adr/0006-payment-provider-abstraction.md` ("wrap
-providers behind one interface; why vs. direct integration"); `architecture.md` gains a payments
-component; `docs/security.md` gets a threat model (payments + PII). The contract `api/openapi.yaml`
-gains `POST /payments`, `GET /payments/:id`, and webhook `POST /payments/callback`; Zod schemas
-generate TS types. → **GATE: approve approach + freeze interface.** Now FE and BE build in parallel.
+**Gate:** approve the foundation.
 
-**Stage 3 — Decompose.** `writing-plans`: PRD → 6 **GitHub issues** (the tracker is the record —
-no in-repo mirror). `project-status` reports the breakdown; agent discloses it and continues (no gate).
+### 1. Spec
 
-**Stage 4 — Implement.** `feature-start` opens the branch `feat/3-payment-intent`, loads the
-PRD/ADR/contract, enters plan mode. → **GATE per task.** Code written against the frozen contract;
-`frontend-design` for the pay screen.
+The user starts with “tenants should pay rent online.” `brainstorming` resolves one question at a
+time and records an optional brief. `to-prd` turns it into `docs/prd/0001-rent-payment.md`.
+`grill-me` resolves cases such as partial payments, failed callbacks, and refunds.
 
-**Stage 5 — QA** (`test-driven-development`, `webapp-testing`, `run`/`verify`). Tests green and CI
-green; agent runs the app and completes a sandbox payment.
+**Gate:** approve the feature PRD. No tracker issues exist yet.
 
-**Stage 6 — Review.** Inline, no separate gate: `code-review` + `simplify`, and — because this
-touches payments + PII — `security-review` (**mandatory** for sensitive areas). Findings fixed.
+### 2. Architecture and contract
 
-**Stage 7 — Land.** Agent opens the PR referencing the issue (`Closes #N`); merging closes it on
-the tracker — no in-repo mirror to update.
-→ **GATE: you merge.** Merge is always the human's call.
+The agent records the payment-provider decision in an ADR, adds the payment component to
+`docs/architecture.md`, and threat-models payments and PII in `docs/security.md`. For TenantPay, it
+defines payment and webhook endpoints in `api/openapi.yaml` and generates shared types. Other
+projects freeze their actual contract source, such as tRPC routers, ts-rest contracts, schemas, or
+interface definitions.
 
-**Stage 8 — Retro.** Learnings ("payment callbacks can arrive twice — make handlers
-idempotent") appended to `docs/context.md` (and, optionally, agent memory).
+**Gate:** approve the approach and freeze the interface. Frontend and backend can now work against
+the same contract.
 
----
+### 3. Decompose
 
-## B. Existing project — adopting the workflow
+`writing-plans` converts the PRD into tracker issues. `project-status` reports the breakdown. The
+agent discloses it and continues without waiting.
 
-**Stage 0 — adopt** (`improve-codebase-architecture`). Agent reverse-engineers `docs/context.md`
-and `docs/architecture.md` *from the code*, and backfills a few lightweight ADRs for decisions
-already baked in (e.g. `0002-monorepo-with-pnpm.md`, status: Accepted, "recorded retroactively").
-Adds `AGENTS.md` and points `docs/contracts/README.md` at the contract source that already exists.
-**No behavior change** — this is documentation only. → review & approve.
+### 4. Implement
 
-**Stages 1–8 — identical.** The next feature enters at Spec and flows through the same gates.
-Existing code just means Stage 2 *amends* `architecture.md` and *extends* an existing contract
-instead of starting one (changing a shipped contract endpoint triggers a versioning ADR).
+`feature-start` creates `feat/3-payment-intent` and loads the relevant PRD, ADR, and contract.
 
----
+**Gate:** approve the task plan. The agent implements against the frozen contract.
 
-## What the gates feel like
+### 5. QA
 
-At each ✅ the agent stops and says, e.g.: *"PRD ready at `docs/prd/0001-rent-payment.md`,
-open questions resolved. Approve to proceed to architecture + contract, or tell me what to
-change."* Nothing downstream happens until you respond.
+The agent runs tests, starts the app, completes a sandbox payment, and confirms CI is green.
 
-Between gates — Decompose, QA, Review — the agent **proceeds and discloses**: it does the work,
-tells you what it did and any decision you might want to override, and keeps moving. You can
-interrupt at any time; it doesn't wait.
+### 6. Review
+
+`code-review` and `simplify` inspect the diff. Because the feature touches payments and PII, the
+agent also runs `security-review` and fixes its findings.
+
+### 7. Land
+
+The agent opens a GitHub PR with `Closes #N`. The issue remains open while the PR is under review.
+
+**Gate:** the human merges. GitHub then closes the issue.
+
+### 8. Retro
+
+The agent prunes stale context and adds up to three durable learnings, such as “payment callbacks
+may arrive twice; handlers must be idempotent.” It then offers the optional `improve` audit,
+`improve next`, or the next `sdlc {feature}` run.
+
+## Existing project
+
+The `adopt` path changes only Stage 0. The agent reads the code and reconstructs
+`docs/context.md`, `docs/architecture.md`, contract pointers, and a few retrospective ADRs. This
+step documents existing behavior; it does not change it.
+
+After foundation approval, the next feature follows Stages 1–8 above. Architecture and contracts
+are extended instead of created. Changing a shipped contract requires a versioning or deprecation
+ADR.
+
+## Gate behavior
+
+At each gate, the agent names the completed artifact and asks for approval. It does nothing
+downstream until the human responds. At non-gate stages, it performs the work, reports decisions
+worth overriding, and continues. The human can interrupt at any time and always controls merge.
