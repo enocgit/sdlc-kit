@@ -113,7 +113,7 @@ behavior.
 |------|---------|
 | `AGENTS.md` | canonical workflow rules copied into projects |
 | `install.sh` | merge-aware installer with `--dry-run` |
-| `skills/` | conductor and local workflow skills |
+| `skills/` | conductor, local workflow skills, and standalone `address-review` |
 | `templates/docs/` | context, PRD, ADR, architecture, security, contract, test, and runbook templates |
 | `templates/github/` | issue and pull-request templates |
 | `templates/ci.yml` | starter CI workflow |

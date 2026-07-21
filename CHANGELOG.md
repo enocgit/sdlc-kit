@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+### Changed
+- Surfaced the standalone `address-review` skill in README and the team cheatsheet.
+
 ## [0.3.2] - 2026-07-21
 
 ### Changed

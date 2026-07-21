@@ -223,6 +223,11 @@ for f in skills/sdlc/SKILL.md INSTALL.md CHEATSHEET.md; do
     fail "$f: improve next must return the chosen direction through sdlc"
   fi
 done
+for f in README.md CHEATSHEET.md; do
+  grep -Fq '`address-review`' "$KIT/$f" \
+    && pass "$f: standalone address-review skill is discoverable" \
+    || fail "$f: standalone address-review skill must be named"
+done
 
 echo
 [ "$FAIL" -eq 0 ] && echo "ALL CHECKS PASSED" || echo "SOME CHECKS FAILED"

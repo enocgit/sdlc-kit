@@ -72,3 +72,6 @@ architecture, ADRs, and tracker current. Unreachable CI blocks. Tracker closure 
 After an epic, optionally run `improve` for an audit or `improve next` for future directions. After
 choosing a direction, decline its planning step and start `sdlc {chosen direction}`. `improve` is
 read-only, outside the pipeline, and never replaces Stage 1.
+
+For comments on an open PR, run `address-review`. It triages human and bot feedback before fixing,
+refuting, or deferring each comment.
