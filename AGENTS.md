@@ -31,7 +31,7 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 
 | Stage | You produce | Gate |
 |-------|-------------|------|
-| 0 — Context + Foundation | filled `docs/context.md`; product PRD + foundational ADRs + architecture skeleton + core contract | ✅ approve foundation |
+| 0 — Context + Foundation | filled `docs/context.md`; product PRD + foundational ADRs + architecture skeleton + core contract | ✅ bootstrap: context filled, then approve foundation; ✅ adopt: approve reconstructed foundation |
 | 1 — Spec | *(optional)* brief `docs/briefs/NNNN-*` for a fuzzy idea → hardened PRD in `docs/prd/` (no issues yet) | ✅ approve PRD |
 | 2 — Architecture + Contract | ADR(s), updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact | ✅ approve approach + freeze |
 | 3 — Decompose | tracker issues (GitHub by default; the tracker is the record) | disclose breakdown |

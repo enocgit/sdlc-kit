@@ -6,6 +6,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-07-21
+
+### Changed
+- Added mobile alternatives for E2E testing, UI verification, build channels, signing, and store
+  promotion without changing the web defaults.
+
+### Fixed
+- Corrected community-skill install examples to use the Skills CLI's `--skill` selector.
+- Counted the separate Stage 0a context-filled gate and distinguished two bootstrap gates from the
+  single combined adoption gate in workflow summaries.
+
 ## [0.3.1] - 2026-07-20
 
 ### Changed

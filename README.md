@@ -3,8 +3,9 @@
 A portable, plan-gated workflow for building software with AI agents.
 
 The kit combines a conductor skill, an `AGENTS.md` operating manual, and project templates. The
-conductor routes work through nine stages and stops at five human approval gates. It works best for
-web, API, and SaaS projects, but its plain Markdown skills can run in any agent that supports
+conductor routes work through nine stages; fresh projects stop at six human approval gates, while
+existing-project adoption stops at five. It works best for web, API, SaaS, and API-backed
+cross-platform mobile apps, but its plain Markdown skills can run in any agent that supports
 `SKILL.md` files.
 
 > This is a workflow kit, not one standalone skill. Install the kit and its community skills before
@@ -14,7 +15,7 @@ web, API, and SaaS projects, but its plain Markdown skills can run in any agent 
 
 The defaults assume a web-shaped product: contracts, CI, database migrations, and deployable
 branches. Backend services, CLIs, libraries, and cross-platform apps can replace the UI test and
-deployment tools. ML research, firmware, native mobile, and games usually need deeper adaptation.
+deployment tools.
 
 The workflow uses established practices: Architecture Decision Records, C4-style architecture
 documentation, contract-first development, GitHub Flow, and phase gates. Community skills remain
@@ -40,7 +41,7 @@ Artifacts also have two homes:
 
 | # | Stage | Output | Gate |
 |---|-------|--------|------|
-| 0 | Context + Foundation | context, product PRD, foundational ADRs, architecture, core contract | approve foundation |
+| 0 | Context + Foundation | context, product PRD, foundational ADRs, architecture, core contract | bootstrap: context filled, then approve foundation; adopt: approve reconstructed foundation |
 | 1 | Spec | optional brief, hardened feature PRD | approve PRD |
 | 2 | Architecture + Contract | ADRs, architecture/security updates, frozen contract | approve and freeze |
 | 3 | Decompose | tracker issues | disclose |

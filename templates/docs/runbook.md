@@ -7,6 +7,8 @@
 
 **GitHub Flow:** `main` is always deployable. Environments are *deploy targets*, not long-lived
 branches — promote the same build artifact forward rather than merging between branches.
+For mobile, replace URLs and web previews with build channels, signing, internal distribution, and
+App Store / Play Store promotion.
 
 | Env | URL | Deployed from | When |
 |-----|-----|---------------|------|

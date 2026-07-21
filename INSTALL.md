@@ -82,7 +82,7 @@ includes a manual fallback for each one.
 | `executing-plans` | obra/superpowers | Implement |
 | `frontend-design` | anthropics/skills | Implement, UI only |
 | `test-driven-development` | obra/superpowers | QA |
-| `webapp-testing` | anthropics/skills | QA, UI only |
+| `webapp-testing` | anthropics/skills | QA, browser UI only; use a platform runner for mobile |
 | `run`, `verify` | runtime-native or equivalent | QA |
 | `code-review`, `simplify`, `security-review` | runtime-native or equivalent | Review |
 | `improve-codebase-architecture` | mattpocock/skills | Adopt existing project |
@@ -91,8 +91,8 @@ Install only the **community** rows with `npx skills add`. Confirm current packa
 [skills.sh](https://skills.sh), for example:
 
 ```bash
-npx skills add obra/superpowers/writing-plans
-npx skills add addyosmani/agent-skills/documentation-and-adrs
+npx skills add obra/superpowers --skill writing-plans
+npx skills add addyosmani/agent-skills --skill documentation-and-adrs
 ```
 
 For **runtime-native** rows, use your agent's equivalent or the documented fallback in
@@ -132,14 +132,14 @@ the surrounding workflow:
 Without a Git integration, close the tracker task only after the human confirms the merge. For
 local-only work, keep `docs/progress.md`; with an external tracker, delete it.
 
-### CI and browser tests
+### CI and end-to-end tests
 
 Adapt `.github/workflows/ci.yml` to the project's lint, typecheck, test, and build commands. Existing
 CI must pass; an unreachable workflow blocks Land. Without a PR workflow, push-triggered CI still
 runs before the human merges directly.
 
-Run authored Playwright tests through the normal test runner. A Playwright MCP server is optional
-and only needed for interactive browser exploration.
+Run E2E tests through the platform runner: Playwright for web, or Maestro/Detox for mobile. A
+Playwright MCP server is optional and only needed for interactive browser exploration.
 
 ### Custom skills
 

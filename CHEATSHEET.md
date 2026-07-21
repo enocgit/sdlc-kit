@@ -6,7 +6,7 @@ Use this during a run. `AGENTS.md` holds the full rules; the `sdlc` skill drives
 
 | # | Stage | Output | Gate |
 |---|-------|--------|------|
-| 0 | Context + Foundation | context, product PRD, foundational ADRs, architecture, core contract | approve foundation |
+| 0 | Context + Foundation | context, product PRD, foundational ADRs, architecture, core contract | bootstrap: context filled, then approve foundation; adopt: approve reconstructed foundation |
 | 1 | Spec | optional brief, hardened PRD; no issues yet | approve PRD |
 | 2 | Architecture + Contract | ADRs, architecture/security updates, frozen contract | approve and freeze |
 | 3 | Decompose | tracker issues | disclose |
@@ -16,8 +16,9 @@ Use this during a run. `AGENTS.md` holds the full rules; the `sdlc` skill drives
 | 7 | Land | PR if supported; otherwise push if a remote exists, run available CI, and merge directly. **GitHub:** `Closes #N`. **Other trackers/local-only:** no keyword; complete after merge | **human merges** |
 | 8 | Retro | up to three durable context learnings | - |
 
-Five hard gates: foundation, PRD, architecture and contract, each task plan, and merge. Stop for a
-human “yes” at each gate. At other stages, do the work, disclose decisions, and continue.
+Fresh projects have six hard gates: context, foundation, PRD, architecture and contract, each task
+plan, and merge. Existing-project adoption combines Stage 0 into one approval, so it has five. Stop
+for a human “yes” at each gate. At other stages, do the work, disclose decisions, and continue.
 
 ## Choose the path
 

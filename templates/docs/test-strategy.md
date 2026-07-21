@@ -12,7 +12,7 @@
 | Unit | {unit runner — e.g. Vitest or Jest} | Pure logic, edge cases | All non-trivial logic |
 | Integration | {same runner} + test DB | Module ↔ DB, API handlers against the contract | Any data/contract change |
 | Contract | (generated types) + schema validation | FE/BE agree on the frozen interface | Any contract change |
-| E2E | {e2e tool — e.g. Playwright or Cypress} | Critical user flows end-to-end | Per epic's key flow |
+| E2E | {e2e tool — e.g. Playwright, Cypress, Maestro, or Detox} | Critical user flows end-to-end | Per epic's key flow |
 
 **Rule of thumb:** test logic at the lowest layer that gives confidence; reserve E2E for the
 few flows that matter most. New logic must be *covered*, not merely *touched*.

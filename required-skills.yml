@@ -31,7 +31,7 @@ skills:
   - { name: using-git-worktrees,           kind: community, source: obra/superpowers,        ref: main, stage: 4,      note: "opt-in — only when isolation is critical; default is a feature branch via feature-start", fallback: "feature-start runs its built-in branch hygiene guards" }
   - { name: executing-plans,               kind: community, source: obra/superpowers,        ref: main, stage: 4,      fallback: "implement the approved plan task by task" }
   - { name: test-driven-development,       kind: community, source: obra/superpowers,        ref: main, stage: 5,      fallback: "write tests first per docs/test-strategy.md" }
-  - { name: webapp-testing,                kind: community, source: anthropics/skills,        ref: main, stage: 5,      note: "UI/browser checks only — skip for backend-only projects", fallback: "drive the app manually / Playwright via the runner" }
+  - { name: webapp-testing,                kind: community, source: anthropics/skills,        ref: main, stage: 5,      note: "UI/browser checks only — skip for backend; replace with a platform runner such as Maestro or Detox for mobile", fallback: "drive the app with its platform runner (Playwright, Maestro, Detox, etc.)" }
   - { name: improve-codebase-architecture, kind: community, source: mattpocock/skills,        ref: main, stage: 0,      fallback: "reverse-engineer context/architecture by reading the code" }
 
   # --- community (install + vet) — these live in your skills dir; on this machine: ~/.agents/skills ---

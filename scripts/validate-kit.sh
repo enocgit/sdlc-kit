@@ -201,6 +201,21 @@ if grep -Fq 'Install only the **community** rows with `npx skills add`.' "$KIT/I
 else
   fail "INSTALL.md: registry installation must be limited to community skills"
 fi
+grep -Fq 'npx skills add obra/superpowers --skill writing-plans' "$KIT/INSTALL.md" \
+  && pass "INSTALL.md: community install example uses --skill selector" \
+  || fail "INSTALL.md: community install example must use the supported --skill selector"
+if grep -Fq 'fresh projects stop at six human approval gates' "$KIT/README.md" \
+  && grep -Fq 'Fresh projects have six hard gates' "$KIT/CHEATSHEET.md"; then
+  pass "README/CHEATSHEET: bootstrap context gate included in gate count"
+else
+  fail "README/CHEATSHEET: fresh-project onboarding must count all six gates"
+fi
+if grep -Fq 'bootstrap: context filled' "$KIT/AGENTS.md" \
+  && grep -Fq 'adopt: approve reconstructed foundation' "$KIT/AGENTS.md"; then
+  pass "AGENTS.md: Stage 0 gates distinguish bootstrap from adoption"
+else
+  fail "AGENTS.md: Stage 0 must use two bootstrap gates but one adoption gate"
+fi
 for f in skills/sdlc/SKILL.md INSTALL.md CHEATSHEET.md; do
   if grep -Fq 'sdlc {chosen direction}' "$KIT/$f"; then
     pass "$f: improve-next handoff returns through sdlc"
