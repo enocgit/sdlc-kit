@@ -8,6 +8,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 - Surfaced the standalone `address-review` skill in README and the team cheatsheet.
+- Stage 8 now reconciles PRD, ADR, contract, architecture, security, test, and tracker artifacts
+  with what shipped before writing durable Retro learnings.
 
 ### Fixed
 - Limited the optional `improve` recommendation to retros that complete a parent task or epic,

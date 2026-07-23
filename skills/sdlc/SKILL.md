@@ -125,7 +125,7 @@ If a borrowed skill's default fights an `AGENTS.md` convention, **`AGENTS.md` wi
 | 5 QA | `test-driven-development`, `run`, `verify` (`webapp-testing` for UI/browser) | tests green, app runs, CI green | proceed (disclose results) |
 | 6 Review | `code-review`, `simplify`, `definition-of-done-review` — pick what the change warrants | clean diff, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
 | 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to *in review* according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
-| 8 Retro | reflect + write (native) | **0–3** durable learnings curated into `docs/context.md` — one dated bullet each, ≤3 lines, **prune while you're there** (see [Stage 8](#stage-8-what-a-learning-is-and-isnt); often the honest answer is *nothing new*) (+ optional agent memory) | surface the change + recommend landing `context.md` on `main` (offer; don't auto-commit) before the next feature — then done |
+| 8 Retro | reflect + write (native) | reconcile feature artifacts, then curate **0–3** durable learnings into `docs/context.md` — one dated bullet each, ≤3 lines, **prune while you're there** (see [Stage 8](#stage-8-what-a-learning-is-and-isnt); often the honest answer is *nothing new*) (+ optional agent memory) | surface the change + recommend landing doc updates on `main` (offer; don't auto-commit) before the next feature — then done |
 
 ## Gate protocol (non-negotiable)
 
@@ -199,6 +199,22 @@ via a `plan/*` branch → PR like any other doc. Stage 8's learnings can ride th
 
 Never pre-empt any of this before the merge: until the human merges, the honest state is *in
 review*, and an abandoned or rejected PR must not leave a task reading done.
+
+## Stage 8: Reconcile feature artifacts before writing Retro learnings
+
+Before writing Retro learnings, reconcile the feature's durable artifacts with what actually
+shipped. Read the PRD, ADRs, frozen contract, architecture, security, test strategy, and tracker.
+Include `docs/contracts/README.md` when it names or indexes the contract source.
+
+Update stale lifecycle labels and status fields: Draft, Proposed, Approved, Accepted, Final, Current,
+In review, Done, or the local template's equivalent. Approved planning artifacts should not
+stay in a pre-implementation state once the feature lands. Tracker closure still follows the
+post-merge rules above.
+
+If implementation drifted from the approved PRD, ADRs, or frozen contract, do not hide the drift by
+rewriting history. Record the shipped state in the artifact that owns it. A changed decision needs a
+new ADR; a changed shipped contract needs the versioning or deprecation decision required by
+`AGENTS.md`. Ask before broadening the feature beyond the approved scope.
 
 ## Stage 8: what a learning is (and isn't)
 

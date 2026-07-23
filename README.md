@@ -49,7 +49,7 @@ Artifacts also have two homes:
 | 5 | QA | tests, running app, CI | - |
 | 6 | Review | clean diff; security review when required | inline |
 | 7 | Land | PR when supported; otherwise push if a remote exists, run available CI, and merge directly | human merges |
-| 8 | Retro | up to three durable learnings in `docs/context.md` | - |
+| 8 | Retro | reconcile shipped artifacts; up to three durable learnings in `docs/context.md` | - |
 
 At Land, GitHub PRs use `Closes #N`; the issue closes on merge. Other trackers use their native
 integration or a post-merge transition. Local-only projects update `docs/progress.md`. If hosting

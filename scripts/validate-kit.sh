@@ -234,6 +234,16 @@ if grep -Fq 'Surface `improve` only when this retro completes an epic-level grou
 else
   fail "skills/sdlc/SKILL.md: improve must not be surfaced after every task retro"
 fi
+if grep -Fq 'Reconcile feature artifacts before writing Retro learnings' \
+    "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'PRD, ADRs, frozen contract, architecture, security, test strategy, and tracker' \
+    "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'Draft, Proposed, Approved, Accepted, Final, Current' \
+    "$KIT/skills/sdlc/SKILL.md"; then
+  pass "skills/sdlc/SKILL.md: Stage 8 reconciles feature artifacts before retro"
+else
+  fail "skills/sdlc/SKILL.md: Stage 8 must reconcile PRD/ADR/contract docs before retro"
+fi
 for f in README.md CHEATSHEET.md; do
   grep -Fq '`address-review`' "$KIT/$f" \
     && pass "$f: standalone address-review skill is discoverable" \

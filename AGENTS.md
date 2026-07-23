@@ -39,7 +39,7 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 | 5 — QA | tests green + app runs + CI green | — |
 | 6 — Review | clean diff, findings fixed (`security-review` if sensitive) | inline — no gate |
 | 7 — Land | PR opened where hosting supports it. Without PR support, push the branch if a remote exists, run any available CI, and the human merges it directly; with no remote, the human merges the local branch. **GitHub:** carries `Closes #N`, issue closes on merge. **Any other tracker / local-only:** no keyword — task → *In review*, completed after the merge (see `sdlc` skill) | ✅ human merges |
-| 8 — Retro | 0–3 durable learnings curated into `docs/context.md` (prune while you're there) | — |
+| 8 — Retro | feature artifacts reconciled with what shipped; 0–3 durable learnings curated into `docs/context.md` (prune while you're there) | — |
 
 > Not every change runs all stages. **Right-size the process:** features run the full pipeline
 > (0→8); bug fixes go Implement → QA → Review; chores go Implement → Review. A change graduates to
@@ -79,7 +79,8 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 - [ ] `code-review` + `simplify` clean; a [sensitive area](#sensitive-areas) also needs
       `security-review` run and `docs/security.md` updated
 - [ ] Diff hygiene: small and focused, references the issue, no stray/debug code
-- [ ] Docs updated: `architecture.md` if shape changed, ADR if a decision was made
+- [ ] Docs updated: `architecture.md` if shape changed, ADR if a decision was made; at Retro,
+      reconcile PRD/ADR/contract/status fields with what shipped
 - [ ] Tracker linked and current (rules by tracker/hosting: see the Stage 7 row above) — closure
       itself is a post-merge step, not required before Land
 
