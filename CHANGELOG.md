@@ -9,6 +9,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 ### Changed
 - Surfaced the standalone `address-review` skill in README and the team cheatsheet.
 
+### Fixed
+- Limited the optional `improve` recommendation to retros that complete a parent task or epic,
+  after all of its descendant subtasks are done, instead of surfacing it after every leaf-task
+  retro.
+
 ## [0.3.2] - 2026-07-21
 
 ### Changed

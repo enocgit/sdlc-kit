@@ -104,7 +104,10 @@ Registry installs are snapshots: update them deliberately, inspect the diff, and
 
 ### Optional post-epic audit
 
-Install `improve` user-wide if you want a read-only advisor after an epic:
+Install `improve` user-wide if you want a read-only advisor after an epic-level group is complete.
+Run it only after all descendant tasks in that group are done, not after each leaf task or small
+parent task. "Epic-level" means the larger product outcome in your tracker: for example, a Jira
+Epic, Linear Project, GitHub milestone/parent issue, or local `docs/progress.md` section.
 
 - `improve` audits shipped work and writes fix plans to `plans/`.
 - `improve next` surfaces directions only. Choose one, decline its planning step, then start
@@ -112,8 +115,9 @@ Install `improve` user-wide if you want a read-only advisor after an epic:
 - Keep `plans/` ephemeral: ignore it or delete completed plans.
 - Land generated plans as dependency-ordered PRs; the human still merges each one.
 
-`improve` is not a pipeline stage and never runs automatically. Do not confuse it with
-`improve-codebase-architecture`, which reconstructs foundation documents when adopting a project.
+`improve` is not a pipeline stage and never runs automatically. If the work has no epic-level
+grouping, skip this recommendation. Do not confuse it with `improve-codebase-architecture`, which
+reconstructs foundation documents when adopting a project.
 
 ## 3. Adapt the integration points
 

@@ -223,6 +223,17 @@ for f in skills/sdlc/SKILL.md INSTALL.md CHEATSHEET.md; do
     fail "$f: improve next must return the chosen direction through sdlc"
   fi
 done
+if grep -Fq 'Surface `improve` only when this retro completes an epic-level group' \
+    "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'Do not surface these options after a leaf-task retro' \
+    "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'If there is no such enclosing group, skip the' \
+    "$KIT/skills/sdlc/SKILL.md" \
+  && ! grep -Fq 'Close every retro' "$KIT/skills/sdlc/SKILL.md"; then
+  pass "skills/sdlc/SKILL.md: improve is surfaced only after an epic-level group completes"
+else
+  fail "skills/sdlc/SKILL.md: improve must not be surfaced after every task retro"
+fi
 for f in README.md CHEATSHEET.md; do
   grep -Fq '`address-review`' "$KIT/$f" \
     && pass "$f: standalone address-review skill is discoverable" \

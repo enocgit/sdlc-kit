@@ -69,9 +69,10 @@ architecture, ADRs, and tracker current. Unreachable CI blocks. Tracker closure 
 | Test policy | `docs/test-strategy.md` |
 | Task status | external tracker, or `docs/progress.md` in local-only mode |
 
-After an epic, optionally run `improve` for an audit or `improve next` for future directions. After
-choosing a direction, decline its planning step and start `sdlc {chosen direction}`. `improve` is
-read-only, outside the pipeline, and never replaces Stage 1.
+After all descendant tasks under an epic-level group are done, optionally run `improve` for a scoped
+audit. Do not suggest it after each leaf task or small parent task. At epic completion, `improve
+next` can surface future directions; after choosing one, decline its planning step and start
+`sdlc {chosen direction}`. `improve` is read-only, outside the pipeline, and never replaces Stage 1.
 
 For comments on an open PR, run `address-review`. It triages human and bot feedback before fixing,
 refuting, or deferring each comment.

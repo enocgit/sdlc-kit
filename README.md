@@ -120,5 +120,7 @@ behavior.
 | `required-skills.yml` | community-skill manifest and manual fallbacks |
 | `scripts/validate-kit.sh` | maintainer validation and install smoke test |
 
-The optional read-only `improve` skill can audit a completed epic or suggest future directions. It
-sits outside the pipeline; see [`INSTALL.md`](./INSTALL.md#optional-post-epic-audit).
+The optional read-only `improve` skill can audit a completed epic-level group after all of its
+descendant tasks are done; it is not suggested after each leaf task or small parent task. It can also
+suggest future directions after that epic-level group. It sits outside the pipeline; see
+[`INSTALL.md`](./INSTALL.md#optional-post-epic-audit).

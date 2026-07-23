@@ -229,12 +229,19 @@ bullets whose gotcha is now fixed, fold any that a doc/ADR/contract now covers i
 **rewrite superseded bullets in place** rather than appending a contradicting one. Keep the whole
 section under ~30 bullets — at the cap, earn each new line by removing one.
 
-**Close every retro the same way — surface `improve`, don't rely on the human remembering it
-exists.** Whether or not a learning qualified, end Stage 8 with one concrete line naming the
-options, so the choice is the human's, not a guess:
+**Surface `improve` only when this retro completes an epic-level group.** Check the tracker before
+closing Stage 8. Do not surface these options after a leaf-task retro, or after a small parent task
+whose purpose is only to organize implementation subtasks. If the enclosing epic-level group still
+has unfinished work, name the next task and return to the Stage 4 plan gate. "Epic-level" is the
+portable concept, not a required tracker type: it may be a Jira Epic, Linear Project, GitHub
+milestone/parent issue, or local `docs/progress.md` section that represents the larger product
+outcome containing multiple implementation tasks. If there is no such enclosing group, skip the
+`improve` recommendation.
 
-> Epic done. Optional:
-> 1. `improve`, scoped to what epic #{N} touched, to audit what just shipped.
+After an epic completes:
+
+> Epic {key} done. Optional:
+> 1. `improve`, scoped to what this epic touched, to audit what just shipped.
 > 2. `improve next` to surface directions only; after choosing one, decline its planning step and
 >    start `sdlc {chosen direction}`.
 > 3. Start the next feature with `sdlc {feature}`.
