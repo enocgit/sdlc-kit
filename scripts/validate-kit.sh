@@ -253,6 +253,15 @@ if grep -Fq 'Stage 1 approval does not ask for a commit' "$KIT/skills/sdlc/SKILL
 else
   fail "planning artifacts must not ask for a commit after every planning gate"
 fi
+for f in README.md INSTALL.md; do
+  text="$(tr '\n' ' ' < "$KIT/$f" | tr -s ' ')"
+  if printf '%s' "$text" | grep -Fq 'required-skills.yml` lists only the skills the SDLC conductor may route to' \
+    && printf '%s' "$text" | grep -Fq 'not become pipeline stages unless'; then
+    pass "$f: extra skills are allowed without changing the pipeline"
+  else
+    fail "$f: must explain extra skills are allowed but not pipeline stages"
+  fi
+done
 for f in README.md CHEATSHEET.md; do
   grep -Fq '`address-review`' "$KIT/$f" \
     && pass "$f: standalone address-review skill is discoverable" \

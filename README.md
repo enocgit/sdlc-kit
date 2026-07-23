@@ -103,6 +103,9 @@ behavior.
 
 - `AGENTS.md` is canonical. Runtime-specific files such as `CLAUDE.md` should point to it.
 - Skills are portable Markdown. Each stage has a manual fallback in `required-skills.yml`.
+- `required-skills.yml` lists only the skills the SDLC conductor may route to. You can install
+  additional project, language, design, deployment, or personal workflow skills; they do not become
+  pipeline stages unless you update `AGENTS.md`, `skills/sdlc/SKILL.md`, and validation.
 - GitHub is the default tracker and PR host, not a runtime requirement.
 - Stack, branch names, test tools, deployment targets, Definition of Done, and gates are defaults.
   Adapt them in `AGENTS.md` and the project docs.

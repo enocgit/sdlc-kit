@@ -12,6 +12,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   with what shipped before writing durable Retro learnings.
 - Feature planning docs now commit as one Stage 1–2 planning package after Stage 2 approval instead
   of prompting for a separate commit after Stage 1.
+- README and installation docs now clarify that teams may install extra skills without making them
+  SDLC pipeline stages.
 
 ### Fixed
 - Limited the optional `improve` recommendation to retros that complete a parent task or epic,

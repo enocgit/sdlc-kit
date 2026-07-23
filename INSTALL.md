@@ -102,6 +102,11 @@ Read each `SKILL.md` before adopting it. Skills run with your agent's permission
 reviewed versions, and commit project-scoped copies for reproducible team and CI environments.
 Registry installs are snapshots: update them deliberately, inspect the diff, and re-run validation.
 
+You may install other skills for your stack or personal workflow. `required-skills.yml` lists only
+the skills the SDLC conductor may route to; extra skills stay available to the agent but do not
+become pipeline stages unless you deliberately update `AGENTS.md`, `skills/sdlc/SKILL.md`, and
+validation.
+
 ### Optional post-epic audit
 
 Install `improve` user-wide if you want a read-only advisor after an epic-level group is complete.
