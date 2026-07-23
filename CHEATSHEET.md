@@ -52,8 +52,9 @@ architecture, ADRs, and tracker current. Unreachable CI blocks. Tracker closure 
 - Use `type(scope): summary` Conventional Commits, imperative and at most 72 characters.
 - Reference GitHub issues with `Refs #N` or `Closes #N`; use native keys for other trackers and no
   issue syntax for local-only IDs.
-- Commit approved Stage 0–2 artifacts to `main` before branching. If `main` is protected, merge a
-  `plan/*` PR first.
+- Commit the Stage 1–2 planning package to `main` once after Stage 2, before branching. Stage 0
+  foundation artifacts may be committed after their gate. If `main` is protected, merge a `plan/*`
+  PR first.
 - Keep commits and PRs focused. The human always merges.
 
 ## Artifact map

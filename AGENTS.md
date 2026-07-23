@@ -92,13 +92,14 @@ response while a feature is in the pipeline** opens with a one-line **status hea
   `feat/{issue#}-{slug}` (or `fix/...`) branches → PR → merge → deploy. Environments
   (preview/staging/prod) are deploy targets driven by CI, not long-lived branches. One feature per
   branch; default to it — reach for a git worktree only when isolation is critical (parallel/disposable).
-- **Where planning commits land.** Stage 0–2 artifacts (foundation docs, PRD, ADRs, frozen
-  contract) are gated, approved decisions → ask to commit them to **`main`** at their gate, not a
-  feature branch. Stage 4 then cuts `feat/{issue#}-{slug}` from a clean `main` already holding the
-  frozen contract (what lets FE/BE build in parallel) — only *code* lives on the branch; a frozen
-  contract changes only via a new ADR. If `main` is PR-protected, use `plan/{NNNN}-{slug}` → PR →
-  merge, then branch `feat/*`. **Stage 8 retro learnings** land the same way, **before the next
-  feature branches**, so nothing is left stashed when `feature-start` needs a clean tree.
+- **Where planning commits land.** Commit the approved planning package once, after Stage 2:
+  Stage 1 PRD + Stage 2 ADRs, architecture/security updates, and frozen contract go to **`main`**,
+  not a feature branch. Stage 0 foundation artifacts may be committed after the foundation gate.
+  Stage 4 then cuts `feat/{issue#}-{slug}` from a clean `main` already holding the frozen contract
+  (what lets FE/BE build in parallel) — only *code* lives on the branch; a frozen contract changes
+  only via a new ADR. If `main` is PR-protected, use `plan/{NNNN}-{slug}` → PR → merge, then branch
+  `feat/*`. **Stage 8 retro learnings** land the same way, **before the next feature branches**, so
+  nothing is left stashed when `feature-start` needs a clean tree.
 - **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types:
   `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the issue
   (`Refs #123` / `Closes #123` — GitHub only; elsewhere its key). Small logical commits, not a blob.

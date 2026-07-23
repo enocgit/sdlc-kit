@@ -133,12 +133,13 @@ At every **GATE**, do ALL of the following and then halt:
 1. Name the artifact you produced and its path.
 2. Summarize what's in it in 2–4 lines.
 3. Say exactly what the next stage will do.
-4. Ask: "Approve to proceed, or tell me what to change?" — at a **planning gate (Stages 0–2)**,
-   which is where the repo artifacts are produced, ask to **commit them to `main`** in the same
-   breath. Asking here is what satisfies the don't-commit-unless-asked guardrail; skip it and the
-   approved PRD/ADRs/contract sit uncommitted, so Stage 4's clean-tree check blocks the branch and
-   the run stalls. Stage 3 Decompose is **not** a gate — never stop there. Tracker-backed it writes
-   only issues; local-only it writes `docs/progress.md`, so just **disclose** that the file is
+4. Ask: "Approve to proceed, or tell me what to change?" Stage 1 approval does not ask for a commit;
+   the approved PRD stays in the worktree while Stage 2 produces the ADRs, architecture, security
+   notes, and frozen contract. At the Stage 2 gate, ask to commit the full planning package to `main`
+   before decomposition. Asking there satisfies the don't-commit-unless-asked guardrail; skip it and
+   the approved PRD/ADRs/contract sit uncommitted, so Stage 4's clean-tree check blocks the branch
+   and the run stalls. Stage 3 Decompose is **not** a gate — never stop there. Tracker-backed it
+   writes only issues; local-only it writes `docs/progress.md`, so just **disclose** that the file is
    uncommitted and continue. `feature-start` clears it at the Stage 4 gate, where stopping belongs.
 
 Do not run the next stage's skill until the user approves. Skills are guidance injected into
@@ -292,12 +293,13 @@ design or spike plan as a substitute for this pipeline's PRD path.
   it, and never invent a remote to satisfy the flow.
 - **Default to a feature branch.** Use a git worktree (`using-git-worktrees`) only when isolation
   is genuinely critical — parallel or disposable work — not as the default.
-- **Planning commits land on `main`.** Stage 0–2 artifacts are gated decisions: when committed they
-  belong on `main`, not a feature branch. Land them at each gate so Stage 4 branches from a clean
-  `main` that already holds the frozen contract — only code lives on the `feat/*` branch. If `main`
-  is PR-protected, use a `plan/*` branch → PR → merge, then branch `feat/*`. **Stage 8 retro
-  learnings** (`docs/context.md`) land on `main` the same way, before the next feature branches.
-  (See `AGENTS.md` → Where planning commits land.)
+- **Planning commits land on `main`.** Stage 0 foundation artifacts may be committed after the
+  foundation gate. For a feature, keep the approved Stage 1 PRD in the worktree, then commit the
+  Stage 1–2 planning package once after Stage 2 approves the ADRs, architecture/security updates,
+  and frozen contract. Stage 4 branches from a clean `main` that already holds the frozen contract —
+  only code lives on the `feat/*` branch. If `main` is PR-protected, use a `plan/*` branch → PR →
+  merge, then branch `feat/*`. **Stage 8 retro learnings** (`docs/context.md`) land on `main` the
+  same way, before the next feature branches. (See `AGENTS.md` → Where planning commits land.)
 - One feature in flight per branch. Reference the tracker issue (its `#`/key) in commits/PRs.
 - At Decompose, create issues with `gh issue create` and **shape their bodies to match**
   `.github/ISSUE_TEMPLATE/{epic,task}.md` — one `epic` per feature, a `task` per child. (`--body`

@@ -244,6 +244,15 @@ if grep -Fq 'Reconcile feature artifacts before writing Retro learnings' \
 else
   fail "skills/sdlc/SKILL.md: Stage 8 must reconcile PRD/ADR/contract docs before retro"
 fi
+if grep -Fq 'Stage 1 approval does not ask for a commit' "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'ask to commit the full planning package to `main`' "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'Commit the approved planning package once, after Stage 2' "$KIT/AGENTS.md" \
+  && ! grep -Fq 'at their gate' "$KIT/AGENTS.md" \
+  && ! grep -Fq 'at each gate so Stage 4 branches' "$KIT/skills/sdlc/SKILL.md"; then
+  pass "planning artifacts commit once after Stage 2"
+else
+  fail "planning artifacts must not ask for a commit after every planning gate"
+fi
 for f in README.md CHEATSHEET.md; do
   grep -Fq '`address-review`' "$KIT/$f" \
     && pass "$f: standalone address-review skill is discoverable" \
