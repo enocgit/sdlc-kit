@@ -19,6 +19,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - Limited the optional `improve` recommendation to retros that complete a parent task or epic,
   after all of its descendant subtasks are done, instead of surfacing it after every leaf-task
   retro.
+- Restored the Stage 0 planning-package commit request and corrected the skill manifest and
+  installed-conductor guidance.
+- Deferred feature-level Retro status changes and optional audits until every child task lands, and
+  required partial-feature Retro edits to land before the next task starts. Final Retro now
+  reconciles and closes the parent epic before reporting it complete; local-only tracking records
+  that parent explicitly.
 
 ## [0.3.2] - 2026-07-21
 

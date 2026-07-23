@@ -102,10 +102,11 @@ Read each `SKILL.md` before adopting it. Skills run with your agent's permission
 reviewed versions, and commit project-scoped copies for reproducible team and CI environments.
 Registry installs are snapshots: update them deliberately, inspect the diff, and re-run validation.
 
-You may install other skills for your stack or personal workflow. `required-skills.yml` lists only
-the skills the SDLC conductor may route to; extra skills stay available to the agent but do not
-become pipeline stages unless you deliberately update `AGENTS.md`, `skills/sdlc/SKILL.md`, and
-validation.
+You may install other skills for your stack or personal workflow. `required-skills.yml` is the
+kit's supported-skill manifest, including pipeline dependencies, standalone utilities, and optional
+companions. Extra skills stay available without becoming pipeline stages. To add one to the
+pipeline, update `AGENTS.md`, the project-root `required-skills.yml`, and the installed conductor at
+`.agents/skills/sdlc/SKILL.md` (or `$SKILLS_DIR/sdlc/SKILL.md` when overridden).
 
 ### Optional post-epic audit
 

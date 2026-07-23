@@ -22,8 +22,9 @@ mode, `docs/progress.md` is the tracker and the skill maintains it as described 
    (e.g. `gh issue list`, `gh project item-list`); if `gh` isn't authenticated, say so and stop.
    **Local-only** (no external tracker), read `docs/progress.md` instead — that's the tracker here,
    so a missing `gh` is expected, not a reason to stop (see Local-only exception below).
-2. **Summarize.** Group by epic. Per task show status (Todo / In progress / In review / Done),
-   assignee, and linked PR. Give a per-epic completion count and a **Now / Next / Blocked** view.
+2. **Summarize.** Group by epic (the `Features` table and task `Parent` keys in local-only mode).
+   Per task show status (Todo / In progress / In review / Done), assignee, and linked PR. Give a
+   per-epic completion count and a **Now / Next / Blocked** view.
 3. **Flag drift from reality.** Call out anything off — an issue closed without meeting its
    acceptance criteria / Definition of Done, or a PR merged without the docs (`architecture.md` /
    ADR) updated. Report it; don't silently fix it.

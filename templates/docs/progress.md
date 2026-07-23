@@ -11,10 +11,18 @@
 - **Next:** {next task}
 - **Blocked:** {task + blocker, or "none"}
 
+## Features
+
+| Key | Feature / epic | PRD | Status |
+|-----|----------------|-----|--------|
+| F1 | {feature} | `docs/prd/0001-{slug}.md` | In progress |
+
+<!-- Feature status: Planned | In progress | Done -->
+
 ## Tasks
 
-| # | Task | Status | PR | Notes |
-|---|------|--------|----|-------|
-| 1 | {task} | In progress | — | {note} |
+| # | Parent | Task | Status | PR | Notes |
+|---|--------|------|--------|----|-------|
+| 1 | F1 | {task} | In progress | — | {note} |
 
 <!-- Status: Todo | In progress | In review | Done -->

@@ -103,9 +103,9 @@ behavior.
 
 - `AGENTS.md` is canonical. Runtime-specific files such as `CLAUDE.md` should point to it.
 - Skills are portable Markdown. Each stage has a manual fallback in `required-skills.yml`.
-- `required-skills.yml` lists only the skills the SDLC conductor may route to. You can install
-  additional project, language, design, deployment, or personal workflow skills; they do not become
-  pipeline stages unless you update `AGENTS.md`, `skills/sdlc/SKILL.md`, and validation.
+- `required-skills.yml` is the kit's supported-skill manifest: pipeline dependencies, standalone
+  utilities, optional companions, and their fallbacks. You can install other skills; they do not
+  become pipeline stages unless you update the workflow and conductor.
 - GitHub is the default tracker and PR host, not a runtime requirement.
 - Stack, branch names, test tools, deployment targets, Definition of Done, and gates are defaults.
   Adapt them in `AGENTS.md` and the project docs.
@@ -120,7 +120,7 @@ behavior.
 | `templates/docs/` | context, PRD, ADR, architecture, security, contract, test, and runbook templates |
 | `templates/github/` | issue and pull-request templates |
 | `templates/ci.yml` | starter CI workflow |
-| `required-skills.yml` | community-skill manifest and manual fallbacks |
+| `required-skills.yml` | supported-skill manifest and manual fallbacks |
 | `scripts/validate-kit.sh` | maintainer validation and install smoke test |
 
 The optional read-only `improve` skill can audit a completed epic-level group after all of its

@@ -39,7 +39,7 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 | 5 — QA | tests green + app runs + CI green | — |
 | 6 — Review | clean diff, findings fixed (`security-review` if sensitive) | inline — no gate |
 | 7 — Land | PR opened where hosting supports it. Without PR support, push the branch if a remote exists, run any available CI, and the human merges it directly; with no remote, the human merges the local branch. **GitHub:** carries `Closes #N`, issue closes on merge. **Any other tracker / local-only:** no keyword — task → *In review*, completed after the merge (see `sdlc` skill) | ✅ human merges |
-| 8 — Retro | feature artifacts reconciled with what shipped; 0–3 durable learnings curated into `docs/context.md` (prune while you're there) | — |
+| 8 — Retro | feature artifacts reconciled with what shipped; final parent epic completed in the tracker; 0–3 durable learnings curated into `docs/context.md` (prune while you're there) | — |
 
 > Not every change runs all stages. **Right-size the process:** features run the full pipeline
 > (0→8); bug fixes go Implement → QA → Review; chores go Implement → Review. A change graduates to
@@ -92,14 +92,15 @@ response while a feature is in the pipeline** opens with a one-line **status hea
   `feat/{issue#}-{slug}` (or `fix/...`) branches → PR → merge → deploy. Environments
   (preview/staging/prod) are deploy targets driven by CI, not long-lived branches. One feature per
   branch; default to it — reach for a git worktree only when isolation is critical (parallel/disposable).
-- **Where planning commits land.** Commit the approved planning package once, after Stage 2:
-  Stage 1 PRD + Stage 2 ADRs, architecture/security updates, and frozen contract go to **`main`**,
-  not a feature branch. Stage 0 foundation artifacts may be committed after the foundation gate.
+- **Where planning commits land.** At the Stage 0 foundation gate, ask to land the approved
+  bootstrap context + foundation package on **`main`**; on adoption, ask at the combined Stage 0
+  gate. Commit the feature planning package once, after Stage 2: Stage 1 PRD + Stage 2 ADRs,
+  architecture/security updates, and frozen contract also go to **`main`**, not a feature branch.
   Stage 4 then cuts `feat/{issue#}-{slug}` from a clean `main` already holding the frozen contract
   (what lets FE/BE build in parallel) — only *code* lives on the branch; a frozen contract changes
   only via a new ADR. If `main` is PR-protected, use `plan/{NNNN}-{slug}` → PR → merge, then branch
-  `feat/*`. **Stage 8 retro learnings** land the same way, **before the next feature branches**, so
-  nothing is left stashed when `feature-start` needs a clean tree.
+  `feat/*`. **Stage 8 artifact updates and retro learnings** land the same way, **before the next
+  task or feature branch**, so `feature-start` starts from a clean tree.
 - **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types:
   `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the issue
   (`Refs #123` / `Closes #123` — GitHub only; elsewhere its key). Small logical commits, not a blob.

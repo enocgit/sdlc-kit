@@ -67,9 +67,13 @@ The agent opens a GitHub PR with `Closes #N`. The issue remains open while the P
 
 ### 8. Retro
 
-The agent prunes stale context and adds up to three durable learnings, such as “payment callbacks
-may arrive twice; handlers must be idempotent.” It then offers the optional `improve` audit,
-`improve next`, or the next `sdlc {feature}` run.
+The agent updates task-specific artifacts and adds only durable learnings, such as “payment
+callbacks may arrive twice; handlers must be idempotent.” If the epic has unfinished tasks, it names
+the next one without marking the feature PRD `Shipped`. It first lands any Retro edits on the
+updated default branch, then returns to the next task's Stage 4 plan gate with a clean tree. Only
+after the final task lands does it reconcile and land feature-level statuses, verify the epic DoD,
+and ask to update and close the parent GitHub issue. Once the parent is closed, it offers the
+optional `improve` audit, `improve next`, or the next `sdlc {feature}` run.
 
 ## Existing project
 

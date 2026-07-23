@@ -1,4 +1,5 @@
-# Machine-readable manifest of every skill the sdlc pipeline routes to.
+# Machine-readable manifest of skills supported by this kit: pipeline dependencies, standalone
+# utilities, optional companions, and runtime-native capabilities with manual fallbacks.
 #
 # kind:
 #   local       - shipped in this kit (skills/), installed by install.sh

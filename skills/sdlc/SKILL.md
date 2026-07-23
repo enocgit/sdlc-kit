@@ -120,7 +120,7 @@ If a borrowed skill's default fights an `AGENTS.md` convention, **`AGENTS.md` wi
 | 0 adopt (existing) | `improve-codebase-architecture` + `init` | reverse-engineered context/architecture + backfilled foundational ADRs (**point `docs/contracts/README.md` at the existing contract source**; note tech-debt/risks in `architecture.md`) | **GATE — approve** |
 | 1 Spec | `brainstorming` (method only) → `to-prd` → `grill-me` | **optional** Stage-1 brief `docs/briefs/NNNN-*.md` (only for a fuzzy/speculative idea — else skip straight to the PRD), then hardened PRD `docs/prd/NNNN-*.md` (no issues yet) | **GATE — approve PRD** |
 | 2 Architecture + Contract | `documentation-and-adrs` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
-| 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: task list in `docs/progress.md`) | disclose the breakdown, then continue |
+| 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
 | 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical) → `executing-plans`, `frontend-design` (UI work only) | code on a `feat/*` branch, one task at a time | **GATE — plan per task** |
 | 5 QA | `test-driven-development`, `run`, `verify` (`webapp-testing` for UI/browser) | tests green, app runs, CI green | proceed (disclose results) |
 | 6 Review | `code-review`, `simplify`, `definition-of-done-review` — pick what the change warrants | clean diff, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
@@ -133,14 +133,16 @@ At every **GATE**, do ALL of the following and then halt:
 1. Name the artifact you produced and its path.
 2. Summarize what's in it in 2–4 lines.
 3. Say exactly what the next stage will do.
-4. Ask: "Approve to proceed, or tell me what to change?" Stage 1 approval does not ask for a commit;
-   the approved PRD stays in the worktree while Stage 2 produces the ADRs, architecture, security
-   notes, and frozen contract. At the Stage 2 gate, ask to commit the full planning package to `main`
-   before decomposition. Asking there satisfies the don't-commit-unless-asked guardrail; skip it and
-   the approved PRD/ADRs/contract sit uncommitted, so Stage 4's clean-tree check blocks the branch
-   and the run stalls. Stage 3 Decompose is **not** a gate — never stop there. Tracker-backed it
-   writes only issues; local-only it writes `docs/progress.md`, so just **disclose** that the file is
-   uncommitted and continue. `feature-start` clears it at the Stage 4 gate, where stopping belongs.
+4. Ask: "Approve to proceed, or tell me what to change?" For bootstrap, Stage 0a approval does not
+   ask for a commit; at the Stage 0b foundation gate, ask to land the full context + foundation
+   package on `main`. For adoption, ask to land the reconstructed package at the combined Stage 0
+   gate. Stage 1 approval also does not ask for a commit; the approved PRD stays in the worktree
+   while Stage 2 produces the ADRs, architecture, security notes, and frozen contract. At the Stage
+   2 gate, ask to commit the full Stage 1–2 planning package to `main` before decomposition. These
+   requests satisfy the don't-commit-unless-asked guardrail; skip them and Stage 4's clean-tree
+   check blocks the branch. Stage 3 Decompose is **not** a gate — never stop there. Tracker-backed
+   it writes only issues; local-only it writes `docs/progress.md`, so just **disclose** that the file
+   is uncommitted and continue. `feature-start` clears it at the Stage 4 gate, where stopping belongs.
 
 Do not run the next stage's skill until the user approves. Skills are guidance injected into
 context — only YOU enforce these stops, so be explicit every time.
@@ -203,14 +205,29 @@ review*, and an abandoned or rejected PR must not leave a task reading done.
 
 ## Stage 8: Reconcile feature artifacts before writing Retro learnings
 
-Before writing Retro learnings, reconcile the feature's durable artifacts with what actually
-shipped. Read the PRD, ADRs, frozen contract, architecture, security, test strategy, and tracker.
-Include `docs/contracts/README.md` when it names or indexes the contract source.
+Before editing repository artifacts, check out and sync the default branch. Ask to land any Stage 8
+edits there; if it is protected, use a `plan/*` branch and merge it through the normal review path.
+Do not invoke `feature-start` again until the default branch contains those edits and the worktree is
+clean.
 
-Update stale lifecycle labels and status fields: Draft, Proposed, Approved, Accepted, Final, Current,
-In review, Done, or the local template's equivalent. Approved planning artifacts should not
-stay in a pre-implementation state once the feature lands. Tracker closure still follows the
-post-merge rules above.
+First check whether the landed task completes its enclosing feature or epic. If child tasks remain,
+reconcile only this task's tracker state and any durable artifact the task changed; do not mark the
+feature PRD `Shipped` or advance other feature-level lifecycle fields. Land any resulting repository
+edits as described above, then name the next task and return to its Stage 4 plan gate.
+
+When all child tasks are complete, reconcile the feature's durable artifacts with what actually
+shipped. Read the PRD, ADRs, frozen contract, architecture, security, test strategy, and tracker.
+Include `docs/contracts/README.md` when it names or indexes the contract source. Update stale
+lifecycle labels and status fields: Draft, Proposed, Approved, Accepted, Final, Current, In review,
+Done, or the local template's equivalent. Land repository edits before completing the parent epic.
+
+Then reconcile the parent epic itself: verify every child is complete, update its task checklist,
+and confirm the epic Definition of Done and end-to-end acceptance criteria. **GitHub:** the child
+PRs close only their task issues, so ask for approval to update and close the parent issue
+explicitly. **Another external tracker:** verify whether its integration completed the parent; if
+not, ask before updating and closing it. **Local-only:** mark the feature/epic row `Done` in
+`docs/progress.md` and include it in the Stage 8 commit. Do not report the epic done or offer
+`improve` until its authoritative tracker record is complete.
 
 If implementation drifted from the approved PRD, ADRs, or frozen contract, do not hide the drift by
 rewriting history. Record the shipped state in the artifact that owns it. A changed decision needs a
@@ -304,9 +321,10 @@ design or spike plan as a substitute for this pipeline's PRD path.
 - At Decompose, create issues with `gh issue create` and **shape their bodies to match**
   `.github/ISSUE_TEMPLATE/{epic,task}.md` — one `epic` per feature, a `task` per child. (`--body`
   bypasses the template, so follow its structure by hand: reference line → Scope/Tasks → DoD.)
-  Another tracker: its create call. Local-only: write the task list to `docs/progress.md` instead —
-  number the rows in its `#` column, since that number is the task's identifier for the rest of the
-  pipeline (Stage 4 branches `feat/{id}-{slug}` from it).
+  Another tracker: its create call. Local-only: add one feature/epic row and its child task rows to
+  `docs/progress.md`; put the feature key in each task's `Parent` column. Number the task rows in
+  their `#` column, since that number is the task's identifier for the rest of the pipeline (Stage 4
+  branches `feat/{id}-{slug}` from it).
 - **Definition of Ready** before Stage 4: acceptance criteria written, contract frozen, no open
   questions. **Definition of Done** before Land (Stage 7) (see `AGENTS.md`).
 - Contract-first: never let implementation drift from the frozen contract. Changing a shipped

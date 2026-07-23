@@ -234,34 +234,70 @@ if grep -Fq 'Surface `improve` only when this retro completes an epic-level grou
 else
   fail "skills/sdlc/SKILL.md: improve must not be surfaced after every task retro"
 fi
+sdlc_text="$(tr '\n' ' ' < "$KIT/skills/sdlc/SKILL.md" | tr -s ' ')"
 if grep -Fq 'Reconcile feature artifacts before writing Retro learnings' \
     "$KIT/skills/sdlc/SKILL.md" \
   && grep -Fq 'PRD, ADRs, frozen contract, architecture, security, test strategy, and tracker' \
     "$KIT/skills/sdlc/SKILL.md" \
-  && grep -Fq 'Draft, Proposed, Approved, Accepted, Final, Current' \
-    "$KIT/skills/sdlc/SKILL.md"; then
-  pass "skills/sdlc/SKILL.md: Stage 8 reconciles feature artifacts before retro"
+  && grep -Fq 'do not mark the' "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'feature PRD `Shipped`' "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'When all child tasks are complete' "$KIT/skills/sdlc/SKILL.md" \
+  && printf '%s' "$sdlc_text" | grep -Fq 'Do not invoke `feature-start` again until the default branch contains those edits and the worktree is clean.' \
+  && printf '%s' "$sdlc_text" | grep -Fq 'the child PRs close only their task issues, so ask for approval to update and close the parent issue explicitly.' \
+  && printf '%s' "$sdlc_text" | grep -Fq 'Do not report the epic done or offer `improve` until its authoritative tracker record is complete.' \
+  && printf '%s' "$sdlc_text" | grep -Fq 'Local-only: add one feature/epic row and its child task rows to `docs/progress.md`' \
+  && grep -Fq '| Key | Feature / epic | PRD | Status |' "$KIT/templates/docs/progress.md" \
+  && grep -Fq '| # | Parent | Task | Status | PR | Notes |' "$KIT/templates/docs/progress.md"; then
+  pass "skills/sdlc/SKILL.md: Stage 8 lands edits and completes the parent after final child"
 else
-  fail "skills/sdlc/SKILL.md: Stage 8 must reconcile PRD/ADR/contract docs before retro"
+  fail "skills/sdlc/SKILL.md: Stage 8 must preserve clean handoff and complete the parent epic"
 fi
-if grep -Fq 'Stage 1 approval does not ask for a commit' "$KIT/skills/sdlc/SKILL.md" \
-  && grep -Fq 'ask to commit the full planning package to `main`' "$KIT/skills/sdlc/SKILL.md" \
-  && grep -Fq 'Commit the approved planning package once, after Stage 2' "$KIT/AGENTS.md" \
-  && ! grep -Fq 'at their gate' "$KIT/AGENTS.md" \
-  && ! grep -Fq 'at each gate so Stage 4 branches' "$KIT/skills/sdlc/SKILL.md"; then
-  pass "planning artifacts commit once after Stage 2"
+example_text="$(tr '\n' ' ' < "$KIT/EXAMPLE.md" | tr -s ' ')"
+if printf '%s' "$example_text" | grep -Fq "If the epic has unfinished tasks, it names the next one without marking the feature PRD \`Shipped\`. It first lands any Retro edits on the updated default branch, then returns to the next task's Stage 4 plan gate with a clean tree. Only after the final task lands"; then
+  pass "EXAMPLE.md: Retro lands edits before returning to unfinished epic tasks"
 else
-  fail "planning artifacts must not ask for a commit after every planning gate"
+  fail "EXAMPLE.md: Retro must land edits before the next task and defer feature completion"
 fi
-for f in README.md INSTALL.md; do
-  text="$(tr '\n' ' ' < "$KIT/$f" | tr -s ' ')"
-  if printf '%s' "$text" | grep -Fq 'required-skills.yml` lists only the skills the SDLC conductor may route to' \
-    && printf '%s' "$text" | grep -Fq 'not become pipeline stages unless'; then
-    pass "$f: extra skills are allowed without changing the pipeline"
-  else
-    fail "$f: must explain extra skills are allowed but not pipeline stages"
-  fi
-done
+if printf '%s' "$example_text" | grep -Fq 'verify the epic DoD, and ask to update and close the parent GitHub issue. Once the parent is closed, it offers the optional'; then
+  pass "EXAMPLE.md: final Retro closes the parent before offering improve"
+else
+  fail "EXAMPLE.md: final Retro must complete the parent GitHub issue before reporting the epic done"
+fi
+if grep -Fq 'ask to land the full context + foundation' "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'ask to land the reconstructed package' "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'ask to commit the full Stage 1–2 planning package to `main`' \
+    "$KIT/skills/sdlc/SKILL.md" \
+  && grep -Fq 'At the Stage 0 foundation gate, ask to land' "$KIT/AGENTS.md" \
+  && grep -Fq 'Commit the feature planning package once, after Stage 2' "$KIT/AGENTS.md"; then
+  pass "Stage 0 and Stage 1–2 planning packages have explicit landing requests"
+else
+  fail "planning packages must have explicit landing requests before Stage 4"
+fi
+readme_text="$(tr '\n' ' ' < "$KIT/README.md" | tr -s ' ')"
+if printf '%s' "$readme_text" | grep -Fq "\`required-skills.yml\` is the kit's supported-skill manifest: pipeline dependencies, standalone utilities, optional companions, and their fallbacks. You can install other skills; they do not become pipeline stages unless you update the workflow and conductor."; then
+  pass "README.md: manifest scope and extra-skill behavior are accurate"
+else
+  fail "README.md: manifest statement must cover supported entries and extra-skill behavior"
+fi
+if grep -Fq '| `required-skills.yml` | supported-skill manifest and manual fallbacks |' \
+    "$KIT/README.md"; then
+  pass "README.md: repository map uses the supported-skill manifest scope"
+else
+  fail "README.md: repository map must not describe the manifest as community-only"
+fi
+install_text="$(tr '\n' ' ' < "$KIT/INSTALL.md" | tr -s ' ')"
+if printf '%s' "$install_text" | grep -Fq "\`required-skills.yml\` is the kit's supported-skill manifest, including pipeline dependencies, standalone utilities, and optional companions. Extra skills stay available without becoming pipeline stages."; then
+  pass "INSTALL.md: manifest scope and extra-skill behavior are accurate"
+else
+  fail "INSTALL.md: manifest statement must cover supported entries and extra-skill behavior"
+fi
+if grep -Fq '.agents/skills/sdlc/SKILL.md' "$KIT/INSTALL.md" \
+  && grep -Fq '$SKILLS_DIR/sdlc/SKILL.md' "$KIT/INSTALL.md" \
+  && grep -Fq 'project-root `required-skills.yml`' "$KIT/INSTALL.md"; then
+  pass "INSTALL.md: pipeline promotion points to installed conductor and manifest"
+else
+  fail "INSTALL.md: pipeline promotion must name the installed conductor and manifest"
+fi
 for f in README.md CHEATSHEET.md; do
   grep -Fq '`address-review`' "$KIT/$f" \
     && pass "$f: standalone address-review skill is discoverable" \
