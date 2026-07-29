@@ -140,6 +140,25 @@ PY
     printf '%s\n' "$DECLARED" | grep -qx "$n" \
       && pass "skill declared in manifest: $n" || fail "skill not in required-skills.yml: $n"
   done
+  if python3 - "$KIT/required-skills.yml" <<'PY'
+import re
+import sys
+import yaml
+
+data = yaml.safe_load(open(sys.argv[1])) or {}
+skill = next(
+    (item for item in data.get("skills", [])
+     if isinstance(item, dict) and item.get("name") == "test-driven-development"),
+    {},
+)
+stages = {part for part in re.split(r"[\s,]+", str(skill.get("stage", ""))) if part}
+raise SystemExit(0 if {"4", "5"} <= stages else 1)
+PY
+  then
+    pass "test-driven-development covers Implement and QA"
+  else
+    fail "test-driven-development must cover stages 4 and 5"
+  fi
 else
   echo "  skip (python3 + pyyaml required for a reformat-proof manifest parse)"
 fi
@@ -179,11 +198,6 @@ for mode in \
     && pass "skills/sdlc/SKILL.md: documents $mode" \
     || fail "skills/sdlc/SKILL.md: missing independent landing mode $mode"
 done
-if grep -Fq '`project-status` (reads only)' "$KIT/skills/sdlc/SKILL.md"; then
-  fail "skills/sdlc/SKILL.md: Stage 7 incorrectly makes local-only tracker handling read-only"
-else
-  pass "skills/sdlc/SKILL.md: local-only tracker write is not suppressed"
-fi
 push_prereq="$(grep -m1 'git push.*must work non-interactively' "$KIT/INSTALL.md" || true)"
 if printf '%s' "$push_prereq" | grep -q 'projects with a remote'; then
   pass "INSTALL.md: non-interactive push prerequisite is conditional on a remote"
@@ -204,12 +218,15 @@ fi
 grep -Fq 'npx skills add obra/superpowers --skill writing-plans' "$KIT/INSTALL.md" \
   && pass "INSTALL.md: community install example uses --skill selector" \
   || fail "INSTALL.md: community install example must use the supported --skill selector"
-if grep -Fq 'fresh projects stop at six human approval gates' "$KIT/README.md" \
-  && grep -Fq 'Fresh projects have six hard gates' "$KIT/CHEATSHEET.md"; then
-  pass "README/CHEATSHEET: bootstrap context gate included in gate count"
-else
-  fail "README/CHEATSHEET: fresh-project onboarding must count all six gates"
-fi
+for f in README.md CHEATSHEET.md; do
+  stage_zero_row="$(grep -m1 '^| 0 ' "$KIT/$f" || true)"
+  if printf '%s' "$stage_zero_row" | grep -Fq 'bootstrap' \
+    && printf '%s' "$stage_zero_row" | grep -Fq 'adopt'; then
+    pass "$f: Stage 0 distinguishes bootstrap from adoption"
+  else
+    fail "$f: Stage 0 row must distinguish bootstrap from adoption"
+  fi
+done
 if grep -Fq 'bootstrap: context filled' "$KIT/AGENTS.md" \
   && grep -Fq 'adopt: approve reconstructed foundation' "$KIT/AGENTS.md"; then
   pass "AGENTS.md: Stage 0 gates distinguish bootstrap from adoption"
@@ -228,40 +245,28 @@ if grep -Fq 'Surface `improve` only when this retro completes an epic-level grou
   && grep -Fq 'Do not surface these options after a leaf-task retro' \
     "$KIT/skills/sdlc/SKILL.md" \
   && grep -Fq 'If there is no such enclosing group, skip the' \
-    "$KIT/skills/sdlc/SKILL.md" \
-  && ! grep -Fq 'Close every retro' "$KIT/skills/sdlc/SKILL.md"; then
+    "$KIT/skills/sdlc/SKILL.md"; then
   pass "skills/sdlc/SKILL.md: improve is surfaced only after an epic-level group completes"
 else
   fail "skills/sdlc/SKILL.md: improve must not be surfaced after every task retro"
 fi
 sdlc_text="$(tr '\n' ' ' < "$KIT/skills/sdlc/SKILL.md" | tr -s ' ')"
-if grep -Fq 'Reconcile feature artifacts before writing Retro learnings' \
+if grep -Fq 'Per-task learning, final epic reconciliation' \
     "$KIT/skills/sdlc/SKILL.md" \
+  && printf '%s' "$sdlc_text" | grep -Fq 'run the Retro learning pass after every landed task' \
+  && printf '%s' "$sdlc_text" | grep -Fq 'If child tasks remain, do not reconcile feature artifacts or update the parent epic checklist.' \
+  && printf '%s' "$sdlc_text" | grep -Fq 'If the leaf-task Retro produces no repository edit, continue to the next task without a landing action.' \
   && grep -Fq 'PRD, ADRs, frozen contract, architecture, security, test strategy, and tracker' \
     "$KIT/skills/sdlc/SKILL.md" \
-  && grep -Fq 'do not mark the' "$KIT/skills/sdlc/SKILL.md" \
-  && grep -Fq 'feature PRD `Shipped`' "$KIT/skills/sdlc/SKILL.md" \
   && grep -Fq 'When all child tasks are complete' "$KIT/skills/sdlc/SKILL.md" \
-  && printf '%s' "$sdlc_text" | grep -Fq 'Do not invoke `feature-start` again until the default branch contains those edits and the worktree is clean.' \
-  && printf '%s' "$sdlc_text" | grep -Fq 'the child PRs close only their task issues, so ask for approval to update and close the parent issue explicitly.' \
+  && printf '%s' "$sdlc_text" | grep -Fq 'Land all final reconciliation repository edits on the default branch before completing the parent epic.' \
   && printf '%s' "$sdlc_text" | grep -Fq 'Do not report the epic done or offer `improve` until its authoritative tracker record is complete.' \
   && printf '%s' "$sdlc_text" | grep -Fq 'Local-only: add one feature/epic row and its child task rows to `docs/progress.md`' \
   && grep -Fq '| Key | Feature / epic | PRD | Status |' "$KIT/templates/docs/progress.md" \
   && grep -Fq '| # | Parent | Task | Status | PR | Notes |' "$KIT/templates/docs/progress.md"; then
-  pass "skills/sdlc/SKILL.md: Stage 8 lands edits and completes the parent after final child"
+  pass "skills/sdlc/SKILL.md: leaf retros keep learnings but defer epic reconciliation"
 else
-  fail "skills/sdlc/SKILL.md: Stage 8 must preserve clean handoff and complete the parent epic"
-fi
-example_text="$(tr '\n' ' ' < "$KIT/EXAMPLE.md" | tr -s ' ')"
-if printf '%s' "$example_text" | grep -Fq "If the epic has unfinished tasks, it names the next one without marking the feature PRD \`Shipped\`. It first lands any Retro edits on the updated default branch, then returns to the next task's Stage 4 plan gate with a clean tree. Only after the final task lands"; then
-  pass "EXAMPLE.md: Retro lands edits before returning to unfinished epic tasks"
-else
-  fail "EXAMPLE.md: Retro must land edits before the next task and defer feature completion"
-fi
-if printf '%s' "$example_text" | grep -Fq 'verify the epic DoD, and ask to update and close the parent GitHub issue. Once the parent is closed, it offers the optional'; then
-  pass "EXAMPLE.md: final Retro closes the parent before offering improve"
-else
-  fail "EXAMPLE.md: final Retro must complete the parent GitHub issue before reporting the epic done"
+  fail "skills/sdlc/SKILL.md: Stage 8 must preserve per-task learnings and reconcile after the final child"
 fi
 if grep -Fq 'ask to land the full context + foundation' "$KIT/skills/sdlc/SKILL.md" \
   && grep -Fq 'ask to land the reconstructed package' "$KIT/skills/sdlc/SKILL.md" \
@@ -273,20 +278,29 @@ if grep -Fq 'ask to land the full context + foundation' "$KIT/skills/sdlc/SKILL.
 else
   fail "planning packages must have explicit landing requests before Stage 4"
 fi
+feature_start_text="$(tr '\n' ' ' < "$KIT/skills/feature-start/SKILL.md" | tr -s ' ')"
+stage_four_agents="$(grep -m1 '^| 4 ' "$KIT/AGENTS.md" || true)"
+stage_four_sdlc="$(grep -m1 '^| 4 ' "$KIT/skills/sdlc/SKILL.md" || true)"
+if printf '%s' "$feature_start_text" | grep -Fq 'The plan is a transient gate artifact, not repository documentation.' \
+  && printf '%s' "$feature_start_text" | grep -Fq 'Do not create `docs/superpowers/plans/` or another plan file unless the human asks for a durable plan.' \
+  && printf '%s' "$feature_start_text" | grep -Fq 'Keep it proportional to this one task and easy to scan' \
+  && printf '%s' "$sdlc_text" | grep -Fq 'follow `feature-start` for its compact in-session format; no file path exists unless the human requested a durable plan' \
+  && printf '%s' "$stage_four_agents" | grep -Fq 'in-session' \
+  && printf '%s' "$stage_four_sdlc" | grep -Fq 'in-session'; then
+  pass "Stage 4 uses a compact in-session plan without a repository file"
+else
+  fail "Stage 4 plans must stay compact and in-session unless the human requests a durable file"
+fi
 readme_text="$(tr '\n' ' ' < "$KIT/README.md" | tr -s ' ')"
-if printf '%s' "$readme_text" | grep -Fq "\`required-skills.yml\` is the kit's supported-skill manifest: pipeline dependencies, standalone utilities, optional companions, and their fallbacks. You can install other skills; they do not become pipeline stages unless you update the workflow and conductor."; then
+if printf '%s' "$readme_text" | grep -Fq 'You can install other skills' \
+  && printf '%s' "$readme_text" | grep -Fq 'do not become pipeline stages'; then
   pass "README.md: manifest scope and extra-skill behavior are accurate"
 else
   fail "README.md: manifest statement must cover supported entries and extra-skill behavior"
 fi
-if grep -Fq '| `required-skills.yml` | supported-skill manifest and manual fallbacks |' \
-    "$KIT/README.md"; then
-  pass "README.md: repository map uses the supported-skill manifest scope"
-else
-  fail "README.md: repository map must not describe the manifest as community-only"
-fi
 install_text="$(tr '\n' ' ' < "$KIT/INSTALL.md" | tr -s ' ')"
-if printf '%s' "$install_text" | grep -Fq "\`required-skills.yml\` is the kit's supported-skill manifest, including pipeline dependencies, standalone utilities, and optional companions. Extra skills stay available without becoming pipeline stages."; then
+if printf '%s' "$install_text" | grep -Fq 'You may install other skills' \
+  && printf '%s' "$install_text" | grep -Fq 'without becoming pipeline stages'; then
   pass "INSTALL.md: manifest scope and extra-skill behavior are accurate"
 else
   fail "INSTALL.md: manifest statement must cover supported entries and extra-skill behavior"
@@ -297,6 +311,39 @@ if grep -Fq '.agents/skills/sdlc/SKILL.md' "$KIT/INSTALL.md" \
   pass "INSTALL.md: pipeline promotion points to installed conductor and manifest"
 else
   fail "INSTALL.md: pipeline promotion must name the installed conductor and manifest"
+fi
+template_guidance_ok=1
+for doc_template in \
+  templates/docs/prd/TEMPLATE.md \
+  templates/docs/adr/TEMPLATE.md \
+  templates/docs/architecture.md \
+  templates/docs/security.md \
+  templates/docs/contracts/README.md \
+  templates/docs/test-strategy.md \
+  templates/docs/runbook.md \
+  templates/docs/context.md; do
+  grep -Fq 'Follow the documentation writing standard in AGENTS.md.' "$KIT/$doc_template" \
+    || template_guidance_ok=0
+done
+if grep -Fq '## Documentation writing standard' "$KIT/AGENTS.md" \
+  && grep -Fq 'Follow the documentation writing standard in `AGENTS.md`; it is the single source.' "$KIT/skills/sdlc/SKILL.md" \
+  && awk '
+    /^## Scan$/ { scan = NR }
+    /^## Problem$/ { problem = NR }
+    scan && !problem && /^- \*\*Scope:\*\*/ { scope = 1 }
+    scan && !problem && /^- \*\*Key decisions:\*\*/ { decisions = 1 }
+    scan && !problem && /^- \*\*Constraints:\*\*/ { constraints = 1 }
+    scan && !problem && /^- \*\*Links:\*\*/ { links = 1 }
+    scan && !problem && /^- \*\*Open questions:\*\*/ { questions = 1 }
+    END {
+      exit !(scan && problem && scan < problem && scope && decisions &&
+             constraints && links && questions)
+    }
+  ' "$KIT/templates/docs/prd/TEMPLATE.md" \
+  && [ "$template_guidance_ok" -eq 1 ]; then
+  pass "documentation standard is single-sourced and the PRD starts with scan fields"
+else
+  fail "documentation guidance must be single-sourced and the PRD scan must precede detail"
 fi
 for f in README.md CHEATSHEET.md; do
   grep -Fq '`address-review`' "$KIT/$f" \

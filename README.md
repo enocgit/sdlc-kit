@@ -45,11 +45,11 @@ Artifacts also have two homes:
 | 1 | Spec | optional brief, hardened feature PRD | approve PRD |
 | 2 | Architecture + Contract | ADRs, architecture/security updates, frozen contract | approve and freeze |
 | 3 | Decompose | tracker issues | disclose |
-| 4 | Implement | code on a `feat/*` branch | approve each task plan |
+| 4 | Implement | code on a `feat/*` branch | approve each compact in-session task plan |
 | 5 | QA | tests, running app, CI | - |
 | 6 | Review | clean diff; security review when required | inline |
 | 7 | Land | PR when supported; otherwise push if a remote exists, run available CI, and merge directly | human merges |
-| 8 | Retro | reconcile shipped artifacts; up to three durable learnings in `docs/context.md` | - |
+| 8 | Retro | per-task learnings; final-child artifact and epic reconciliation | - |
 
 At Land, GitHub PRs use `Closes #N`; the issue closes on merge. Other trackers use their native
 integration or a post-merge transition. Local-only projects update `docs/progress.md`. If hosting

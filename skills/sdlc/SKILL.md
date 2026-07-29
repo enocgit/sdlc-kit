@@ -106,10 +106,18 @@ and **override its workflow**:
   **not** auto-run `writing-plans`; the next step is the Stage 1 Spec (`to-prd`), then the gate.
 - `documentation-and-adrs` → ADRs go to **`docs/adr/NNNN-{slug}.md`** (this project's convention),
   never `docs/decisions/`.
+- `writing-plans` → use its decomposition method at Stage 3, but write the result to the tracker.
+  Do **not** create `docs/superpowers/plans/`; the tracker is the record.
 - Any skill that wants to open tracker issues/epics → **defer to Stage 3 Decompose.** The Spec stage
   produces a PRD, not issues.
 
 If a borrowed skill's default fights an `AGENTS.md` convention, **`AGENTS.md` wins.**
+
+## Documentation writing standard
+
+Follow the documentation writing standard in `AGENTS.md`; it is the single source. Apply it to every
+durable artifact this conductor creates or updates, and trim borrowed-skill output to match before
+each gate.
 
 ## The stages, skills, and gates
 
@@ -121,16 +129,17 @@ If a borrowed skill's default fights an `AGENTS.md` convention, **`AGENTS.md` wi
 | 1 Spec | `brainstorming` (method only) → `to-prd` → `grill-me` | **optional** Stage-1 brief `docs/briefs/NNNN-*.md` (only for a fuzzy/speculative idea — else skip straight to the PRD), then hardened PRD `docs/prd/NNNN-*.md` (no issues yet) | **GATE — approve PRD** |
 | 2 Architecture + Contract | `documentation-and-adrs` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
-| 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical) → `executing-plans`, `frontend-design` (UI work only) | code on a `feat/*` branch, one task at a time | **GATE — plan per task** |
+| 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical) → `test-driven-development`, `frontend-design` (UI work only) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
 | 5 QA | `test-driven-development`, `run`, `verify` (`webapp-testing` for UI/browser) | tests green, app runs, CI green | proceed (disclose results) |
 | 6 Review | `code-review`, `simplify`, `definition-of-done-review` — pick what the change warrants | clean diff, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
 | 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to *in review* according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
-| 8 Retro | reflect + write (native) | reconcile feature artifacts, then curate **0–3** durable learnings into `docs/context.md` — one dated bullet each, ≤3 lines, **prune while you're there** (see [Stage 8](#stage-8-what-a-learning-is-and-isnt); often the honest answer is *nothing new*) (+ optional agent memory) | surface the change + recommend landing doc updates on `main` (offer; don't auto-commit) before the next feature — then done |
+| 8 Retro | reflect + write (native) | curate **0–3** durable learnings after every task; after the final child, reconcile feature artifacts and the parent epic (see [Stage 8](#stage-8-what-a-learning-is-and-isnt)) | if repository files changed, offer to land them on `main`; otherwise continue without an empty landing action |
 
 ## Gate protocol (non-negotiable)
 
 At every **GATE**, do ALL of the following and then halt:
-1. Name the artifact you produced and its path.
+1. Name the artifact you produced and its path. For the Stage 4 plan, follow `feature-start` for its
+   compact in-session format; no file path exists unless the human requested a durable plan.
 2. Summarize what's in it in 2–4 lines.
 3. Say exactly what the next stage will do.
 4. Ask: "Approve to proceed, or tell me what to change?" For bootstrap, Stage 0a approval does not
@@ -203,31 +212,44 @@ via a `plan/*` branch → PR like any other doc. Stage 8's learnings can ride th
 Never pre-empt any of this before the merge: until the human merges, the honest state is *in
 review*, and an abandoned or rejected PR must not leave a task reading done.
 
-## Stage 8: Reconcile feature artifacts before writing Retro learnings
+## Stage 8: Per-task learning, final epic reconciliation
 
-Before editing repository artifacts, check out and sync the default branch. Ask to land any Stage 8
-edits there; if it is protected, use a `plan/*` branch and merge it through the normal review path.
-Do not invoke `feature-start` again until the default branch contains those edits and the worktree is
-clean.
+After the merge, complete the task transition under [Task completion by tracker](#task-completion-by-tracker),
+then run the Retro learning pass after every landed task using the criteria below. The budget remains
+**0–3** durable learnings per task, and writing nothing remains normal.
 
 First check whether the landed task completes its enclosing feature or epic. If child tasks remain,
-reconcile only this task's tracker state and any durable artifact the task changed; do not mark the
-feature PRD `Shipped` or advance other feature-level lifecycle fields. Land any resulting repository
-edits as described above, then name the next task and return to its Stage 4 plan gate.
+do not reconcile feature artifacts or update the parent epic checklist. A decision, contract change,
+security correction, or document required by the next task should have landed with the task PR. If
+one is discovered only after merge, correct it before the next task; that is blocking corrective
+work, not routine reconciliation.
+
+If a leaf-task learning, local-only tracker transition, or blocking correction changes a repository
+file, check out and sync the default branch, then ask to land the edit there. If the default branch
+is protected, use a `plan/*` branch and the normal review path. Do not invoke `feature-start` until
+those edits are on the default branch and the worktree is clean. If the leaf-task Retro produces no
+repository edit, continue to the next task without a landing action.
 
 When all child tasks are complete, reconcile the feature's durable artifacts with what actually
 shipped. Read the PRD, ADRs, frozen contract, architecture, security, test strategy, and tracker.
 Include `docs/contracts/README.md` when it names or indexes the contract source. Update stale
 lifecycle labels and status fields: Draft, Proposed, Approved, Accepted, Final, Current, In review,
-Done, or the local template's equivalent. Land repository edits before completing the parent epic.
+Done, or the local template's equivalent.
 
-Then reconcile the parent epic itself: verify every child is complete, update its task checklist,
-and confirm the epic Definition of Done and end-to-end acceptance criteria. **GitHub:** the child
-PRs close only their task issues, so ask for approval to update and close the parent issue
-explicitly. **Another external tracker:** verify whether its integration completed the parent; if
-not, ask before updating and closing it. **Local-only:** mark the feature/epic row `Done` in
-`docs/progress.md` and include it in the Stage 8 commit. Do not report the epic done or offer
-`improve` until its authoritative tracker record is complete.
+Also reconcile the parent epic: verify every child is complete, update its task checklist, and
+confirm the epic Definition of Done and end-to-end acceptance criteria. **Local-only:** make the
+checklist and `Done` transition in `docs/progress.md` part of this repository reconciliation.
+
+Check out and sync the default branch before editing; the final task's learning, artifact
+reconciliation, and local-only tracker transition may share one landing action. Land all final
+reconciliation repository edits on the default branch before completing the parent epic. If that
+requires a `plan/*` PR, wait for the human to merge it and confirm the edits are on the default
+branch. Only then update an external tracker: **GitHub:** the child PRs close only their task
+issues, so ask for approval to update and close the parent issue explicitly. **Another external
+tracker:** verify whether its integration completed the parent; if not, ask before updating and
+closing it. Treat a local-only epic as complete only after its `docs/progress.md` transition has
+landed. Do not report the epic done or offer `improve` until its authoritative tracker record is
+complete.
 
 If implementation drifted from the approved PRD, ADRs, or frozen contract, do not hide the drift by
 rewriting history. Record the shipped state in the artifact that owns it. A changed decision needs a
@@ -316,7 +338,8 @@ design or spike plan as a substitute for this pipeline's PRD path.
   and frozen contract. Stage 4 branches from a clean `main` that already holds the frozen contract —
   only code lives on the `feat/*` branch. If `main` is PR-protected, use a `plan/*` branch → PR →
   merge, then branch `feat/*`. **Stage 8 retro learnings** (`docs/context.md`) land on `main` the
-  same way, before the next feature branches. (See `AGENTS.md` → Where planning commits land.)
+  same way before the next task or feature branch; final feature reconciliation waits for the last
+  child. (See `AGENTS.md` → Where planning commits land.)
 - One feature in flight per branch. Reference the tracker issue (its `#`/key) in commits/PRs.
 - At Decompose, create issues with `gh issue create` and **shape their bodies to match**
   `.github/ISSUE_TEMPLATE/{epic,task}.md` — one `epic` per feature, a `task` per child. (`--body`

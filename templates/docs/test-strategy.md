@@ -1,5 +1,9 @@
 # Test strategy & Definition of Done
 
+> Follow the documentation writing standard in AGENTS.md. Keep this doc focused on test-specific
+> policy and links to real tools; do not duplicate the canonical Definition of Done from AGENTS.md.
+> Delete placeholder runners once the stack is set.
+>
 > **STATUS: TEMPLATE** — set the tools below at Stage 0 from your **real** stack; the tool names
 > are placeholders, not a decision (e.g. the starter may be wired for Jest, not Vitest). The
 > authoritative **Definition of Done** and **Definition of Ready** live in `AGENTS.md` and are

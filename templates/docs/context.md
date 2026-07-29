@@ -1,5 +1,8 @@
 # Project context
 
+> Follow the documentation writing standard in AGENTS.md. This file is loaded every session, so keep
+> only durable domain facts and agent-critical gotchas. Link detail elsewhere.
+>
 > STATUS: TEMPLATE — not yet filled. **Stage 0 is incomplete** until this line is removed and
 > the sections below are completed for your project. The conductor will not advance to Spec
 > (Stage 1) while this marker (or any `{placeholder}`) remains.

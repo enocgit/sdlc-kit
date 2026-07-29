@@ -10,11 +10,11 @@ Use this during a run. `AGENTS.md` holds the full rules; the `sdlc` skill drives
 | 1 | Spec | optional brief, hardened PRD; no issues yet | approve PRD |
 | 2 | Architecture + Contract | ADRs, architecture/security updates, frozen contract | approve and freeze |
 | 3 | Decompose | tracker issues | disclose |
-| 4 | Implement | one task on a `feat/*` branch | approve task plan |
+| 4 | Implement | one task on a `feat/*` branch | approve compact in-session task plan |
 | 5 | QA | tests, running app, CI | - |
 | 6 | Review | clean diff; security review when required | inline |
 | 7 | Land | PR if supported; otherwise push if a remote exists, run available CI, and merge directly. **GitHub:** `Closes #N`. **Other trackers/local-only:** no keyword; complete after merge | **human merges** |
-| 8 | Retro | reconcile shipped artifacts; up to three durable context learnings | - |
+| 8 | Retro | per-task learnings; final-child artifact and epic reconciliation | - |
 
 Fresh projects have six hard gates: context, foundation, PRD, architecture and contract, each task
 plan, and merge. Existing-project adoption combines Stage 0 into one approval, so it has five. Stop

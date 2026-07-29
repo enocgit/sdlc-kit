@@ -1,5 +1,8 @@
 # Brief — {feature}
 
+> Follow the documentation writing standard in AGENTS.md. Keep this to one page: problem, who has
+> it, why now, success signal, and the few questions that decide whether to promote it.
+>
 > Lightweight, pre-PRD problem statement (Stage 1, the discovery step of Spec). A page at most.
 > **Optional** — skip it for a well-understood feature and go straight to the PRD; reach for it only
 > to cheaply shape or *kill* a fuzzy/speculative idea before investing in a full PRD (that's its whole

@@ -8,12 +8,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 - Surfaced the standalone `address-review` skill in README and the team cheatsheet.
-- Stage 8 now reconciles PRD, ADR, contract, architecture, security, test, and tracker artifacts
-  with what shipped before writing durable Retro learnings.
+- Stage 8 keeps the durable-learning pass after every task but defers feature artifacts and the
+  parent epic checklist until the final child lands.
 - Feature planning docs now commit as one Stage 1–2 planning package after Stage 2 approval instead
   of prompting for a separate commit after Stage 1.
 - README and installation docs now clarify that teams may install extra skills without making them
   SDLC pipeline stages.
+- Added a scan-first documentation writing standard in `AGENTS.md`, linked the conductor and
+  templates to it, and moved PRD scan fields ahead of detail.
+- Stage 4 now uses a compact in-session task plan by default; durable plan files are created only
+  when requested, and implementation proceeds directly through test-driven development.
 
 ### Fixed
 - Limited the optional `improve` recommendation to retros that complete a parent task or epic,
@@ -21,10 +25,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   retro.
 - Restored the Stage 0 planning-package commit request and corrected the skill manifest and
   installed-conductor guidance.
-- Deferred feature-level Retro status changes and optional audits until every child task lands, and
-  required partial-feature Retro edits to land before the next task starts. Final Retro now
-  reconciles and closes the parent epic before reporting it complete; local-only tracking records
-  that parent explicitly.
+- Deferred feature-level Retro reconciliation and the parent checklist until every child task
+  lands. A leaf Retro lands only a real learning, local-only tracker change, or blocking correction;
+  final Retro lands reconciliation edits before completing and reporting the parent epic done.
 
 ## [0.3.2] - 2026-07-21
 

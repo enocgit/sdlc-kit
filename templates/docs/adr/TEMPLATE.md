@@ -1,5 +1,9 @@
 # ADR NNNN — {short decision title}
 
+> Follow the documentation writing standard in AGENTS.md. Keep ADRs decision-first: context only
+> for forces that shaped the choice, then the decision and consequences. Delete unused scaffold in
+> the filled ADR.
+
 - **Status:** Proposed | Accepted | Superseded by ADR-NNNN
 - **Date:** YYYY-MM-DD
 - **Relates to:** {PRD / issue / ADR links}

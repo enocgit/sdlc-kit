@@ -1,5 +1,9 @@
 # Architecture
 
+> Follow the documentation writing standard in AGENTS.md. Keep this as the current system shape:
+> compact summaries, diagrams or small tables when useful, and links to ADRs/contracts for detail.
+> Delete unused sections once filled.
+>
 > The **current shape** of the system (living document). The decision _history_ lives in
 > `docs/adr/`; this is the decision _result_. Update when the shape changes; link the ADR that
 > caused the change.

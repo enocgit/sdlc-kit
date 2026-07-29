@@ -1,5 +1,9 @@
 # Runbook
 
+> Follow the documentation writing standard in AGENTS.md. Keep real operations steps short,
+> current, and executable. If a section is intentionally deferred, name the trigger or owner instead
+> of leaving generic template text.
+>
 > How the system is operated: deploy, roll back, observe, and respond. Keep current as
 > infrastructure changes.
 

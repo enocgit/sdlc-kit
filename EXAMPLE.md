@@ -48,7 +48,8 @@ agent discloses it and continues without waiting.
 
 `feature-start` creates `feat/3-payment-intent` and loads the relevant PRD, ADR, and contract.
 
-**Gate:** approve the task plan. The agent implements against the frozen contract.
+**Gate:** approve the compact in-session task plan. No plan file is created unless the human asks
+for one. The agent then implements against the frozen contract.
 
 ### 5. QA
 
@@ -67,13 +68,13 @@ The agent opens a GitHub PR with `Closes #N`. The issue remains open while the P
 
 ### 8. Retro
 
-The agent updates task-specific artifacts and adds only durable learnings, such as “payment
-callbacks may arrive twice; handlers must be idempotent.” If the epic has unfinished tasks, it names
-the next one without marking the feature PRD `Shipped`. It first lands any Retro edits on the
-updated default branch, then returns to the next task's Stage 4 plan gate with a clean tree. Only
-after the final task lands does it reconcile and land feature-level statuses, verify the epic DoD,
-and ask to update and close the parent GitHub issue. Once the parent is closed, it offers the
-optional `improve` audit, `improve next`, or the next `sdlc {feature}` run.
+After every task, the agent curates only durable learnings, such as “payment callbacks may arrive
+twice; handlers must be idempotent.” If the epic has unfinished tasks, it leaves feature artifacts
+and the epic checklist alone. A real learning is landed on the updated default branch before the
+next task; when no repository file changed, there is no extra landing action. After the final task,
+the agent reconciles and lands feature artifacts and statuses, verifies the epic DoD, and only then
+asks to update and close the parent GitHub issue. Once the parent is closed, it offers the optional
+`improve` audit, `improve next`, or the next `sdlc {feature}` run.
 
 ## Existing project
 

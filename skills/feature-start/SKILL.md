@@ -3,8 +3,8 @@ name: feature-start
 description: >
   Starts implementation of one decomposed task: isolates a workspace (a feature branch by default;
   a git worktree only when isolation is critical), loads the relevant PRD, ADR, and frozen contract
-  into context, then enters plan mode and proposes a per-task plan for approval before any code is
-  written. Use at the start of Stage 4 (Implement) once scope is approved, or when the user says
+  into context, then proposes a compact in-session plan for approval before any code is written.
+  Use at the start of Stage 4 (Implement) once scope is approved, or when the user says
   "start working on issue #N",
   "begin this task", or "let's implement {feature}".
 ---
@@ -53,8 +53,21 @@ plan approval gate.
    - Any ADR(s) it depends on in `docs/adr/`
    - The frozen contract artifact (OpenAPI/tRPC/schema) the task implements against
    - `docs/test-strategy.md` (Definition of Done + which layer to test at)
-4. **Plan.** Enter plan mode. Produce a granular plan (small steps, exact file paths, the tests
-   you'll write first). Hand off to `executing-plans` / `test-driven-development` for execution.
+4. **Plan.** Present a compact in-session plan. If the runtime provides a structured plan artifact,
+   use it; otherwise present the same plan in the response. The plan is a transient gate artifact,
+   not repository documentation. Do not create `docs/superpowers/plans/` or another plan file unless
+   the human asks for a durable plan.
+
+   Keep it proportional to this one task and easy to scan:
+   - **Outcome** — one sentence.
+   - **Affected files** — exact paths and why each changes.
+   - **Approach** — a few logical implementation steps, with tests paired to the behavior.
+   - **Tests and observable verification** — commands or user-visible checks that prove completion.
+   - **Risks or open questions** — only when real.
+
+   Omit implementation code, repeated PRD/ADR/contract content, speculative work, mechanical
+   microsteps, and commit instructions. After approval, execute the plan with
+   `test-driven-development`.
 5. **GATE.** Present the plan. Ask for approval before writing any code.
 
 ## Rules

@@ -1,5 +1,9 @@
 # Security & threat model
 
+> Follow the documentation writing standard in AGENTS.md. Keep each threat model scan-first:
+> invariants, actors, trust boundaries, then a compact threat table. Move long explanations below
+> the table or into ADRs.
+>
 > Lightweight, living security doc. Touched at the **Architecture** stage for any feature in a
 > **sensitive area** (canonical list in `AGENTS.md` → Sensitive areas), and revisited at review.
 > Not a formal audit — a structured "what could go wrong and how do we prevent it."

@@ -79,9 +79,8 @@ includes a manual fallback for each one.
 | `documentation-and-adrs` | addyosmani/agent-skills | Foundation, Architecture |
 | `writing-plans` | obra/superpowers | Decompose |
 | `using-git-worktrees` | obra/superpowers | Implement |
-| `executing-plans` | obra/superpowers | Implement |
 | `frontend-design` | anthropics/skills | Implement, UI only |
-| `test-driven-development` | obra/superpowers | QA |
+| `test-driven-development` | obra/superpowers | Implement, QA |
 | `webapp-testing` | anthropics/skills | QA, browser UI only; use a platform runner for mobile |
 | `run`, `verify` | runtime-native or equivalent | QA |
 | `code-review`, `simplify`, `security-review` | runtime-native or equivalent | Review |

@@ -1,5 +1,9 @@
 # Contracts
 
+> Follow the documentation writing standard in AGENTS.md. Keep contract docs precise and
+> scan-first: authoritative paths, request/response shape, auth, validation, errors, compatibility,
+> and freeze status before examples or extended notes.
+>
 > The integration **source of truth** between frontend, backend, and services. Contracts are
 > *artifacts, not prose* — they live in the codebase and (ideally) generate the types both sides
 > consume, so the contract can't silently drift from the code. This folder documents where they

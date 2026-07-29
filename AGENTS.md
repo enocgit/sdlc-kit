@@ -35,11 +35,11 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 | 1 — Spec | *(optional)* brief `docs/briefs/NNNN-*` for a fuzzy idea → hardened PRD in `docs/prd/` (no issues yet) | ✅ approve PRD |
 | 2 — Architecture + Contract | ADR(s), updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact | ✅ approve approach + freeze |
 | 3 — Decompose | tracker issues (GitHub by default; the tracker is the record) | disclose breakdown |
-| 4 — Implement | code on a `feat/*` branch, one task at a time | ✅ plan per task |
+| 4 — Implement | code on a `feat/*` branch, one task at a time | ✅ approve compact in-session plan per task |
 | 5 — QA | tests green + app runs + CI green | — |
 | 6 — Review | clean diff, findings fixed (`security-review` if sensitive) | inline — no gate |
 | 7 — Land | PR opened where hosting supports it. Without PR support, push the branch if a remote exists, run any available CI, and the human merges it directly; with no remote, the human merges the local branch. **GitHub:** carries `Closes #N`, issue closes on merge. **Any other tracker / local-only:** no keyword — task → *In review*, completed after the merge (see `sdlc` skill) | ✅ human merges |
-| 8 — Retro | feature artifacts reconciled with what shipped; final parent epic completed in the tracker; 0–3 durable learnings curated into `docs/context.md` (prune while you're there) | — |
+| 8 — Retro | 0–3 durable learnings curated per task; after the final child, feature artifacts reconciled and parent epic completed | — |
 
 > Not every change runs all stages. **Right-size the process:** features run the full pipeline
 > (0→8); bug fixes go Implement → QA → Review; chores go Implement → Review. A change graduates to
@@ -57,6 +57,16 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 - **Task status** → your tracker (GitHub Issues/Projects), the single source of truth, reported live
   by `project-status`. *Local-only (no tracker):* `docs/progress.md` **is** the tracker
 - **Test strategy + Definition of Done** → `docs/test-strategy.md`
+
+## Documentation writing standard
+
+All durable docs are for humans first: PRDs, ADRs, contracts, architecture, security, test strategy,
+runbook, context, progress, README, and kit docs. Start with a cheap scan: status, scope, key
+decision/outcome, constraints, links, and open questions before detail. Prefer bullets, checklists,
+small tables, and links to source-of-truth docs over narrative or duplicated facts. Keep useful
+template prompts in templates; in filled project artifacts remove unused scaffold, empty headings,
+HTML comments, and boilerplate. If a deferred section matters, write the owner/trigger for filling
+it instead of leaving generic placeholders.
 
 ## Definition of Ready (before a task enters Implement)
 
@@ -79,8 +89,8 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 - [ ] `code-review` + `simplify` clean; a [sensitive area](#sensitive-areas) also needs
       `security-review` run and `docs/security.md` updated
 - [ ] Diff hygiene: small and focused, references the issue, no stray/debug code
-- [ ] Docs updated: `architecture.md` if shape changed, ADR if a decision was made; at Retro,
-      reconcile PRD/ADR/contract/status fields with what shipped
+- [ ] Docs required for the task are current; after the final epic child, reconcile
+      PRD/ADR/contract/architecture/status fields with what shipped
 - [ ] Tracker linked and current (rules by tracker/hosting: see the Stage 7 row above) — closure
       itself is a post-merge step, not required before Land
 
@@ -99,8 +109,9 @@ response while a feature is in the pipeline** opens with a one-line **status hea
   Stage 4 then cuts `feat/{issue#}-{slug}` from a clean `main` already holding the frozen contract
   (what lets FE/BE build in parallel) — only *code* lives on the branch; a frozen contract changes
   only via a new ADR. If `main` is PR-protected, use `plan/{NNNN}-{slug}` → PR → merge, then branch
-  `feat/*`. **Stage 8 artifact updates and retro learnings** land the same way, **before the next
-  task or feature branch**, so `feature-start` starts from a clean tree.
+  `feat/*`. A per-task **Stage 8 learning** or local tracker edit lands the same way before the next
+  task; after the final child, feature reconciliation and Retro edits land **before completing the
+  parent epic**. If a leaf Retro changes no repository file, no landing action is needed.
 - **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types:
   `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the issue
   (`Refs #123` / `Closes #123` — GitHub only; elsewhere its key). Small logical commits, not a blob.

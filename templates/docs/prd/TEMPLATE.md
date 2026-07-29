@@ -1,8 +1,19 @@
 # PRD NNNN — {title}
 
+> Follow the documentation writing standard in AGENTS.md. Keep this scan-first: status, scope,
+> decisions, constraints, links, and open questions before detail. Delete unused sections in the
+> filled PRD.
+
+## Scan
+
 - **Status:** Draft | Approved | Shipped
-- **Epic:** {tracker epic/issue link}
-- **Author / date:** {name} / YYYY-MM-DD
+- **Outcome:** {one sentence describing the intended result}
+- **Scope:** In — {short list}; Out — {short list}
+- **Key decisions:** {decision summary or links}
+- **Constraints:** {hard product, technical, legal, or operational limits}
+- **Links:** {brief, epic, designs, ADRs, contracts}
+- **Open questions:** {questions to resolve before approval, or None}
+- **Owner / date:** {name} / YYYY-MM-DD
 
 ## Problem
 
@@ -17,11 +28,6 @@
 <!-- Measurable. How we'll know this worked. -->
 
 - {metric and target}
-
-## Scope
-
-**In:** {bulleted}
-**Out:** {bulleted — what we are explicitly NOT doing}
 
 ## Requirements
 
@@ -45,12 +51,6 @@
 <!-- Testable. These become the Definition-of-Done checks per task. -->
 
 - [ ] {criterion}
-
-## Open questions
-
-<!-- Resolved during stress-test (grill-me), before the Spec gate. -->
-
-- [ ] {question}
 
 ## Risks
 

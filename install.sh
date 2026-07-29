@@ -93,7 +93,7 @@ copy_tree() { # srcdir dstdir — recursive, file-level no-clobber
 # Operating manual + one-line CLAUDE.md pointer
 copy_file "$KIT/AGENTS.md" "$TARGET/AGENTS.md"
 if [ ! -e "$TARGET/CLAUDE.md" ]; then
-  [ "$DRY" -eq 0 ] && echo "See AGENTS.md for how we work on this project." > "$TARGET/CLAUDE.md"
+  [ "$DRY" -eq 0 ] && echo "@AGENTS.md" > "$TARGET/CLAUDE.md"
   ADDED=$((ADDED + 1)); echo "  + CLAUDE.md"
 else
   SKIPPED=$((SKIPPED + 1)); SKIPPED_LIST+=("CLAUDE.md"); echo "  skip (exists): CLAUDE.md"

@@ -28,10 +28,9 @@ skills:
   # and what runs next. See skills/sdlc/SKILL.md "Borrow the technique, not the workflow".
   - { name: brainstorming,                 kind: community, source: obra/superpowers,        ref: main, stage: 1,      note: "method only — land a Stage-1 brief in docs/briefs/; do NOT write docs/superpowers/specs/ or auto-run writing-plans", fallback: "ask clarifying questions and draft the brief by hand" }
   - { name: documentation-and-adrs,        kind: community, source: addyosmani/agent-skills, ref: main, stage: "0b,2", note: "ADRs go to docs/adr/NNNN-slug.md, never docs/decisions/", fallback: "use docs/adr/TEMPLATE.md + docs/contracts/README.md by hand" }
-  - { name: writing-plans,                 kind: community, source: obra/superpowers,        ref: main, stage: 3,      fallback: "decompose into issues manually" }
+  - { name: writing-plans,                 kind: community, source: obra/superpowers,        ref: main, stage: 3,      note: "method only — decompose into tracker issues; do NOT write docs/superpowers/plans/", fallback: "decompose into issues manually" }
   - { name: using-git-worktrees,           kind: community, source: obra/superpowers,        ref: main, stage: 4,      note: "opt-in — only when isolation is critical; default is a feature branch via feature-start", fallback: "feature-start runs its built-in branch hygiene guards" }
-  - { name: executing-plans,               kind: community, source: obra/superpowers,        ref: main, stage: 4,      fallback: "implement the approved plan task by task" }
-  - { name: test-driven-development,       kind: community, source: obra/superpowers,        ref: main, stage: 5,      fallback: "write tests first per docs/test-strategy.md" }
+  - { name: test-driven-development,       kind: community, source: obra/superpowers,        ref: main, stage: "4,5",  fallback: "write tests first per docs/test-strategy.md" }
   - { name: webapp-testing,                kind: community, source: anthropics/skills,        ref: main, stage: 5,      note: "UI/browser checks only — skip for backend; replace with a platform runner such as Maestro or Detox for mobile", fallback: "drive the app with its platform runner (Playwright, Maestro, Detox, etc.)" }
   - { name: improve-codebase-architecture, kind: community, source: mattpocock/skills,        ref: main, stage: 0,      fallback: "reverse-engineer context/architecture by reading the code" }
 
