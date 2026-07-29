@@ -6,7 +6,7 @@
 ## Context
 
 We want a durable, append-only history of significant technical decisions so that future
-engineers and AI agents understand *why* the system is the way it is — without reverse-
+engineers and AI agents understand _why_ the system is the way it is — without reverse-
 engineering it from code. Architecture decisions are easy to forget and expensive to relearn.
 
 ## Decision
@@ -20,7 +20,7 @@ concern, or would surprise a competent newcomer.
 
 ## Consequences
 
-- The current system *shape* lives in `docs/architecture.md`; the *why/history* lives here.
+- The current system _shape_ lives in `docs/architecture.md`; the _why/history_ lives here.
 - Approving an ADR is a pipeline gate (Stage 2). A shipped-contract change requires a new ADR.
 - Small reversible choices don't need an ADR — keep the log signal-rich.
 

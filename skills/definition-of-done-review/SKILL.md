@@ -11,7 +11,7 @@ description: >
 # definition-of-done-review
 
 A consistent, team-specific final check. Generic `code-review` and `simplify` catch bugs and
-cleanup; this verifies the change is actually *done* by our standard. Run it after them.
+cleanup; this verifies the change is actually _done_ by our standard. Run it after them.
 
 ## Checklist — read it from AGENTS.md, don't rely on a copy
 

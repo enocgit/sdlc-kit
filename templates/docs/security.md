@@ -21,7 +21,7 @@ trust boundary? What happens if each input is hostile? What if a dependency/webh
 
 ## Baseline controls (check on every sensitive change)
 
-- [ ] **AuthN/AuthZ** — every endpoint checks identity *and* permission; no broken object-level
+- [ ] **AuthN/AuthZ** — every endpoint checks identity _and_ permission; no broken object-level
       access (can user A read user B's data?)
 - [ ] **Input validation** — all inputs validated against the contract schema; output encoded
 - [ ] **Secrets** — never in code/logs; loaded from env/secret manager; rotation possible

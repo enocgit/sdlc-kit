@@ -25,7 +25,7 @@ plan approval gate.
    experiments — or when the user asks. Either way, FIRST run these guards (the worktree skill does
    them for you; the branch path must not skip them):
    - **Clean tree:** `git status --porcelain` is empty — nothing uncommitted to clobber. If the
-     *only* change is the local-only tracker (`docs/progress.md`) that Decompose just wrote, ask to
+     _only_ change is the local-only tracker (`docs/progress.md`) that Decompose just wrote, ask to
      commit it and continue once approved — this is the gate that clears it. If the default branch
      is PR-protected, a direct commit there can never be pushed: land it via a `plan/{NNNN}-{slug}`
      branch → PR → merge first, same as any other planning commit (`AGENTS.md` → Where planning
@@ -33,7 +33,7 @@ plan approval gate.
    - **Fresh base:** check out the default branch and bring it up to date before branching — a
      stale base is as bad as a dirty tree. With an upstream (`git rev-parse --abbrev-ref
      '@{upstream}'` succeeds), `git pull`. **With a remote but no upstream** — before the first
-     push, or after tracking was removed — don't assume local is current. First resolve *which*
+     push, or after tracking was removed — don't assume local is current. First resolve _which_
      remote is authoritative: exactly one → use it; several (`origin` plus a fork or mirror) →
      **ask which owns the default branch**, never guess, since fast-forwarding from a fork bases
      the work on the wrong history. Then `git fetch` that remote and fast-forward onto its

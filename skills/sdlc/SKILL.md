@@ -24,7 +24,7 @@ Artifacts live at two altitudes — keep them straight:
   datastore, API style), the **architecture skeleton**, and the **core contract**. These belong
   to no single feature.
 - **Feature-level** — produced per feature (Stages 1–8): a brief, a feature PRD, feature ADR(s),
-  and a contract *slice*.
+  and a contract _slice_.
 
 Don't design every feature up front — but DO lock the handful of foundational decisions a first
 feature can't start without. Let everything else emerge per-feature.
@@ -50,7 +50,7 @@ skill **and** no runtime equivalent, use the manual `fallback` in `required-skil
      - **0a Context:** the kit's installer already scaffolded `docs/`, `AGENTS.md`, and the
        one-line `CLAUDE.md` pointer — if any are missing, re-run the kit's `install.sh` (it's
        non-destructive) rather than recreating them by hand. Then interactively fill
-       `docs/context.md`. Do NOT run `init` — there's no codebase yet. *Gate: context filled.*
+       `docs/context.md`. Do NOT run `init` — there's no codebase yet. _Gate: context filled._
      - **0b Foundation:** produce the **project-level** artifacts — a product PRD at
        `docs/prd/0000-product.md`, the few unavoidable cross-cutting ADRs (stack, repo layout,
        auth, datastore, API style), the `architecture.md` skeleton, and a core contract scaffold.
@@ -94,7 +94,7 @@ the stage each turn is what keeps you from drifting off-process over a long conv
 ## Borrow the technique, not the workflow
 
 The community skills below are **techniques**, not the pipeline. Each was authored standalone and
-carries its own opinions about *where it writes* and *what it does next* — those opinions are wrong
+carries its own opinions about _where it writes_ and _what it does next_ — those opinions are wrong
 here, because **this conductor owns the workflow.** When you run a borrowed skill, use its method
 and **override its workflow**:
 
@@ -132,7 +132,7 @@ each gate.
 | 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical) → `test-driven-development`, `frontend-design` (UI work only) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
 | 5 QA | `test-driven-development`, `run`, `verify` (`webapp-testing` for UI/browser) | tests green, app runs, CI green | proceed (disclose results) |
 | 6 Review | `code-review`, `simplify`, `definition-of-done-review` — pick what the change warrants | clean diff, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
-| 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to *in review* according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
+| 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to _in review_ according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
 | 8 Retro | reflect + write (native) | curate **0–3** durable learnings after every task; after the final child, reconcile feature artifacts and the parent epic (see [Stage 8](#stage-8-what-a-learning-is-and-isnt)) | if repository files changed, offer to land them on `main`; otherwise continue without an empty landing action |
 
 ## Gate protocol (non-negotiable)
@@ -165,9 +165,9 @@ always interrupt. This keeps the front half rigorous and the back half moving.
 **The Stage 5 CI seam — don't over-stop.** When CI exists and needs a pushed branch, the guardrail
 says don't commit/push/PR unless asked. That is **one narrow stop at the commit/push boundary — not
 a reason to stop at the end of Stage 4.** After the Implement plan gate, keep going through
-everything that needs *no* push: local tests, `run`/`verify`, and the whole Stage 6 pass
-(`code-review`, `simplify`, `security-review` if sensitive, diff hygiene). Only *then* stop, at the
-push, and disclose: *"local checks + review done; CI green is pending your approval to commit/push."*
+everything that needs _no_ push: local tests, `run`/`verify`, and the whole Stage 6 pass
+(`code-review`, `simplify`, `security-review` if sensitive, diff hygiene). Only _then_ stop, at the
+push, and disclose: _"local checks + review done; CI green is pending your approval to commit/push."_
 After approval, start CI and return to the human merge gate instead of polling; required CI must be
 green before the human merges. If no CI workflow exists, CI is N/A and no push is required for it.
 
@@ -176,7 +176,7 @@ green before the human merges. If no CI workflow exists, CI is N/A and no push i
 **This is the canonical statement — other kit docs point here rather than restating it.**
 
 **`Closes #N` is GitHub-only syntax.** On Linear/Jira it either fails to close the real task or
-closes an unrelated repo issue of that number — unless *that tracker's own* Git integration is
+closes an unrelated repo issue of that number — unless _that tracker's own_ Git integration is
 configured, which auto-closes via its native key (`ENG-123`, `PROJ-45`) instead, same mechanism as
 GitHub's, different syntax. A **local-only** id is a `docs/progress.md` row, not an issue at all, so
 nothing auto-closes. So:
@@ -187,12 +187,12 @@ nothing auto-closes. So:
   convention (commit/PR title, or branch name); it closes the issue on merge like GitHub. Confirm the
   integration is actually wired before relying on it — don't assume.
 - **Linear/Jira with no Git integration, or local-only** — **no closing keyword anywhere**, in the PR
-  or in commits. The task moves to *in review* at Land and is completed only after the merge.
+  or in commits. The task moves to _in review_ at Land and is completed only after the merge.
 
 **Who writes the tracker.** Against an **external tracker** `project-status` is read-only — it
 never edits issues unless the user explicitly asks — so a Linear/Jira transition is a separate,
 outward-facing action: show the change and get a go-ahead before writing. In **local-only**,
-`docs/progress.md` *is* the tracker and `project-status` maintains it (its one documented write);
+`docs/progress.md` _is_ the tracker and `project-status` maintains it (its one documented write);
 that's a repo file, so the edit rides the normal commit approval. Either way the transition is
 never a silent side effect of opening the PR — if it hasn't happened, report the tracker as stale
 rather than describing it as moved.
@@ -204,9 +204,9 @@ also closed it via the native key — verify it actually fired, don't assume. An
 with no Git integration** needs its task closed explicitly now — outward-facing, so confirm before
 writing, same as at Land.
 **Local-only** needs the `docs/progress.md` row moved to `Done` —
-and that file *is* the tracker, so **check out the default branch and sync it first**: you're still
+and that file _is_ the tracker, so **check out the default branch and sync it first**: you're still
 standing on the just-merged `feat/*`, and committing there strands the update on a dead branch while
-`main` reads *In review* for good. Then edit and ask to commit; if `main` is PR-protected, land it
+`main` reads _In review_ for good. Then edit and ask to commit; if `main` is PR-protected, land it
 via a `plan/*` branch → PR like any other doc. Stage 8's learnings can ride the same commit.
 
 Never pre-empt any of this before the merge: until the human merges, the honest state is *in
@@ -277,7 +277,7 @@ it lives somewhere else, it goes there instead — **never both**:
 
 **Format — enforced, not suggested:** append to the flat `## Learnings` list as **one dated bullet,
 ≤3 lines**, stating the trap and the rule. No per-feature `###` headings, no
-"What shipped / Keep doing / Watch out for / Process" sub-structure — that's a retro *report*, not
+"What shipped / Keep doing / Watch out for / Process" sub-structure — that's a retro _report_, not
 durable context. Budget: **0–3 bullets per retro.** If you're writing a fourth, you're transcribing.
 
 **Prune before you append** (this is the part that keeps the file from growing unbounded): delete
@@ -313,11 +313,11 @@ design or spike plan as a substitute for this pipeline's PRD path.
 
 - **GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{issue#}-{slug}`
   branches → PR → merge → deploy. Environments are deploy targets, not long-lived branches.
-- **Tracker, remote, PR workflow, and CI workflow are independent capabilities.** *Local-only* means
+- **Tracker, remote, PR workflow, and CI workflow are independent capabilities.** _Local-only_ means
   `docs/progress.md` replaces an **external tracker** — it does **not** imply there's no remote, and
   such a project can still open PRs and run CI. Equally, a remote does **not** imply a PR workflow:
   a bare, self-hosted, or backup remote has no PRs, branch protection, or checks to honour. Decide
-  on what the hosting *actually supports*, never on remote presence as a proxy:
+  on what the hosting _actually supports_, never on remote presence as a proxy:
   - **PR workflow available** → open the PR; run CI there when a CI workflow also exists, then the
     human merges through the PR. If no CI workflow exists, the CI check is N/A.
   - **No PR workflow, CI workflow available** → push the branch to start CI, require it to be green,
@@ -358,13 +358,13 @@ design or spike plan as a substitute for this pipeline's PRD path.
 - Sensitive areas (canonical list in `AGENTS.md` → Sensitive areas): threat-model at Stage 2
   (`docs/security.md`) AND `security-review` at Stage 6.
 - DB schema changes follow expand/contract (migrate → deploy → clean up) **once the table holds real
-  data or any deployed process reads or writes it** — a deployed *writer* breaks on a renamed/dropped
+  data or any deployed process reads or writes it** — a deployed _writer_ breaks on a renamed/dropped
   column or a new required one just as a reader does. Before that, change it outright.
 - If a PRD/ADR is ambiguous, stop and ask — do not guess.
 - Keep the relevant doc (`architecture.md` / ADR) updated as you go; task status lives in the
   tracker (no in-repo mirror), reported via `project-status`.
 - **At Land, don't poll CI.** With a PR workflow, open the PR and report CI running; with CI but no
-  PR workflow, push the branch to start CI and report the run. A *single* status glance to catch an
+  PR workflow, push the branch to start CI and report the run. A _single_ status glance to catch an
   instant failure is fine. Then **stop — return to the human merge gate.** Don't watch the run to
   completion (`gh run watch`) or keep the turn alive polling. Required CI must be green before the
   human merges; a later failure is handled as a normal fix, not babysat in the Land turn.

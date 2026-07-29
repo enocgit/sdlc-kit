@@ -5,7 +5,7 @@
 >
 > **Only needed when you have no external tracker.** If you use GitHub Issues / Linear / Jira, that
 > tracker is your single source of truth — **delete this file** and use the `project-status` skill
-> to report status live from it. Keep this file *only* in local/offline mode, where it **is** the
+> to report status live from it. Keep this file _only_ in local/offline mode, where it **is** the
 > tracker: hand-maintain it as you work. (There is no automatic mirror to sync.)
 
 ## Now / Next / Blocked

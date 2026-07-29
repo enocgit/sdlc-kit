@@ -23,7 +23,7 @@ the project's `AGENTS.md` → Sensitive areas) get extra care, comments cite the
 (ADR/PRD/contract) not the pipeline, and outward-facing actions and merges stay the human's call.
 
 It is **not** a second `code-review`. `code-review` proactively audits your own diff before you
-push; this skill reactively triages what *reviewers* already said on an open PR. If a comment
+push; this skill reactively triages what _reviewers_ already said on an open PR. If a comment
 prompts a broader re-audit, that's `code-review`'s job — route back to it.
 
 ## Steps
@@ -57,7 +57,7 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
      it in the report. No gate.
    - **Valid + non-trivial** (touches logic, a sensitive area per `AGENTS.md`, or the contract)
      → **STOP and gate**: present a short per-fix plan and get approval before editing. A comment
-     that implies changing a *shipped/frozen* contract is a decision — raise a new ADR, don't
+     that implies changing a _shipped/frozen_ contract is a decision — raise a new ADR, don't
      silently edit the interface.
    - **False positive** → do **not** change code. Draft a brief reply explaining why, citing the
      doc that settles it ("the frozen data contract 0001 permits null here", not "this is fine").

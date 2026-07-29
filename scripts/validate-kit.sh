@@ -351,6 +351,32 @@ for f in README.md CHEATSHEET.md; do
     || fail "$f: standalone address-review skill must be named"
 done
 
+echo "[11] Markdown emphasis style"
+emphasis_hits=""
+while IFS= read -r -d '' f; do
+  hits="$(grep -nE '(^|[[:space:](>])\*([^*[:space:]]|[^*[:space:]][^*]*[^*[:space:]])\*($|[[:space:].,;:!?)])' "$f" || true)"
+  [ -z "$hits" ] || emphasis_hits+="${f#"$KIT/"}:"$'\n'"$hits"$'\n'
+done < <(
+  find \
+    "$KIT/AGENTS.md" \
+    "$KIT/CHANGELOG.md" \
+    "$KIT/CHEATSHEET.md" \
+    "$KIT/CONTRIBUTING.md" \
+    "$KIT/EXAMPLE.md" \
+    "$KIT/INSTALL.md" \
+    "$KIT/README.md" \
+    "$KIT/skills" \
+    "$KIT/templates" \
+    -type f -name '*.md' -print0
+)
+if [ -z "$emphasis_hits" ] \
+  && grep -Fq 'Use underscores (`_text_`) for emphasis.' "$KIT/AGENTS.md"; then
+  pass "Markdown emphasis uses underscores"
+else
+  fail "single emphasis must use underscores and AGENTS.md must state the convention"
+  printf '%s' "$emphasis_hits" | sed 's/^/      /'
+fi
+
 echo
 [ "$FAIL" -eq 0 ] && echo "ALL CHECKS PASSED" || echo "SOME CHECKS FAILED"
 exit "$FAIL"

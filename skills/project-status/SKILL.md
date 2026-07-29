@@ -35,6 +35,6 @@ mode, `docs/progress.md` is the tracker and the skill maintains it as described 
   issues unless the user explicitly asks; this skill reports.
 - **No in-repo mirror.** In tracker-backed mode, do not create or update a `docs/progress.md` — the
   tracker is the record. Keep PRD/ADR/issue cross-links in your summary so it stays navigable.
-- **Local-only exception.** If the project runs with no external tracker, `docs/progress.md` *is*
+- **Local-only exception.** If the project runs with no external tracker, `docs/progress.md` _is_
   the tracker (hand-maintained) — read and report from it, and update it there as the source of
   truth. (This is the one case where the skill writes; there's no second copy to drift against.)

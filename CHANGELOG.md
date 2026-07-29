@@ -16,6 +16,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   SDLC pipeline stages.
 - Added a scan-first documentation writing standard in `AGENTS.md`, linked the conductor and
   templates to it, and moved PRD scan fields ahead of detail.
+- Standardized Markdown emphasis on underscores across maintained docs and added a regression
+  check so consumers do not inherit formatting-only cleanup.
 - Stage 4 now uses a compact in-session task plan by default; durable plan files are created only
   when requested, and implementation proceeds directly through test-driven development.
 
@@ -82,7 +84,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   proceed-with-disclosure; where it writes `docs/progress.md` (local-only), it discloses the
   uncommitted file and `feature-start` clears it at the Stage 4 gate, where stopping belongs.
 - **Expand/contract is conditional, and the condition covers writers.** Required once a table holds
-  real data or *any deployed process reads or writes it* — a deployed writer breaks on a
+  real data or _any deployed process reads or writes it_ — a deployed writer breaks on a
   renamed/dropped column or a new required one just as a reader does. It was unconditional, which
   contradicts the new back-compat principle on greenfield schema.
 - **Stage 7 no longer reports the issue as closed.** The PR carries `Closes #N`, the issue stays
@@ -93,7 +95,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - **Closing keywords are GitHub-only.** Linear/Jira use their own keys (`ENG-123`) and a local-only
   id is a `docs/progress.md` row, so `Closes #3` either fails to close the real task or closes an
   unrelated repository issue #3. Only GitHub-backed PRs and commits carry `Closes #N`; every other
-  mode moves the task to *in review* and completes it after the merge. `INSTALL.md`'s tracker-port
+  mode moves the task to _in review_ and completes it after the merge. `INSTALL.md`'s tracker-port
   guidance matches — its explicit close moved from Land to the post-merge step — and the PR
   template tells every non-GitHub mode to delete its `Closes #` line.
 - **The tracker-completion rule is stated once.** `skills/sdlc/SKILL.md` gains a canonical
@@ -113,7 +115,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   exists and the human merges directly. A configured PR or CI workflow that is unreachable
   (expired auth, network) is a blocker to surface, never a mode. Installation now requires
   non-interactive `git push` only for projects that actually have a remote.
-- **Tracker transitions are explicit, approved writes.** Stage 7's move to *in review* is a
+- **Tracker transitions are explicit, approved writes.** Stage 7's move to _in review_ is a
   separate action, not a side effect of opening the PR: against an external tracker
   `project-status` is read-only, so a Linear/Jira transition needs outward-facing confirmation;
   in local-only it maintains `docs/progress.md` — its one documented write — under normal commit
@@ -136,7 +138,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   closes itself via `Closes #N`, an alternate tracker without Git integration is closed explicitly,
   and the local-only row moves to `Done` — after checking out and syncing the default branch, since
   the checkout is otherwise still on the just-merged `feat/*` and the update would strand there
-  while `main` read *In review* permanently (PR-protected `main` lands it via a `plan/*` branch).
+  while `main` read _In review_ permanently (PR-protected `main` lands it via a `plan/*` branch).
 
 ## [0.1.0] - 2026-07-06
 

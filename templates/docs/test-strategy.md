@@ -19,7 +19,7 @@
 | E2E | {e2e tool — e.g. Playwright, Cypress, Maestro, or Detox} | Critical user flows end-to-end | Per epic's key flow |
 
 **Rule of thumb:** test logic at the lowest layer that gives confidence; reserve E2E for the
-few flows that matter most. New logic must be *covered*, not merely *touched*.
+few flows that matter most. New logic must be _covered_, not merely _touched_.
 
 ## Definition of Done
 

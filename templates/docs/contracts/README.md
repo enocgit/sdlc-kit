@@ -5,13 +5,13 @@
 > and freeze status before examples or extended notes.
 >
 > The integration **source of truth** between frontend, backend, and services. Contracts are
-> *artifacts, not prose* — they live in the codebase and (ideally) generate the types both sides
+> _artifacts, not prose_ — they live in the codebase and (ideally) generate the types both sides
 > consume, so the contract can't silently drift from the code. This folder documents where they
 > live and the rules around them.
 
 ## Where the contract artifacts live
 
-> **REPLACE THIS LIST at Stage 0.** The entries below are *examples*, not real locations. At
+> **REPLACE THIS LIST at Stage 0.** The entries below are _examples_, not real locations. At
 > foundation (0b), once the API-style/datastore ADRs are decided, delete what doesn't apply and
 > point each remaining line at a path that **actually exists in this repo** (or mark it
 > `(future — not built yet)`). Leaving template paths here sends implementers and agents to

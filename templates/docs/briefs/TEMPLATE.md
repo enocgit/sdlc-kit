@@ -5,7 +5,7 @@
 >
 > Lightweight, pre-PRD problem statement (Stage 1, the discovery step of Spec). A page at most.
 > **Optional** — skip it for a well-understood feature and go straight to the PRD; reach for it only
-> to cheaply shape or *kill* a fuzzy/speculative idea before investing in a full PRD (that's its whole
+> to cheaply shape or _kill_ a fuzzy/speculative idea before investing in a full PRD (that's its whole
 > value — a one-page filter, not a warm-up). If it survives scrutiny, it graduates into a PRD.
 
 - **Date / author:** YYYY-MM-DD / {name}

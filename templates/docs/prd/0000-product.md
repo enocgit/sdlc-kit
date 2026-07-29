@@ -6,7 +6,7 @@
 >
 > **Project-level (foundation).** The product's vision and scope — set once at Stage 0 and
 > revised rarely. This is NOT a feature PRD; feature PRDs are `0001+` and reference this one.
-> Keep it short: it frames *why the product exists*, not how any one feature works.
+> Keep it short: it frames _why the product exists_, not how any one feature works.
 
 - **Status:** Draft | Approved | Living
 - **Owner / date:** {name} / YYYY-MM-DD
