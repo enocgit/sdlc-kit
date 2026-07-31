@@ -159,6 +159,30 @@ PY
   else
     fail "test-driven-development must cover stages 4 and 5"
   fi
+  if python3 - "$KIT/required-skills.yml" <<'PY'
+import sys
+import yaml
+
+data = yaml.safe_load(open(sys.argv[1])) or {}
+names = {
+    item.get("name")
+    for item in data.get("skills", [])
+    if isinstance(item, dict)
+}
+raise SystemExit(0 if "grilling" in names and "grill-me" not in names else 1)
+PY
+  then
+    pass "Stage 1 declares the executable grilling skill directly"
+  else
+    fail "Stage 1 must declare grilling directly, not the grill-me wrapper"
+  fi
+  stage_one_row="$(grep -m1 '^| 1 Spec ' "$KIT/skills/sdlc/SKILL.md" || true)"
+  if printf '%s' "$stage_one_row" | grep -Fq '`grilling`' \
+    && ! printf '%s' "$stage_one_row" | grep -Fq '`grill-me`'; then
+    pass "Stage 1 conductor invokes grilling directly"
+  else
+    fail "Stage 1 conductor must invoke grilling directly, not the grill-me wrapper"
+  fi
 else
   echo "  skip (python3 + pyyaml required for a reformat-proof manifest parse)"
 fi

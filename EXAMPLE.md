@@ -24,7 +24,7 @@ The agent creates the project PRD, foundational ADRs, architecture skeleton, and
 
 The user starts with “tenants should pay rent online.” `brainstorming` resolves one question at a
 time and records an optional brief. `to-prd` turns it into `docs/prd/0001-rent-payment.md`.
-`grill-me` resolves cases such as partial payments, failed callbacks, and refunds.
+`grilling` resolves cases such as partial payments, failed callbacks, and refunds.
 
 **Gate:** approve the feature PRD. No tracker issues exist yet.
 

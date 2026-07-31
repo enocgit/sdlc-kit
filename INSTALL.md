@@ -75,7 +75,7 @@ includes a manual fallback for each one.
 |-------|--------|-------|
 | `brainstorming` | obra/superpowers | Spec |
 | `to-prd` | mattpocock/skills | Spec |
-| `grill-me` | mattpocock/skills | Spec |
+| `grilling` | mattpocock/skills | Spec |
 | `documentation-and-adrs` | addyosmani/agent-skills | Foundation, Architecture |
 | `writing-plans` | obra/superpowers | Decompose |
 | `using-git-worktrees` | obra/superpowers | Implement |

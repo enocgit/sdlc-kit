@@ -22,6 +22,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   when requested, and implementation proceeds directly through test-driven development.
 
 ### Fixed
+- Replaced the `grill-me` wrapper with its direct `grilling` dependency so fresh installs include
+  the Stage 1 stress-test procedure.
 - Limited the optional `improve` recommendation to retros that complete a parent task or epic,
   after all of its descendant subtasks are done, instead of surfacing it after every leaf-task
   retro.
