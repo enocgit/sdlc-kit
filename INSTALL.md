@@ -80,7 +80,6 @@ includes a manual fallback for each one.
 | `writing-plans` | obra/superpowers | Decompose |
 | `using-git-worktrees` | obra/superpowers | Implement |
 | `frontend-design` | anthropics/skills | Implement, UI only |
-| `test-driven-development` | obra/superpowers | Implement, QA |
 | `webapp-testing` | anthropics/skills | QA, browser UI only; use a platform runner for mobile |
 | `run`, `verify` | runtime-native or equivalent | QA |
 | `code-review`, `simplify`, `security-review` | runtime-native or equivalent | Review |
@@ -106,6 +105,17 @@ kit's supported-skill manifest, including pipeline dependencies, standalone util
 companions. Extra skills stay available without becoming pipeline stages. To add one to the
 pipeline, update `AGENTS.md`, the project-root `required-skills.yml`, and the installed conductor at
 `.agents/skills/sdlc/SKILL.md` (or `$SKILLS_DIR/sdlc/SKILL.md` when overridden).
+
+### Optional strict TDD
+
+The pipeline's default is proportional verification: every task needs evidence, while bug fixes
+and non-trivial testable behavior start with a failing test. The community
+`test-driven-development` skill is stricter and can auto-trigger for every feature, bug fix,
+refactor, and behavior change. Install it only when the team wants that broader policy:
+
+```bash
+npx skills add obra/superpowers --skill test-driven-development
+```
 
 ### Optional post-epic audit
 

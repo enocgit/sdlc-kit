@@ -25,7 +25,8 @@ Closes #
 
 ## Definition of Done (see AGENTS.md)
 
-- [ ] Tests at the right layer; suite green
+- [ ] Verification matches the risk; non-trivial behavior has automated coverage; suite green
+- [ ] Any choice not to add a test is explained with concrete alternative evidence
 - [ ] App run / change observed working
 - [ ] CI green (lint, typecheck, test, build)
 - [ ] DB changes follow expand/contract — N/A if no real data and nothing deployed reads/writes it

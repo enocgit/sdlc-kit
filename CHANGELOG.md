@@ -7,6 +7,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 ## [Unreleased]
 
 ### Changed
+- Stage 4 now requires proportional verification for every task, with test-first work for bug fixes
+  and non-trivial testable behavior. The broadly auto-triggered strict TDD skill is now optional,
+  and Stage 5 runs QA without restarting a TDD workflow.
 - Surfaced the standalone `address-review` skill in README and the team cheatsheet.
 - Stage 8 keeps the durable-learning pass after every task but defers feature artifacts and the
   parent epic checklist until the final child lands.
@@ -19,7 +22,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - Standardized Markdown emphasis on underscores across maintained docs and added a regression
   check so consumers do not inherit formatting-only cleanup.
 - Stage 4 now uses a compact in-session task plan by default; durable plan files are created only
-  when requested, and implementation proceeds directly through test-driven development.
+  when requested, and implementation proceeds with the approved proportional verification.
 
 ### Fixed
 - Replaced the `grill-me` wrapper with its direct `grilling` dependency so fresh installs include

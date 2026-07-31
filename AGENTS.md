@@ -82,7 +82,9 @@ asterisks for bold (`**text**`).
 - [ ] Implements against the frozen contract (no silent contract changes)
 - [ ] DB schema changes follow expand/contract (migrate → deploy → clean up) **once the table holds
       real data or any deployed process reads or writes it** — before that, change it outright
-- [ ] Tests at the right layer (see `docs/test-strategy.md`); suite is green
+- [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Automated tests cover
+      non-trivial behavior at the right layer; when a new test adds little confidence, use concrete
+      alternative evidence and state why. The existing suite is green
 - [ ] App runs and the change is observed working (not just unit-green)
 - [ ] **CI is green** (lint, typecheck, test, build) — N/A _only_ where no CI workflow exists;
       CI that exists but is unreachable blocks, it doesn't exempt. When CI needs a pushed branch,

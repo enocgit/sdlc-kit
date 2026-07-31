@@ -9,6 +9,14 @@
 > authoritative **Definition of Done** and **Definition of Ready** live in `AGENTS.md` and are
 > enforced before Land; this doc only adds the test-specific bar (see "Definition of Done" below).
 
+## Policy
+
+Every task needs verification evidence; not every change needs a new automated test. For bug fixes
+and non-trivial testable behavior, begin with a failing test and follow a RED → GREEN cycle.
+Otherwise choose the smallest check that proves the change: existing tests, typecheck, build,
+schema validation, dry-run, smoke test, browser observation, or another concrete oracle. When
+adding no test, state why it would add little confidence and record the alternative evidence.
+
 ## Test layers (the pyramid)
 
 | Layer | Tool | What it covers | When required |
@@ -18,16 +26,19 @@
 | Contract | (generated types) + schema validation | FE/BE agree on the frozen interface | Any contract change |
 | E2E | {e2e tool — e.g. Playwright, Cypress, Maestro, or Detox} | Critical user flows end-to-end | Per epic's key flow |
 
-**Rule of thumb:** test logic at the lowest layer that gives confidence; reserve E2E for the
-few flows that matter most. New logic must be _covered_, not merely _touched_.
+**Rule of thumb:** test logic at the lowest layer that gives confidence; reserve E2E for the few
+flows that matter most. Non-trivial behavior must be _covered_, not merely _touched_. Styling,
+documentation, configuration, generated output, and already-covered refactors may use more direct
+evidence when an additional automated test would not improve confidence.
 
 ## Definition of Done
 
 The **canonical Definition of Done lives in `AGENTS.md`** ("Definition of Done") — one list, no
 copies to drift; `definition-of-done-review` checks against it at the merge gate. What this
-document adds to that bar: tests at the **right layer** per the table above, the suite fully
-green, and the change **run and observed working** (`run`/`verify`) — with `security-review` when
-a sensitive area is touched (canonical list in `AGENTS.md` → Sensitive areas).
+document adds to that bar: proportional verification per the policy above, automated coverage for
+non-trivial behavior at the **right layer**, the existing suite fully green, and the change **run
+and observed working** (`run`/`verify`) — with `security-review` when a sensitive area is touched
+(canonical list in `AGENTS.md` → Sensitive areas).
 
 ## Conventions
 

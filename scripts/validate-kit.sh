@@ -152,12 +152,27 @@ skill = next(
     {},
 )
 stages = {part for part in re.split(r"[\s,]+", str(skill.get("stage", ""))) if part}
-raise SystemExit(0 if {"4", "5"} <= stages else 1)
+note = str(skill.get("note", ""))
+raise SystemExit(
+    0
+    if stages == {"none"}
+    and "optional strict mode" in note
+    and "auto-trigger" in note
+    else 1
+)
 PY
   then
-    pass "test-driven-development covers Implement and QA"
+    pass "strict test-driven-development is an explicit optional mode"
   else
-    fail "test-driven-development must cover stages 4 and 5"
+    fail "test-driven-development must be optional because its upstream skill auto-triggers broadly"
+  fi
+  stage_four_row="$(grep -m1 '^| 4 Implement ' "$KIT/skills/sdlc/SKILL.md" || true)"
+  stage_five_row="$(grep -m1 '^| 5 QA ' "$KIT/skills/sdlc/SKILL.md" || true)"
+  if ! printf '%s' "$stage_four_row" | grep -Fq '`test-driven-development`' \
+    && ! printf '%s' "$stage_five_row" | grep -Fq '`test-driven-development`'; then
+    pass "conductor does not force the optional strict TDD skill"
+  else
+    fail "conductor must not force the optional strict TDD skill in Stage 4 or 5"
   fi
   if python3 - "$KIT/required-skills.yml" <<'PY'
 import sys

@@ -61,13 +61,16 @@ plan approval gate.
    Keep it proportional to this one task and easy to scan:
    - **Outcome** — one sentence.
    - **Affected files** — exact paths and why each changes.
-   - **Approach** — a few logical implementation steps, with tests paired to the behavior.
-   - **Tests and observable verification** — commands or user-visible checks that prove completion.
+   - **Approach** — a few logical implementation steps, with verification paired to the risk.
+   - **Verification** — automated tests and/or observable checks that prove completion; if no new
+     test adds useful confidence, say why and name the alternative evidence.
    - **Risks or open questions** — only when real.
 
    Omit implementation code, repeated PRD/ADR/contract content, speculative work, mechanical
-   microsteps, and commit instructions. After approval, execute the plan with
-   `test-driven-development`.
+   microsteps, and commit instructions. After approval, start a bug fix or non-trivial testable
+   behavior with a failing test, then make it pass and refactor. Otherwise implement directly and
+   collect the planned proportional verification; do not invent a low-value test merely to satisfy
+   the process.
 5. **GATE.** Present the plan. Ask for approval before writing any code.
 
 ## Rules

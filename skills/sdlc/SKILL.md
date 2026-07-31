@@ -129,8 +129,8 @@ each gate.
 | 1 Spec | `brainstorming` (method only) → `to-prd` → `grilling` | **optional** Stage-1 brief `docs/briefs/NNNN-*.md` (only for a fuzzy/speculative idea — else skip straight to the PRD), then hardened PRD `docs/prd/NNNN-*.md` (no issues yet) | **GATE — approve PRD** |
 | 2 Architecture + Contract | `documentation-and-adrs` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
-| 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical) → `test-driven-development`, `frontend-design` (UI work only) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
-| 5 QA | `test-driven-development`, `run`, `verify` (`webapp-testing` for UI/browser) | tests green, app runs, CI green | proceed (disclose results) |
+| 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical), `frontend-design` (UI work only) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
+| 5 QA | tests + `run`, `verify` (`webapp-testing` for UI/browser) | verification evidence, tests green, app runs, CI green | proceed (disclose results) |
 | 6 Review | `code-review`, `simplify`, `definition-of-done-review` — pick what the change warrants | clean diff, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
 | 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to _in review_ according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
 | 8 Retro | reflect + write (native) | curate **0–3** durable learnings after every task; after the final child, reconcile feature artifacts and the parent epic (see [Stage 8](#stage-8-what-a-learning-is-and-isnt)) | if repository files changed, offer to land them on `main`; otherwise continue without an empty landing action |
@@ -350,6 +350,11 @@ design or spike plan as a substitute for this pipeline's PRD path.
   branches `feat/{id}-{slug}` from it).
 - **Definition of Ready** before Stage 4: acceptance criteria written, contract frozen, no open
   questions. **Definition of Done** before Land (Stage 7) (see `AGENTS.md`).
+- **Every task needs proportional verification, not necessarily a new test.** Start bug fixes and
+  non-trivial testable behavior with a failing test (RED → GREEN). For changes where a new
+  automated test adds little confidence, use the concrete alternative evidence required by
+  `docs/test-strategy.md` and state why no new test was added. The strict community
+  `test-driven-development` skill is an optional team-wide policy, not a pipeline dependency.
 - Contract-first: never let implementation drift from the frozen contract. Changing a shipped
   contract requires a new ADR (versioning/deprecation).
 - **Reviews run inline** during Implement/QA — pick `code-review` / `simplify` /

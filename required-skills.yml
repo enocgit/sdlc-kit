@@ -30,7 +30,6 @@ skills:
   - { name: documentation-and-adrs,        kind: community, source: addyosmani/agent-skills, ref: main, stage: "0b,2", note: "ADRs go to docs/adr/NNNN-slug.md, never docs/decisions/", fallback: "use docs/adr/TEMPLATE.md + docs/contracts/README.md by hand" }
   - { name: writing-plans,                 kind: community, source: obra/superpowers,        ref: main, stage: 3,      note: "method only — decompose into tracker issues; do NOT write docs/superpowers/plans/", fallback: "decompose into issues manually" }
   - { name: using-git-worktrees,           kind: community, source: obra/superpowers,        ref: main, stage: 4,      note: "opt-in — only when isolation is critical; default is a feature branch via feature-start", fallback: "feature-start runs its built-in branch hygiene guards" }
-  - { name: test-driven-development,       kind: community, source: obra/superpowers,        ref: main, stage: "4,5",  fallback: "write tests first per docs/test-strategy.md" }
   - { name: webapp-testing,                kind: community, source: anthropics/skills,        ref: main, stage: 5,      note: "UI/browser checks only — skip for backend; replace with a platform runner such as Maestro or Detox for mobile", fallback: "drive the app with its platform runner (Playwright, Maestro, Detox, etc.)" }
   - { name: improve-codebase-architecture, kind: community, source: mattpocock/skills,        ref: main, stage: 0,      fallback: "reverse-engineer context/architecture by reading the code" }
 
@@ -48,6 +47,10 @@ skills:
   - { name: security-review, kind: claude-code, stage: 6, note: "mandatory when a sensitive area is touched — not agent-discretion", fallback: "review sensitive-area changes against docs/security.md" }
 
   # --- companion (optional; NOT part of the pipeline, not gated, no stage) ---
+  # Strict TDD is opt-in because the upstream skill advertises itself for every feature, bug fix,
+  # refactor, and behavior change. The kit's default proportional policy lives in test-strategy.md.
+  - { name: test-driven-development, kind: community, source: obra/superpowers, ref: main, stage: none, note: "optional strict mode — the upstream skill can auto-trigger for every feature, bug fix, refactor, and behavior change; install only when the team wants that policy", fallback: "for bug fixes and non-trivial behavior, write the failing test first; otherwise follow docs/test-strategy.md" }
+
   # A read-only advisor at the portfolio altitude — good to run standalone AFTER an epic closes.
   # Recon ingests docs/adr, PRDs, and context.md, so it composes with this kit's docs/. Default
   # `improve` AUDITS the code (bugs/debt/perf/tests) → self-contained fix plans in plans/; `--issues`
