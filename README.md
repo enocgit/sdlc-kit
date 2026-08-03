@@ -102,6 +102,8 @@ behavior.
 ## Portability
 
 - `AGENTS.md` is canonical. Runtime-specific files such as `CLAUDE.md` should point to it.
+- Agent replies default to compact, outcome-first prose; durable docs remain concise but use complete
+  sentences. A response-compression skill can strengthen this preference but is never required.
 - Skills are portable Markdown. Each stage has a manual fallback in `required-skills.yml`.
 - `required-skills.yml` is the kit's supported-skill manifest: pipeline dependencies, standalone
   utilities, optional companions, and their fallbacks. You can install other skills; they do not

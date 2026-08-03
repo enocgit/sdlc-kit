@@ -106,6 +106,15 @@ companions. Extra skills stay available without becoming pipeline stages. To add
 pipeline, update `AGENTS.md`, the project-root `required-skills.yml`, and the installed conductor at
 `.agents/skills/sdlc/SKILL.md` (or `$SKILLS_DIR/sdlc/SKILL.md` when overridden).
 
+### Optional response compression
+
+The communication standard in `AGENTS.md` works without a skill. If the runtime provides a response
+profile, or the user installs a skill such as `caveman`, use its full level for conversational
+output and its lite level for repository documentation. Code, commits, and PRs retain their existing
+standards, and the SDLC status header remains required. Keep full sentences for the clarity
+exceptions in `AGENTS.md`. Session-scoped mode persistence is only a convenience; the project
+instruction is the cross-session default. Runtime safety and progress instructions take precedence.
+
 ### Optional strict TDD
 
 The pipeline's default is proportional verification: every task needs evidence, while bug fixes

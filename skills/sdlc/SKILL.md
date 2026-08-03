@@ -113,11 +113,11 @@ and **override its workflow**:
 
 If a borrowed skill's default fights an `AGENTS.md` convention, **`AGENTS.md` wins.**
 
-## Documentation writing standard
+## Communication and documentation writing standards
 
-Follow the documentation writing standard in `AGENTS.md`; it is the single source. Apply it to every
-durable artifact this conductor creates or updates, and trim borrowed-skill output to match before
-each gate.
+Follow the communication and documentation writing standards in `AGENTS.md`; it is the single source
+for both. Apply the communication standard to replies and the documentation standard to every
+durable artifact. Trim borrowed-skill output to match before each gate.
 
 ## The stages, skills, and gates
 

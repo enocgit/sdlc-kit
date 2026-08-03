@@ -66,8 +66,16 @@ decision/outcome, constraints, links, and open questions before detail. Prefer b
 small tables, and links to source-of-truth docs over narrative or duplicated facts. Keep useful
 template prompts in templates; in filled project artifacts remove unused scaffold, empty headings,
 HTML comments, and boilerplate. If a deferred section matters, write the owner/trigger for filling
-it instead of leaving generic placeholders. Use underscores (`_text_`) for emphasis. Reserve
-asterisks for bold (`**text**`).
+it instead of leaving generic placeholders. Write tight, complete sentences; omit filler and
+repetition, but avoid conversational fragments that make durable facts ambiguous.
+Use underscores (`_text_`) for emphasis. Reserve asterisks for bold (`**text**`).
+
+## Communication standard
+
+Keep user-facing replies compact: lead with the outcome, state each fact once, omit filler, and
+quote only decisive log lines unless more detail is requested. Fragments are fine when clear; use
+complete sentences for gates, security warnings, irreversible actions, ordered steps, and complex
+trade-offs. Expand when the human asks; runtime safety and progress rules win.
 
 ## Definition of Ready (before a task enters Implement)
 

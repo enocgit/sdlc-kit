@@ -7,6 +7,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 ## [Unreleased]
 
 ### Changed
+- Agent replies now default to compact, outcome-first prose, while durable docs use concise, complete
+  sentences. Optional response-compression skills can strengthen the preference without becoming a
+  pipeline dependency.
 - Stage 4 now requires proportional verification for every task, with test-first work for bug fixes
   and non-trivial testable behavior. The broadly auto-triggered strict TDD skill is now optional,
   and Stage 5 runs QA without restarting a TDD workflow.

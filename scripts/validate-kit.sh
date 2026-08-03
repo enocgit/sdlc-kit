@@ -364,8 +364,10 @@ for doc_template in \
   grep -Fq 'Follow the documentation writing standard in AGENTS.md.' "$KIT/$doc_template" \
     || template_guidance_ok=0
 done
-if grep -Fq '## Documentation writing standard' "$KIT/AGENTS.md" \
-  && grep -Fq 'Follow the documentation writing standard in `AGENTS.md`; it is the single source.' "$KIT/skills/sdlc/SKILL.md" \
+if grep -Fq '## Communication standard' "$KIT/AGENTS.md" \
+  && grep -Fq '## Documentation writing standard' "$KIT/AGENTS.md" \
+  && printf '%s' "$sdlc_text" | grep -Fq 'communication and documentation writing standards in `AGENTS.md`' \
+  && printf '%s' "$sdlc_text" | grep -Fq 'single source for both' \
   && awk '
     /^## Scan$/ { scan = NR }
     /^## Problem$/ { problem = NR }
@@ -380,9 +382,9 @@ if grep -Fq '## Documentation writing standard' "$KIT/AGENTS.md" \
     }
   ' "$KIT/templates/docs/prd/TEMPLATE.md" \
   && [ "$template_guidance_ok" -eq 1 ]; then
-  pass "documentation standard is single-sourced and the PRD starts with scan fields"
+  pass "communication and documentation standards are single-sourced; PRD starts with scan fields"
 else
-  fail "documentation guidance must be single-sourced and the PRD scan must precede detail"
+  fail "communication/documentation guidance must be single-sourced and the PRD scan must precede detail"
 fi
 for f in README.md CHEATSHEET.md; do
   grep -Fq '`address-review`' "$KIT/$f" \
