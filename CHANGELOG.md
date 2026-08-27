@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-27
+
 ### Changed
 - Agent replies now default to compact, outcome-first prose, while durable docs use concise, complete
   sentences. Optional response-compression skills can strengthen the preference without becoming a
