@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skill": "documentation-and-adrs",
+  "source": "https://github.com/addyosmani/agent-skills.git",
+  "commit": "7cb7a20bb38b199728d456999c725a0488490ab6",
+  "upstreamPath": "skills/documentation-and-adrs",
+  "snapshotHash": "sha256-framed-v3",
+  "contentSha256": "cdebbaf595ff80f4bb7373df68a142aadd0de5ae716f73764c4a5f3a0ee6a9ff",
+  "licenseSource": "LICENSE",
+  "licenseSha256": "6f202f8bd568cd730dbb2b0d1f8e243bc74c2fa1f64dbce9b2c7ea08bd5c9fd7"
+}

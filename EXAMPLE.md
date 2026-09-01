@@ -16,9 +16,12 @@ yet.
 
 ### 0b. Foundation
 
-The agent creates the project PRD, foundational ADRs, architecture skeleton, and core contract.
+The agent creates the project PRD, foundational ADRs, architecture skeleton, core contract, and
+foundational threat model, then replaces the test strategy's placeholder runners with the project's
+real tools. Because authentication is sensitive, it runs `security-review` on this planning diff.
 
-**Gate:** approve the foundation.
+**Gate:** approve the foundation and land the context + foundation package on `main`. If `main` is
+protected, use a `plan/*` PR and wait for the human to merge it.
 
 ### 1. Spec
 
@@ -34,10 +37,12 @@ The agent records the payment-provider decision in an ADR, adds the payment comp
 `docs/architecture.md`, and threat-models payments and PII in `docs/security.md`. For TenantPay, it
 defines payment and webhook endpoints in `api/openapi.yaml` and generates shared types. Other
 projects freeze their actual contract source, such as tRPC routers, ts-rest contracts, schemas, or
-interface definitions.
+interface definitions. It runs `security-review` on the sensitive planning diff before landing it;
+Stage 6 reviews the implementation diff separately.
 
-**Gate:** approve the approach and freeze the interface. Frontend and backend can now work against
-the same contract.
+**Gate:** approve the approach, freeze the interface, and land the Stage 1–2 planning package on
+`main`. If `main` is protected, use a `plan/*` PR and wait for the human to merge it. Frontend and
+backend can then work against the same contract.
 
 ### 3. Decompose
 
@@ -53,18 +58,24 @@ for one. The agent then implements against the frozen contract.
 
 ### 5. QA
 
-The agent runs tests, starts the app, completes a sandbox payment, and confirms CI is green.
+The agent runs tests, starts the app, and completes a sandbox payment. CI is green when it can run
+before a PR; otherwise it remains pending until Land opens the PR.
 
 ### 6. Review
 
 `code-review` and `simplify` inspect the diff. Because the feature touches payments and PII, the
-agent also runs `security-review` and fixes its findings.
+agent also runs `security-review` and fixes its findings. It then runs the mandatory local-readiness
+`definition-of-done-review`; required CI is the only pending item before Land.
 
 ### 7. Land
 
-The agent opens a GitHub PR with `Closes #N`. The issue remains open while the PR is under review.
+After local review, the agent asks for one combined approval to commit, push, and open the PR. The
+request authorizes only those named actions, never merge. The GitHub PR uses `Closes #N`; the issue
+remains open while the PR is under review. After required CI passes, the agent runs the final DoD
+confirmation and reports whether the change is ready to merge.
 
-**Gate:** the human merges. GitHub then closes the issue.
+**Gate:** the human merges after CI is green and final DoD confirmation passes. GitHub then closes
+the issue.
 
 ### 8. Retro
 
@@ -78,9 +89,10 @@ asks to update and close the parent GitHub issue. Once the parent is closed, it 
 
 ## Existing project
 
-The `adopt` path changes only Stage 0. The agent reads the code and reconstructs
-`docs/context.md`, `docs/architecture.md`, contract pointers, and a few retrospective ADRs. This
-step documents existing behavior; it does not change it.
+The `adopt` path changes only Stage 0. The agent reads the code, configures
+`docs/test-strategy.md`, and reconstructs `docs/context.md`, `docs/architecture.md`, contract
+pointers, and a few retrospective ADRs. This step documents existing behavior; it does not change
+it.
 
 After foundation approval, the next feature follows Stages 1–8 above. Architecture and contracts
 are extended instead of created. Changing a shipped contract requires a versioning or deprecation

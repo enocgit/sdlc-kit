@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skill": "frontend-design",
+  "source": "https://github.com/anthropics/skills.git",
+  "commit": "3b3fad96af16a10759d930941b4520ba0c40edae",
+  "upstreamPath": "skills/frontend-design",
+  "snapshotHash": "sha256-framed-v3",
+  "contentSha256": "315a8f632f79fb9d42863044513f2998022a58d16c7ef4b5e314bedb91698d51",
+  "licenseSource": "skills/frontend-design/LICENSE.txt",
+  "licenseSha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+}

@@ -3,7 +3,9 @@ skills/definition-of-done-review/SKILL.md
 skills/feature-start/SKILL.md
 skills/project-status/SKILL.md
 skills/sdlc/SKILL.md
-templates/ci.yml
+templates/AGENTS.md
+templates/CLAUDE.md
+templates/github/workflows/ci.yml
 templates/docs/adr/0001-record-architecture-decisions.md
 templates/docs/adr/TEMPLATE.md
 templates/docs/architecture.md
