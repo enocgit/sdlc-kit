@@ -4,8 +4,9 @@
 > invariants, actors, trust boundaries, then a compact threat table. Move long explanations below
 > the table or into ADRs.
 >
-> Lightweight, living security doc. Touched at the **Architecture** stage for any feature in a
-> **sensitive area** (canonical list in `AGENTS.md` → Sensitive areas), and revisited at review.
+> Lightweight, living security doc. At **Foundation**, replace the example row with project-specific
+> threats for foundational auth and other sensitive surfaces. Update it at **Architecture** for each
+> sensitive feature (canonical list in `AGENTS.md` → Sensitive areas), then revisit it at review.
 > Not a formal audit — a structured "what could go wrong and how do we prevent it."
 
 ## Threat model (per sensitive feature)
@@ -34,6 +35,6 @@ trust boundary? What happens if each input is hostile? What if a dependency/webh
 
 ## Review
 
-`security-review` runs at Review (Stage 6), before the Stage 7 merge, for any change in a
-sensitive area and must close its findings — this is mandatory, not agent-discretion. Decisions
-that change the security posture are recorded as ADRs.
+Run `security-review` before landing a sensitive Foundation or Architecture planning package, and
+again at Review (Stage 6) for the implementation diff. Close all findings before each merge; this
+is mandatory, not agent discretion. Record decisions that change the security posture as ADRs.

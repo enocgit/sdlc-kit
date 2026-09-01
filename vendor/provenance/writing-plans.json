@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skill": "writing-plans",
+  "source": "https://github.com/obra/superpowers.git",
+  "commit": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+  "upstreamPath": "skills/writing-plans",
+  "snapshotHash": "sha256-framed-v3",
+  "contentSha256": "ae810d901e75e409c701ccb659b40875ae5ba2e5daae2d119e582d222d818208",
+  "licenseSource": "LICENSE",
+  "licenseSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
+}

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skill": "to-prd",
+  "source": "https://github.com/mattpocock/skills.git",
+  "commit": "c5a4a8c2e966e28628f56d1bfef07f401d399df0",
+  "upstreamPath": "skills/engineering/to-prd",
+  "snapshotHash": "sha256-framed-v3",
+  "contentSha256": "e113e37d8f5e78d7fa38d27dda9108e00c454d273108db8677cc0883aec9aa63",
+  "licenseSource": "LICENSE",
+  "licenseSha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+}

@@ -16,10 +16,23 @@ yarn-error.log*
 .env.*
 !.env.example
 
-# Skill install artifacts — the kit ships skills as SOURCE under skills/.
+# Skill install artifacts — kit-owned source lives in skills/; third-party snapshots in vendor/skills/.
 .agents/
 .claude/skills/
 skills-lock.json
+
+# Maintainer transaction and installer recovery state
+.vendor-transaction.json
+.vendor-transaction.json.tmp-*
+.vendor-backup
+.vendor-staging-*
+.vendor-preserved-*
+.sdlc-staging-intent
+.sdlc-staging-intent.tmp-*
+.sdlc-file-*
+.sdlc-skill-*
+.sdlc-rename-probe-*
+.sdlc-preserved-*
 
 # Scratch
 *.log

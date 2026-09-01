@@ -1,0 +1,87 @@
+{
+  "version": 2,
+  "skills": {
+    "brainstorming": {
+      "source": "https://github.com/obra/superpowers.git",
+      "track": "refs/heads/main",
+      "commit": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+      "upstreamPath": "skills/brainstorming",
+      "contentSha256": "d6ec8dae24bff1fdddc321d087d51e5636a8dddec73a18b6ad8a707896c68705",
+      "licenseSource": "LICENSE",
+      "licenseSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
+    },
+    "to-prd": {
+      "source": "https://github.com/mattpocock/skills.git",
+      "track": "c5a4a8c2e966e28628f56d1bfef07f401d399df0",
+      "commit": "c5a4a8c2e966e28628f56d1bfef07f401d399df0",
+      "upstreamPath": "skills/engineering/to-prd",
+      "contentSha256": "e113e37d8f5e78d7fa38d27dda9108e00c454d273108db8677cc0883aec9aa63",
+      "licenseSource": "LICENSE",
+      "licenseSha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    "grilling": {
+      "source": "https://github.com/mattpocock/skills.git",
+      "track": "refs/heads/main",
+      "commit": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+      "upstreamPath": "skills/productivity/grilling",
+      "contentSha256": "74b778ef8ae80aa2a8f70fcc9606c95b9547f20f8ba187b24d6b1d513a296cec",
+      "licenseSource": "LICENSE",
+      "licenseSha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    },
+    "documentation-and-adrs": {
+      "source": "https://github.com/addyosmani/agent-skills.git",
+      "track": "refs/heads/main",
+      "commit": "7cb7a20bb38b199728d456999c725a0488490ab6",
+      "upstreamPath": "skills/documentation-and-adrs",
+      "contentSha256": "cdebbaf595ff80f4bb7373df68a142aadd0de5ae716f73764c4a5f3a0ee6a9ff",
+      "licenseSource": "LICENSE",
+      "licenseSha256": "6f202f8bd568cd730dbb2b0d1f8e243bc74c2fa1f64dbce9b2c7ea08bd5c9fd7"
+    },
+    "writing-plans": {
+      "source": "https://github.com/obra/superpowers.git",
+      "track": "refs/heads/main",
+      "commit": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+      "upstreamPath": "skills/writing-plans",
+      "contentSha256": "ae810d901e75e409c701ccb659b40875ae5ba2e5daae2d119e582d222d818208",
+      "licenseSource": "LICENSE",
+      "licenseSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
+    },
+    "using-git-worktrees": {
+      "source": "https://github.com/obra/superpowers.git",
+      "track": "refs/heads/main",
+      "commit": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+      "upstreamPath": "skills/using-git-worktrees",
+      "contentSha256": "0acfad12a39435e2b55dcaa3b410ba1094e6da8d993c1b27ce594c46f7b1e648",
+      "licenseSource": "LICENSE",
+      "licenseSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
+    },
+    "frontend-design": {
+      "source": "https://github.com/anthropics/skills.git",
+      "track": "refs/heads/main",
+      "commit": "3b3fad96af16a10759d930941b4520ba0c40edae",
+      "upstreamPath": "skills/frontend-design",
+      "contentSha256": "315a8f632f79fb9d42863044513f2998022a58d16c7ef4b5e314bedb91698d51",
+      "licenseSource": "skills/frontend-design/LICENSE.txt",
+      "licenseSha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    "webapp-testing": {
+      "source": "https://github.com/anthropics/skills.git",
+      "track": "refs/heads/main",
+      "commit": "3b3fad96af16a10759d930941b4520ba0c40edae",
+      "upstreamPath": "skills/webapp-testing",
+      "contentSha256": "2a6fc822d75c875c127b9344d44e68aa65f0cb431892cc9467d2a931068db670",
+      "licenseSource": "skills/webapp-testing/LICENSE.txt",
+      "licenseSha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
+    },
+    "improve-codebase-architecture": {
+      "source": "https://github.com/mattpocock/skills.git",
+      "track": "refs/heads/main",
+      "commit": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+      "upstreamPath": "skills/engineering/improve-codebase-architecture",
+      "contentSha256": "2889222c35b133361e87aa71863cf2e679fb62b5f6cefce365f1c681de52f315",
+      "licenseSource": "LICENSE",
+      "licenseSha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+    }
+  },
+  "snapshotHash": "sha256-framed-v3"
+}

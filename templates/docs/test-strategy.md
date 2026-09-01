@@ -1,4 +1,4 @@
-# Test strategy & Definition of Done
+# Test strategy
 
 > Follow the documentation writing standard in AGENTS.md. Keep this doc focused on test-specific
 > policy and links to real tools; do not duplicate the canonical Definition of Done from AGENTS.md.
@@ -6,8 +6,9 @@
 >
 > **STATUS: TEMPLATE** — set the tools below at Stage 0 from your **real** stack; the tool names
 > are placeholders, not a decision (e.g. the starter may be wired for Jest, not Vitest). The
-> authoritative **Definition of Done** and **Definition of Ready** live in `AGENTS.md` and are
-> enforced before Land; this doc only adds the test-specific bar (see "Definition of Done" below).
+> authoritative **Definition of Done** and **Definition of Ready** live in `AGENTS.md`. Local
+> readiness is required before Land; the full Definition of Done is enforced before merge. This doc
+> only adds the test-specific bar (see "Verification bar" below).
 
 ## Policy
 
@@ -20,7 +21,7 @@ adding no test, state why it would add little confidence and record the alternat
 ## Test layers (the pyramid)
 
 | Layer | Tool | What it covers | When required |
-|-------|------|----------------|---------------|
+| ------- | ------ | ---------------- | --------------- |
 | Unit | {unit runner — e.g. Vitest or Jest} | Pure logic, edge cases | All non-trivial logic |
 | Integration | {same runner} + test DB | Module ↔ DB, API handlers against the contract | Any data/contract change |
 | Contract | (generated types) + schema validation | FE/BE agree on the frozen interface | Any contract change |
@@ -31,14 +32,13 @@ flows that matter most. Non-trivial behavior must be _covered_, not merely _touc
 documentation, configuration, generated output, and already-covered refactors may use more direct
 evidence when an additional automated test would not improve confidence.
 
-## Definition of Done
+## Verification bar
 
 The **canonical Definition of Done lives in `AGENTS.md`** ("Definition of Done") — one list, no
-copies to drift; `definition-of-done-review` checks against it at the merge gate. What this
-document adds to that bar: proportional verification per the policy above, automated coverage for
-non-trivial behavior at the **right layer**, the existing suite fully green, and the change **run
-and observed working** (`run`/`verify`) — with `security-review` when a sensitive area is touched
-(canonical list in `AGENTS.md` → Sensitive areas).
+copies to drift; `definition-of-done-review` checks against it during Review and again before merge.
+This document adds only the test-specific bar: proportional verification per the policy above,
+automated coverage for non-trivial behavior at the **right layer**, and the existing suite fully
+green.
 
 ## Conventions
 

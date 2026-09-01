@@ -21,8 +21,8 @@ Artifacts live at two altitudes — keep them straight:
 
 - **Project-level (foundation)** — set once, early (Stage 0): the **product PRD**
   (`docs/prd/0000-product.md`), the few cross-cutting **ADRs** (stack, repo layout, auth,
-  datastore, API style), the **architecture skeleton**, and the **core contract**. These belong
-  to no single feature.
+  datastore, API style), the **architecture skeleton**, **foundational threat model**, and **core
+  contract**. These belong to no single feature.
 - **Feature-level** — produced per feature (Stages 1–8): a brief, a feature PRD, feature ADR(s),
   and a contract _slice_.
 
@@ -31,44 +31,58 @@ feature can't start without. Let everything else emerge per-feature.
 
 ## First: orient
 
-**Resolve skills from the skill dirs.** Look for this pipeline's skills in the user-global
-dirs (`~/.agents/skills`, `~/.claude/skills`) **and** the project's local skills dir — not the
-project alone. A skill may be installed globally; don't assume a stage's skill is missing just
-because it isn't vendored in the repo. If it's in neither place, resolve in this order: (1) use the
-named skill if present; (2) else use your **runtime's equivalent** — several stage skills are named
-after Claude Code's commands (`code-review`, `simplify`, `verify`, `run`, `security-review`) and other
-runtimes have their own (e.g. Codex `review` ≈ `code-review`), so use that; (3) only if there's no
-skill **and** no runtime equivalent, use the manual `fallback` in `required-skills.yml`.
+**Resolve skills from the skill dirs.** Project-local bundled skills are authoritative inside a
+pipeline project. Use the project's local skill first; consult user-global directories
+(`~/.agents/skills`, `~/.claude/skills`) only when that local skill is absent, and disclose the
+fallback. If neither location has it, use your **runtime's equivalent** — several stage skills are
+named after Claude Code's commands (`code-review`, `simplify`, `verify`, `run`, `security-review`) and
+other runtimes have their own (e.g. Codex `review` ≈ `code-review`). Only when no skill or runtime
+equivalent exists should you use the manual `fallback` in `required-skills.yml`.
 
-1. Read `AGENTS.md` and `docs/context.md`. **Stage 0 is incomplete** if either is missing OR
-   still contains template markers — an unfilled `docs/context.md` carries a `> STATUS: TEMPLATE`
-   line and/or `{placeholder}` tokens. The installer ships these files pre-created, so do NOT
-   rely on existence alone: check the context is actually filled. If Stage 0 is incomplete, run
+1. Read `AGENTS.md`, `docs/context.md`, and `docs/test-strategy.md`. **Stage 0 is incomplete** if
+   the operating manual or context is missing, `AGENTS.md` still contains `Stack (placeholder`, the
+   context still has its `> STATUS: TEMPLATE` line or `{placeholder}` tokens, or the test strategy is
+   missing or the test strategy still contains its `STATUS: TEMPLATE` marker or placeholder tools.
+   Stage 0 is also incomplete when the product PRD, architecture, contracts index, or foundational ADR set is missing or still templated.
+   A missing or templated security threat model also blocks completion. Check
+   `docs/prd/0000-product.md`, `docs/architecture.md`, `docs/security.md`,
+   `docs/contracts/README.md`, and the applicable decisions in `docs/adr/`; reject placeholder tokens, example-only contract paths, draft foundation status,
+   and an ADR directory that records no actual stack, repository, auth, datastore, or API decision.
+   Also reject a security doc with no project-specific foundational threats and mitigations. The
+   installer pre-creates these
+   paths, so do NOT rely on existence alone. If Stage 0 is incomplete, run
    the on-ramp and treat **"context filled" as a gate** — do not advance to Discovery until the
    STATUS marker is gone and the sections are completed for this project:
    - **`bootstrap` (new project, little/no code):** two parts —
      - **0a Context:** the kit's installer already scaffolded `docs/`, `AGENTS.md`, and the
        one-line `CLAUDE.md` pointer — if any are missing, re-run the kit's `install.sh` (it's
-       non-destructive) rather than recreating them by hand. Then interactively fill
-       `docs/context.md`. Do NOT run `init` — there's no codebase yet. _Gate: context filled._
+       non-destructive) rather than recreating them by hand. Then adapt the stack and conventions in
+       `AGENTS.md` and interactively fill `docs/context.md`. _Gate: context filled._
      - **0b Foundation:** produce the **project-level** artifacts — a product PRD at
        `docs/prd/0000-product.md`, the few unavoidable cross-cutting ADRs (stack, repo layout,
-       auth, datastore, API style), the `architecture.md` skeleton, and a core contract scaffold.
-       Keep it minimal: only decisions a first feature genuinely can't start without — let the
+       auth, datastore, API style), the `architecture.md` skeleton, a core contract scaffold, the
+       foundational threat model in `docs/security.md`, and configure `docs/test-strategy.md` with
+       the real test tools. Keep it minimal: only decisions a
+       first feature genuinely can't start without — let the
        rest emerge per-feature. **GATE: approve the foundation before Discovery.**
-   - **`adopt` (existing codebase):** run `improve-codebase-architecture` (and `init`) to
-     reverse-engineer `context.md` + `architecture.md` and **backfill the foundational ADRs**
-     (stack, repo, auth, datastore already baked into the code). That reverse-engineered set IS
-     the project-level foundation. Note known **tech-debt / risky areas** in `architecture.md`
-     (and file actionable ones as issues); the first feature to validate the workflow is simply
-     your first Stage 1 Spec. **GATE: approve.**
+   - **`adopt` (existing codebase):** use `improve-codebase-architecture` plus explicit read-only
+     code analysis to reconstruct `docs/prd/0000-product.md`, reverse-engineer `docs/context.md` +
+     `docs/architecture.md`, adapt `AGENTS.md` to the actual stack and conventions, and configure
+     `docs/test-strategy.md` from the existing test setup, reconstruct `docs/security.md` for
+     sensitive existing surfaces, and **backfill the foundational ADRs** (stack, repo, auth,
+     datastore already baked into the code). That reverse-engineered set IS
+     the project-level foundation. Record known **tech-debt / risky areas** and actionable follow-up
+     candidates in `architecture.md`; do not create issues during adoption. Stage 3 owns issue
+     creation after foundation approval. Your first workflow-validation feature starts at Stage 1.
+     **GATE: approve.**
    - **If these files already exist** (`AGENTS.md`/`CLAUDE.md`/`docs/`), do NOT overwrite. Merge:
      back up or section-merge, preserve the team's content, surface conflicts. Never clobber.
 2. **Right-size the path.** Classify the change before routing:
-   - **Feature / user-facing / risky** → full pipeline (0→8).
-   - **Bug fix / small enhancement** → skip to **4 Implement → 5 QA → 6 Review** (reference an
-     issue; no PRD/contract/ADR).
-   - **Chore / docs / dep bump** → **4 → 6**, trivial diff, CI green.
+   - **Feature / user-facing / risky** → establish Stage 0 once if needed, then run Stages 1→8.
+   - **Bug fix / small enhancement** → **Implement → QA → Review → Land → Retro** (Stages
+     4→5→6→7→8; reference an issue; no PRD/contract/ADR).
+   - **Chore / docs / dep bump** → **Implement → Review → Land → Retro** (Stages 4→6→7→8;
+     trivial diff, CI green before merge).
    - The moment a "small" change touches a **contract**, a **security-sensitive area**, or makes
      a **decision**, it graduates to the full path. When unsure, ask.
 3. Read the tracker (via `gh` / `project-status`) and the active PRD to infer the current stage and
@@ -77,19 +91,20 @@ skill **and** no runtime equivalent, use the manual `fallback` in `required-skil
 
 ## Status header (every response)
 
-Open every substantive response with one compact line, so the user — and you — always know where
-the pipeline is:
+Open every response while a feature is in the pipeline with one compact line, so the user — and
+you — always know where the pipeline is:
 
 `SDLC ▸ Stage {N}/8 {Name} · {next gate or action}`
 
 Examples (on-ramp sub-stages keep their letter — `0a`/`0b`/`0adopt`):
+
 - `SDLC ▸ Stage 0b/8 Foundation · next gate: approve foundation`
 - `SDLC ▸ Stage 1/8 Spec · next gate: approve PRD`
 - `SDLC ▸ Stage 4/8 Implement · task #5 · next: plan approval`
 - `SDLC ▸ Stage 6/8 Review · running security-review (sensitive area)`
 
-One line only; skip it only for trivial acknowledgements. It doubles as your own anchor — restating
-the stage each turn is what keeps you from drifting off-process over a long conversation.
+One line only. It doubles as your own anchor — restating the stage each turn is what keeps you from
+drifting off-process over a long conversation.
 
 ## Borrow the technique, not the workflow
 
@@ -103,11 +118,27 @@ and **override its workflow**:
   and STOP. Reach for brainstorming + a brief only when the idea is fuzzy; a well-understood feature
   skips both and goes straight to `to-prd`.
   Discovery is exploratory — **no code.** Do **not** write to `docs/superpowers/specs/`, and do
-  **not** auto-run `writing-plans`; the next step is the Stage 1 Spec (`to-prd`), then the gate.
+  **not** auto-run `writing-plans`; the next step is the Stage 1 Spec (`to-prd`), then the gate. If
+  the user approves its visual companion, set `SUPERPOWERS_DISABLE_TELEMETRY=1` to block its branding
+  request. Keep it on loopback; use an SSH tunnel, never plaintext non-loopback mode. Use the default
+  temporary session directory; do not pass `--project-dir`. Ignore its instruction to commit or write
+  under `docs/superpowers/`; this conductor owns the artifact and approval gate.
 - `documentation-and-adrs` → ADRs go to **`docs/adr/NNNN-{slug}.md`** (this project's convention),
   never `docs/decisions/`.
 - `writing-plans` → use its decomposition method at Stage 3, but write the result to the tracker.
   Do **not** create `docs/superpowers/plans/`; the tracker is the record.
+- `improve-codebase-architecture` → use only its code-reading and deepening heuristics. In that
+  snapshot, `CONTEXT.md` means `docs/context.md`; do not invoke the unavailable `codebase-design` or
+  `domain-modeling` skills. Update `docs/context.md` directly when needed, and skip its upstream HTML
+  report. Write the adoption findings into this kit's foundation artifacts instead.
+- `using-git-worktrees` → isolation does not approve repository code execution. Name the exact
+  install/build command and get approval before running repository-controlled setup commands. For an
+  in-repository worktree, check the selected worktree location itself with
+  `git check-ignore -q "$LOCATION/"`; reject it if the command fails.
+- `webapp-testing` → use its Playwright method, but do not use its bundled `with_server.py`; use the
+  project's lifecycle runner or an already-running server so output is drained and the full process
+  tree remains owned. Wait for an app-specific readiness signal, such as a locator, URL, or health
+  check; do not require `networkidle`.
 - Any skill that wants to open tracker issues/epics → **defer to Stage 3 Decompose.** The Spec stage
   produces a PRD, not issues.
 
@@ -122,22 +153,23 @@ durable artifact. Trim borrowed-skill output to match before each gate.
 ## The stages, skills, and gates
 
 | Stage | Use skill | Output | After producing output |
-|-------|-----------|--------|------------------------|
-| 0a Context (new) | installer-scaffolded templates (fill) | `AGENTS.md`, filled `docs/context.md` | gate: context filled |
-| 0b Foundation (new) | `documentation-and-adrs` | `docs/prd/0000-product.md`, foundational ADRs (→ `docs/adr/`), `architecture.md` skeleton, core contract scaffold (**trim `docs/contracts/README.md`** to real/`(future)` paths — never leave template examples) | **GATE — approve foundation** |
-| 0 adopt (existing) | `improve-codebase-architecture` + `init` | reverse-engineered context/architecture + backfilled foundational ADRs (**point `docs/contracts/README.md` at the existing contract source**; note tech-debt/risks in `architecture.md`) | **GATE — approve** |
+| ------- | ----------- | -------- | ------------------------ |
+| 0a Context (new) | installer-scaffolded templates (fill) | `AGENTS.md`, filled `docs/context.md` | **GATE — context filled** |
+| 0b Foundation (new) | `documentation-and-adrs` | `docs/prd/0000-product.md`, foundational ADRs (→ `docs/adr/`), `architecture.md` skeleton, core contract scaffold, foundational threat model in `docs/security.md`, configured `docs/test-strategy.md` (**trim `docs/contracts/README.md`** to real/`(future)` paths — never leave template examples) | **GATE — approve foundation** |
+| 0 adopt (existing) | `improve-codebase-architecture` + read-only code analysis | reconstructed product PRD, context/architecture/security, configured `docs/test-strategy.md`, and backfilled foundational ADRs (**point `docs/contracts/README.md` at the existing contract source**; note tech-debt/risks in `architecture.md`) | **GATE — approve** |
 | 1 Spec | `brainstorming` (method only) → `to-prd` → `grilling` | **optional** Stage-1 brief `docs/briefs/NNNN-*.md` (only for a fuzzy/speculative idea — else skip straight to the PRD), then hardened PRD `docs/prd/NNNN-*.md` (no issues yet) | **GATE — approve PRD** |
 | 2 Architecture + Contract | `documentation-and-adrs` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
 | 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical), `frontend-design` (UI work only) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
-| 5 QA | tests + `run`, `verify` (`webapp-testing` for UI/browser) | verification evidence, tests green, app runs, CI green | proceed (disclose results) |
-| 6 Review | `code-review`, `simplify`, `definition-of-done-review` — pick what the change warrants | clean diff, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
+| 5 QA | tests + `run`, `verify` (`webapp-testing` for UI/browser) | verification evidence, local tests green, runtime observation or a relevant non-runtime check; CI green now or after PR creation | proceed (disclose results) |
+| 6 Review | mandatory `code-review`, `simplify`, and local-readiness `definition-of-done-review` | clean diff, local DoD evidence, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
 | 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to _in review_ according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
 | 8 Retro | reflect + write (native) | curate **0–3** durable learnings after every task; after the final child, reconcile feature artifacts and the parent epic (see [Stage 8](#stage-8-what-a-learning-is-and-isnt)) | if repository files changed, offer to land them on `main`; otherwise continue without an empty landing action |
 
 ## Gate protocol (non-negotiable)
 
 At every **GATE**, do ALL of the following and then halt:
+
 1. Name the artifact you produced and its path. For the Stage 4 plan, follow `feature-start` for its
    compact in-session format; no file path exists unless the human requested a durable plan.
 2. Summarize what's in it in 2–4 lines.
@@ -147,8 +179,11 @@ At every **GATE**, do ALL of the following and then halt:
    package on `main`. For adoption, ask to land the reconstructed package at the combined Stage 0
    gate. Stage 1 approval also does not ask for a commit; the approved PRD stays in the worktree
    while Stage 2 produces the ADRs, architecture, security notes, and frozen contract. At the Stage
-   2 gate, ask to commit the full Stage 1–2 planning package to `main` before decomposition. These
-   requests satisfy the don't-commit-unless-asked guardrail; skip them and Stage 4's clean-tree
+   2 gate, ask to commit the full Stage 1–2 planning package to `main` before decomposition. Before
+   asking to land a Stage 0 or Stage 2 package that touches a sensitive area, update
+   `docs/security.md` and run `security-review` on that planning diff. Stage 6 reviews the later
+   implementation diff again. These requests satisfy the don't-commit-unless-asked guardrail; skip
+   them and Stage 4's clean-tree
    check blocks the branch. Stage 3 Decompose is **not** a gate — never stop there. Tracker-backed
    it writes only issues; local-only it writes `docs/progress.md`, so just **disclose** that the file
    is uncommitted and continue. `feature-start` clears it at the Stage 4 gate, where stopping belongs.
@@ -156,8 +191,8 @@ At every **GATE**, do ALL of the following and then halt:
 Do not run the next stage's skill until the user approves. Skills are guidance injected into
 context — only YOU enforce these stops, so be explicit every time.
 
-**Gates vs. proceed-with-disclosure.** Only the **GATE** rows are hard stops: Foundation, Spec,
-Architecture+Contract, the per-task Implement plan, and the human merge at Land. The remaining
+**Gates vs. proceed-with-disclosure.** Only the **GATE** rows are hard stops: Context, Foundation,
+Spec, Architecture+Contract, the per-task Implement plan, and the human merge at Land. The remaining
 stages (Decompose, QA, Review) are **proceed-with-disclosure**: do the work, then state what you
 did and any decision a human might want to override, and continue — don't wait. The human can
 always interrupt. This keeps the front half rigorous and the back half moving.
@@ -167,9 +202,15 @@ says don't commit/push/PR unless asked. That is **one narrow stop at the commit/
 a reason to stop at the end of Stage 4.** After the Implement plan gate, keep going through
 everything that needs _no_ push: local tests, `run`/`verify`, and the whole Stage 6 pass
 (`code-review`, `simplify`, `security-review` if sensitive, diff hygiene). Only _then_ stop, at the
-push, and disclose: _"local checks + review done; CI green is pending your approval to commit/push."_
-After approval, start CI and return to the human merge gate instead of polling; required CI must be
-green before the human merges. If no CI workflow exists, CI is N/A and no push is required for it.
+push. For a PR workflow, report that tree-only local checks and review are done, then ask one combined
+question: _"Approve commit, push, and opening the PR?"_ A yes authorizes exactly the actions named
+in the request; it does not authorize merge or any unnamed action. With a remote but no PR workflow,
+ask _"Approve commit and push?"_ With no remote, ask only _"Approve commit?"_ After approval, create
+the commit first, verify its parent and tree, and rerun every metadata- or topology-dependent check
+against that commit. If any check fails, stop before the push. When they pass, only then push or open the PR,
+start CI when available, and return to the human merge gate instead of polling. After required CI finishes,
+run the final DoD confirmation before reporting the change ready for the human to merge. Required CI
+must be green before the human merges. If no CI workflow exists, CI is N/A.
 
 ## Task completion by tracker
 
@@ -209,8 +250,8 @@ standing on the just-merged `feat/*`, and committing there strands the update on
 `main` reads _In review_ for good. Then edit and ask to commit; if `main` is PR-protected, land it
 via a `plan/*` branch → PR like any other doc. Stage 8's learnings can ride the same commit.
 
-Never pre-empt any of this before the merge: until the human merges, the honest state is *in
-review*, and an abandoned or rejected PR must not leave a task reading done.
+Never pre-empt any of this before the merge: until the human merges, the honest state is _in
+review_, and an abandoned or rejected PR must not leave a task reading done.
 
 ## Stage 8: Per-task learning, final epic reconciliation
 
@@ -267,7 +308,7 @@ trap, a tool/library behavior that contradicts its docs, a constraint discovered
 it lives somewhere else, it goes there instead — **never both**:
 
 | Tempting to write | Where it actually belongs |
-|---|---|
+| --- | --- |
 | What shipped / summary of the change | the PR + git history (already permanent) |
 | Why we chose X | an ADR |
 | How the system is now shaped | `docs/architecture.md` |
@@ -297,13 +338,14 @@ outcome containing multiple implementation tasks. If there is no such enclosing 
 After an epic completes:
 
 > Epic {key} done. Optional:
+>
 > 1. `improve`, scoped to what this epic touched, to audit what just shipped.
 > 2. `improve next` to surface directions only; after choosing one, decline its planning step and
 >    start `sdlc {chosen direction}`.
 > 3. Start the next feature with `sdlc {feature}`.
 
-This is disclosure, not a gate. `improve` is an optional third-party companion skill (see
-`required-skills.yml`) — never required, never auto-run; naming it here just removes the guesswork.
+This is disclosure, not a gate. `improve` is an optional external skill described in `INSTALL.md`.
+It is never required or run automatically. Naming it here removes the guesswork.
 State the scope in prose, as above: `next` is a real invocation variant, but there is **no
 epic/issue flag** — don't advertise one, or you promise scoping the skill won't honor.
 When a chosen direction returns to `sdlc`, route it through Stage 1; never accept an `improve`
@@ -311,7 +353,7 @@ design or spike plan as a substitute for this pipeline's PRD path.
 
 ## Rules
 
-- **GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{issue#}-{slug}`
+- **GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{id}-{slug}`
   branches → PR → merge → deploy. Environments are deploy targets, not long-lived branches.
 - **Tracker, remote, PR workflow, and CI workflow are independent capabilities.** _Local-only_ means
   `docs/progress.md` replaces an **external tracker** — it does **not** imply there's no remote, and
@@ -335,8 +377,9 @@ design or spike plan as a substitute for this pipeline's PRD path.
 - **Planning commits land on `main`.** Stage 0 foundation artifacts may be committed after the
   foundation gate. For a feature, keep the approved Stage 1 PRD in the worktree, then commit the
   Stage 1–2 planning package once after Stage 2 approves the ADRs, architecture/security updates,
-  and frozen contract. Stage 4 branches from a clean `main` that already holds the frozen contract —
-  only code lives on the `feat/*` branch. If `main` is PR-protected, use a `plan/*` branch → PR →
+  and frozen contract. Stage 4 branches from a clean `main` that already holds the frozen contract.
+  The branch carries the task implementation plus its required task-scoped tests and docs. If `main`
+  is PR-protected, use a `plan/*` branch → PR →
   merge, then branch `feat/*`. **Stage 8 retro learnings** (`docs/context.md`) land on `main` the
   same way before the next task or feature branch; final feature reconciliation waits for the last
   child. (See `AGENTS.md` → Where planning commits land.)
@@ -348,20 +391,35 @@ design or spike plan as a substitute for this pipeline's PRD path.
   `docs/progress.md`; put the feature key in each task's `Parent` column. Number the task rows in
   their `#` column, since that number is the task's identifier for the rest of the pipeline (Stage 4
   branches `feat/{id}-{slug}` from it).
-- **Definition of Ready** before Stage 4: acceptance criteria written, contract frozen, no open
-  questions. **Definition of Done** before Land (Stage 7) (see `AGENTS.md`).
+- **Definition of Ready** before Stage 4: acceptance criteria written, the applicable contract
+  frozen or explicitly N/A for fast-path work with no integration contract, and no open questions.
+  Require local readiness before entering Land, then require the full Definition of Done, including
+  required CI, before the human merges (see `AGENTS.md`).
 - **Every task needs proportional verification, not necessarily a new test.** Start bug fixes and
   non-trivial testable behavior with a failing test (RED → GREEN). For changes where a new
   automated test adds little confidence, use the concrete alternative evidence required by
-  `docs/test-strategy.md` and state why no new test was added. The strict community
+  `docs/test-strategy.md` and state why no new test was added. The external
   `test-driven-development` skill is an optional team-wide policy, not a pipeline dependency.
 - Contract-first: never let implementation drift from the frozen contract. Changing a shipped
   contract requires a new ADR (versioning/deprecation).
-- **Reviews run inline** during Implement/QA — pick `code-review` / `simplify` /
-  `definition-of-done-review` as the change warrants. `security-review` is **mandatory** (not
-  agent-discretion) whenever a sensitive area is touched.
-- Sensitive areas (canonical list in `AGENTS.md` → Sensitive areas): threat-model at Stage 2
-  (`docs/security.md`) AND `security-review` at Stage 6.
+- **Reviews run inline** during Implement/QA. Run `code-review`, `simplify`, and local readiness on a
+  clean materialization of the complete target-to-tree delta; bind evidence to its target, parent,
+  and tree. After commit, require the tree to have the same reviewed content and its parent to match.
+  At final confirmation, resolve authoritative target/head tips by PR, remote-only, or local-only
+  mode and require a pending non-empty delta. Treat target CI policy as the baseline; feature-side
+  changes cannot reduce it, and approved additions or modifications must run from the reviewed
+  candidate revision. Accept head CI only when the target is its ancestor; otherwise
+  reproduce a synthetic `(target, head)` integration tree and review it against both parents. If
+  head or envelope topology differs from landing, accept its CI only for tree-only,
+  topology-independent checks; other checks must run on the actual landing candidate. Re-resolve
+  tips, policy, and workflow identity before the verdict. Stale refs,
+  unreachable configured hosts, changed content, or sensitive interactions block until applicable
+  QA and reviews rerun. Classify feature and integration deltas semantically against the canonical
+  sensitive-area list and record the rationale. `security-review` is **mandatory** whenever a
+  sensitive area is touched.
+- Sensitive areas (canonical list in `AGENTS.md` → Sensitive areas): threat-model in
+  `docs/security.md` and run `security-review` before landing a sensitive Stage 0 or Stage 2 planning
+  package; review the implementation diff again at Stage 6.
 - DB schema changes follow expand/contract (migrate → deploy → clean up) **once the table holds real
   data or any deployed process reads or writes it** — a deployed _writer_ breaks on a renamed/dropped
   column or a new required one just as a reader does. Before that, change it outright.
@@ -373,7 +431,9 @@ design or spike plan as a substitute for this pipeline's PRD path.
   instant failure is fine. Then **stop — return to the human merge gate.** Don't watch the run to
   completion (`gh run watch`) or keep the turn alive polling. Required CI must be green before the
   human merges; a later failure is handled as a normal fix, not babysat in the Land turn.
-- Don't commit, push, open PRs, **or merge** unless asked — **merge is always the human's call.**
+- Don't commit, push, open PRs, **or merge** unless asked. One combined approval may cover commit,
+  push, and opening a PR when the request names all three. It authorizes exactly the actions named
+  in the request; **merge is always the human's call.**
 
 ## Referenced files
 

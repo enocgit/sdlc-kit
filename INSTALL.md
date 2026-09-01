@@ -1,35 +1,46 @@
-# Install the workflow
+# Install
 
 ## Prerequisites
 
-- **Git** for branches and commits.
-- **An agent that loads `SKILL.md` files** and can run shell commands.
-- **GitHub CLI (`gh`)** when GitHub provides issues or pull requests. Run `gh auth login` with
-  `repo` scope. Add `project` scope only for GitHub Projects:
+The installer requires:
+
+- A POSIX environment with Bash and Python 3.10+.
+- Filesystems that support descriptor-relative operations, same-directory hard links, and
+  `renameat2` or `renameatx_np`. `install.sh --dry-run` checks the OS. A real install also checks
+  each target filesystem before writing.
+- Git 2.25 or newer. Before the first review, run `git rev-parse --show-object-format` in the target
+  repository. Upgrade Git if this fails.
+- An agent that loads `SKILL.md` files and can run shell commands.
+- GitHub CLI when the project uses GitHub issues or pull requests. Run `gh auth login` with `repo`
+  scope. Add `project` scope only for GitHub Projects:
 
   ```bash
   gh auth refresh -s project
   ```
 
-- **For projects with a remote, `git push` must work non-interactively.** For GitHub over HTTPS,
-  run:
+A project with a remote must support non-interactive `git push`. For a GitHub SSH remote, load the
+key and test it:
 
-  ```bash
-  gh auth setup-git
-  ```
+```bash
+ssh-add -l
+ssh -T git@github.com
+```
 
-  For an SSH remote, use a working SSH agent or configure a project-local HTTPS rewrite:
+GitHub may return status 1 after successful authentication because it does not provide shell access.
+To use HTTPS instead, configure GitHub CLI and change the remote explicitly:
 
-  ```bash
-  git config --local url."https://github.com/".insteadOf "git@github.com:"
-  ```
+```bash
+gh auth login
+gh auth setup-git
+git remote set-url origin https://github.com/OWNER/REPOSITORY.git
+```
 
-Projects with no remote need neither push authentication nor a PR host; the human merges the local
-feature branch directly. A configured remote workflow that is unreachable remains a blocker.
+Do not add a broad Git URL rewrite. Projects without a remote need no push credentials or PR host.
+An unreachable configured remote still blocks Land.
 
 ## 1. Install the kit
 
-Run the merge-aware installer from this repository:
+Run the installer from this repository:
 
 ```bash
 ./install.sh /path/to/your/project
@@ -38,41 +49,101 @@ Run the merge-aware installer from this repository:
 ./install.sh --dry-run /path/to/your/project
 ```
 
-The installer adds missing files and never overwrites existing ones:
+The installer adds missing files. It never overwrites an existing destination.
 
 | Source | Destination |
-|--------|-------------|
-| `AGENTS.md` | project root |
-| `required-skills.yml` | project root |
+| --- | --- |
+| `templates/AGENTS.md` | `AGENTS.md` |
+| `templates/CLAUDE.md` | `CLAUDE.md` |
+| `required-skills.yml` | `required-skills.yml` |
 | `templates/docs/` | `docs/` |
-| `templates/ci.yml` | `.github/workflows/ci.yml` |
 | `templates/github/` | `.github/` |
-| `skills/` | `.agents/skills/` by default |
+| `skills/`, `vendor/skills/` | `.agents/skills/` by default |
 
-Set `SKILLS_DIR` when your runtime uses another location:
+Set `SKILLS_DIR` if the runtime reads another project-local directory:
 
 ```bash
 SKILLS_DIR=.claude/skills ./install.sh /path/to/your/project
 ```
 
-Relative overrides resolve inside the target project. The installer copies real directories. You
-may instead symlink `.claude/skills` to `../.agents/skills`, but committed symlinks can fail on
-Windows without developer mode, in some CI checkouts, or across Docker bind mounts.
+A relative path resolves inside the target project. An absolute path must belong only to that
+project. The installer rejects common user-global directories, including `~/.agents/skills` and
+`~/.claude/skills`, so pipeline skills do not load in unrelated projects.
 
-If your runtime does not read `AGENTS.md`, point its instruction file to it:
+The installer copies directories. You may instead link `.claude/skills` to `../.agents/skills`.
+Committed links may fail on Windows without developer mode, in some CI checkouts, or across Docker
+bind mounts.
+
+Each file or skill publication is atomic, so the destination is either absent or complete. The
+installer gives control directories mode `0700`, skill directories `0755`, and files `0644` or
+`0755` based on executable intent.
+
+After an interruption, the next install locks the parent directory and moves marked stale state to
+`.sdlc-preserved-*`. Inspect that directory before removing it. The installer does not touch an
+unmarked lookalike. An interruption while writing recovery intent may also leave
+`.sdlc-staging-intent.tmp-*`, which requires manual inspection and removal.
+
+If the target tracks installer state, ignore these names:
+
+```gitignore
+.sdlc-staging-intent
+.sdlc-staging-intent.tmp-*
+.sdlc-file-*
+.sdlc-skill-*
+.sdlc-rename-probe-*
+.sdlc-preserved-*
+```
+
+### Upgrade an existing installation
+
+Re-running the installer adds new files but does not replace existing files or skills.
+
+1. Commit or back up the target. Update this kit checkout and review its `CHANGELOG.md` and diff.
+2. Stop agents that use the target.
+3. Record absolute paths. Keep the skills directory project-specific:
+
+   ```bash
+   TARGET=/absolute/path/to/the/project
+   SKILLS_DIR_ABS=/absolute/path/to/the/project/.agents/skills
+   ```
+
+4. Preview with those paths. Merge changes to existing root and `docs/` files by hand:
+
+   ```bash
+   SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh --dry-run "$TARGET"
+   ```
+
+5. Move each bundled skill directory to a backup outside `SKILLS_DIR_ABS`, then install:
+
+   ```bash
+   SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh "$TARGET"
+   ```
+
+6. Review the target diff and verify the installed snapshots:
+
+   ```bash
+   python3 scripts/vendor-skills.py verify-installed "$SKILLS_DIR_ABS"
+   ```
+
+7. Run the target project's validation. Delete the backup only after it passes.
+
+If validation fails, leave agents stopped. Remove the failed replacement skills, restore the
+backups, restore root and `docs/` files from the pre-upgrade commit or backup, and rerun the old
+validation.
+
+If the runtime does not read `AGENTS.md`, point its instruction file to it:
 
 ```text
 See AGENTS.md for how we work on this project.
 ```
 
-## 2. Install community skills
+## 2. Review the bundled skills
 
-The kit maintains only its conductor and workflow-specific skills. Install the remaining skills
-from their sources; [`required-skills.yml`](./required-skills.yml) is the machine-readable list and
-includes a manual fallback for each one.
+The installer copies these stage-bound skills into the target project. It does not use a registry or
+change user-global skills.
 
-| Skill | Source | Stage |
-|-------|--------|-------|
+| Skill | Upstream | Stage |
+| --- | --- | --- |
 | `brainstorming` | obra/superpowers | Spec |
 | `to-prd` | mattpocock/skills | Spec |
 | `grilling` | mattpocock/skills | Spec |
@@ -80,103 +151,92 @@ includes a manual fallback for each one.
 | `writing-plans` | obra/superpowers | Decompose |
 | `using-git-worktrees` | obra/superpowers | Implement |
 | `frontend-design` | anthropics/skills | Implement, UI only |
-| `webapp-testing` | anthropics/skills | QA, browser UI only; use a platform runner for mobile |
-| `run`, `verify` | runtime-native or equivalent | QA |
-| `code-review`, `simplify`, `security-review` | runtime-native or equivalent | Review |
-| `improve-codebase-architecture` | mattpocock/skills | Adopt existing project |
+| `webapp-testing` | anthropics/skills | QA, browser UI only |
+| `improve-codebase-architecture` | mattpocock/skills | Adopt an existing project |
 
-Install only the **community** rows with `npx skills add`. Confirm current package names on
-[skills.sh](https://skills.sh), for example:
+`vendor/skills/` contains exact upstream snapshots. The installer preserves their contents and adds
+`$SKILLS_DIR/{skill}/.sdlc-vendor/` with provenance and license files. `to-prd` remains pinned to the
+last reviewed revision before its rename to `to-spec`. See
+[`vendor/skills.lock.json`](./vendor/skills.lock.json) for every pinned commit.
 
-```bash
-npx skills add obra/superpowers --skill writing-plans
-npx skills add addyosmani/agent-skills --skill documentation-and-adrs
-```
+Use the agent's equivalent for runtime capabilities such as `run`, `verify`, `code-review`,
+`simplify`, and `security-review`. `required-skills.yml` provides fallbacks where available.
 
-For **runtime-native** rows, use your agent's equivalent or the documented fallback in
-`required-skills.yml`; do not search for them as registry packages.
+Skills run with the agent's permissions. Read each `SKILL.md`, then commit the project-local copies
+so every team and CI environment uses the same instructions.
 
-Read each `SKILL.md` before adopting it. Skills run with your agent's permissions. Prefer pinned,
-reviewed versions, and commit project-scoped copies for reproducible team and CI environments.
-Registry installs are snapshots: update them deliberately, inspect the diff, and re-run validation.
+The unchanged snapshots need these precautions:
 
-You may install other skills for your stack or personal workflow. `required-skills.yml` is the
-kit's supported-skill manifest, including pipeline dependencies, standalone utilities, and optional
-companions. Extra skills stay available without becoming pipeline stages. To add one to the
-pipeline, update `AGENTS.md`, the project-root `required-skills.yml`, and the installed conductor at
-`.agents/skills/sdlc/SKILL.md` (or `$SKILLS_DIR/sdlc/SKILL.md` when overridden).
+- Before using the `brainstorming` visual companion, export
+  `SUPERPOWERS_DISABLE_TELEMETRY=1`. Keep it on loopback with its default temporary session
+  directory. Do not pass `--project-dir`. Use an SSH tunnel for remote access. Ignore its commit and
+  `docs/superpowers/` instructions because the conductor owns those actions.
+- The `improve-codebase-architecture` HTML report loads unpinned Tailwind and Mermaid scripts and
+  enables Mermaid loose mode. For a private or sensitive repository, use pinned local assets with
+  strict mode or skip the report.
+- Before `using-git-worktrees` runs setup or build commands, name the command and get approval. For
+  an in-repository worktree, require `git check-ignore -q "$LOCATION/"` to pass.
+- Do not use `webapp-testing`'s `with_server.py`. Use the project's lifecycle runner or an existing
+  server. Wait for an app-specific locator, URL, or health check rather than `networkidle`.
 
-### Optional response compression
-
-The communication standard in `AGENTS.md` works without a skill. If the runtime provides a response
-profile, or the user installs a skill such as `caveman`, use its full level for conversational
-output and its lite level for repository documentation. Code, commits, and PRs retain their existing
-standards, and the SDLC status header remains required. Keep full sentences for the clarity
-exceptions in `AGENTS.md`. Session-scoped mode persistence is only a convenience; the project
-instruction is the cross-session default. Runtime safety and progress instructions take precedence.
-
-### Optional strict TDD
-
-The pipeline's default is proportional verification: every task needs evidence, while bug fixes
-and non-trivial testable behavior start with a failing test. The community
-`test-driven-development` skill is stricter and can auto-trigger for every feature, bug fix,
-refactor, and behavior change. Install it only when the team wants that broader policy:
+Maintainers need PyYAML. Follow [CONTRIBUTING.md](./CONTRIBUTING.md) when updating snapshots. These
+commands restore locked content or verify it offline:
 
 ```bash
-npx skills add obra/superpowers --skill test-driven-development
+python3 scripts/vendor-skills.py sync
+python3 scripts/vendor-skills.py verify
 ```
 
-### Optional post-epic audit
+`required-skills.yml` lists pipeline dependencies, standalone utilities, and optional companions.
+To add a pipeline skill, update `AGENTS.md`, `required-skills.yml`, the snapshot and provenance when
+applicable, and the installed conductor at `$SKILLS_DIR/sdlc/SKILL.md`.
 
-Install `improve` user-wide if you want a read-only advisor after an epic-level group is complete.
-Run it only after all descendant tasks in that group are done, not after each leaf task or small
-parent task. "Epic-level" means the larger product outcome in your tracker: for example, a Jira
-Epic, Linear Project, GitHub milestone/parent issue, or local `docs/progress.md` section.
+### Additional skills
 
-- `improve` audits shipped work and writes fix plans to `plans/`.
-- `improve next` surfaces directions only. Choose one, decline its planning step, then start
-  `sdlc {chosen direction}` so the feature enters Stage 1.
-- Keep `plans/` ephemeral: ignore it or delete completed plans.
-- Land generated plans as dependency-ordered PRs; the human still merges each one.
+The kit does not manage skills outside `required-skills.yml`. Install any additional skill with your
+runtime's normal command, either for the project or for your user account.
 
-`improve` is not a pipeline stage and never runs automatically. If the work has no epic-level
-grouping, skip this recommendation. Do not confuse it with `improve-codebase-architecture`, which
-reconstructs foundation documents when adopting a project.
+Teams may add `test-driven-development` when they want strict TDD for all behavior changes. The
+kit's default remains the proportional policy in `docs/test-strategy.md`.
 
-## 3. Adapt the integration points
+The optional `improve` skill can audit a completed epic or suggest a direction with `improve next`.
+It remains outside the pipeline. Install it only where you want it available, keep its `plans/`
+output temporary, and route selected directions through Stage 1 with `sdlc {chosen direction}`.
+
+## 3. Adapt the project
 
 ### Tracker
 
-GitHub Issues is the default tracker. To use Linear or Jira, replace these commands while preserving
+GitHub Issues is the default. For Linear or Jira, replace these integration points without changing
 the surrounding workflow:
 
-| Responsibility | Default | Replacement |
-|----------------|---------|-------------|
-| Create tasks | `gh issue create` in `skills/sdlc/SKILL.md` | tracker create API/CLI |
-| Report status | `gh issue list` / `gh project item-list` in `project-status` | tracker query |
-| Complete tasks | GitHub `Closes #N` | native Git integration or post-merge transition |
-| Identify branches | issue number | tracker key, such as `ENG-123` |
+| Responsibility | GitHub default | Replacement |
+| --- | --- | --- |
+| Create tasks | `gh issue create` in `$SKILLS_DIR/sdlc/SKILL.md` | Tracker API or CLI |
+| Report status | `gh issue list` or `gh project item-list` | Tracker query |
+| Complete tasks | `Closes #N` | Native Git integration or post-merge update |
+| Name branches | Issue number | Tracker key such as `ENG-123` |
 
-Without a Git integration, close the tracker task only after the human confirms the merge. For
-local-only work, keep `docs/progress.md`; with an external tracker, delete it.
+Without a Git integration, close the task after the human confirms the merge. For local-only work,
+use `docs/progress.md`. Delete that file when an external tracker is authoritative.
 
 ### CI and end-to-end tests
 
-Adapt `.github/workflows/ci.yml` to the project's lint, typecheck, test, and build commands. Existing
-CI must pass; an unreachable workflow blocks Land. Without a PR workflow, push-triggered CI still
-runs before the human merges directly.
+Replace the commands in `.github/workflows/ci.yml` with the project's lint, typecheck, test, and
+build commands. Existing CI must pass. An unreachable workflow blocks Land. Without pull requests,
+push-triggered CI still runs before the human merges.
 
-Run E2E tests through the platform runner: Playwright for web, or Maestro/Detox for mobile. A
-Playwright MCP server is optional and only needed for interactive browser exploration.
+Use the platform's E2E runner: Playwright for web, or Maestro or Detox for mobile. A Playwright MCP
+server is optional and useful only for interactive browser work.
 
 ### Custom skills
 
-Optionally use `skill-creator` when creating or substantially changing the five skills in `skills/`.
-Regardless of tooling, keep each `SKILL.md` portable, validate its frontmatter, match its `name` to
-its directory, and give it a specific triggering description.
+You may use `skill-creator` when creating or substantially changing the five maintained skills in
+`skills/`. Either way, keep each `SKILL.md` portable, validate its frontmatter, match its `name` to
+its directory, and write a specific trigger description.
 
 ## 4. Smoke test
 
-Ask the agent to start `sdlc`. A fresh install should find the `> STATUS: TEMPLATE` marker in
-`docs/context.md`, begin Stage 0, and stop at the context gate. It must not enter Spec until Stage 0
+Ask the agent to start `sdlc`. A fresh installation should find `> STATUS: TEMPLATE` in
+`docs/context.md`, begin Stage 0, and stop at the context gate. It must not enter Spec before Stage 0
 is complete.

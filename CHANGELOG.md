@@ -4,11 +4,36 @@ All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); this project aims to follow
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.5.0] - 2026-09-01
+
+### Added
+
+- Vendored nine stage-bound community skills as pinned project-local snapshots, including provenance
+  records and upstream licenses.
+
+### Changed
+
+- Stage-bound skills now install reproducibly without a registry or global skill writes. Existing
+  skill directories are preserved as units rather than merged across versions.
+- Replaced the monolithic shell validator with a compact Python release gate covering critical
+  installer safety, manifests, provenance, recovery, containment, and installed integrity.
+- Strengthened Review and Land with canonical Git-tree evidence, authoritative CI provenance,
+  integration-candidate validation, and mandatory security review for sensitive changes.
+
+### Fixed
+
+- Hardened installer publication against path races, symlink escapes, partial writes, destination
+  replacement, and interrupted recovery. Uncertain state is quarantined for inspection.
+- Hardened vendored-snapshot locking, hashing, transaction recovery, and metadata validation while
+  preserving offline installation.
+- Tightened validation for kit-managed skill manifests and vendored sources.
+- Clarified foundation, adoption, tracker, CI, and no-remote workflows; aligned templates and
+  verification guidance with the canonical project rules.
 
 ## [0.4.0] - 2026-08-27
 
 ### Changed
+
 - Agent replies now default to compact, outcome-first prose, while durable docs use concise, complete
   sentences. Optional response-compression skills can strengthen the preference without becoming a
   pipeline dependency.
@@ -30,6 +55,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   when requested, and implementation proceeds with the approved proportional verification.
 
 ### Fixed
+
 - Replaced the `grill-me` wrapper with its direct `grilling` dependency so fresh installs include
   the Stage 1 stress-test procedure.
 - Limited the optional `improve` recommendation to retros that complete a parent task or epic,
@@ -44,10 +70,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 ## [0.3.2] - 2026-07-21
 
 ### Changed
+
 - Added mobile alternatives for E2E testing, UI verification, build channels, signing, and store
   promotion without changing the web defaults.
 
 ### Fixed
+
 - Corrected community-skill install examples to use the Skills CLI's `--skill` selector.
 - Counted the separate Stage 0a context-filled gate and distinguished two bootstrap gates from the
   single combined adoption gate in workflow summaries.
@@ -55,6 +83,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 ## [0.3.1] - 2026-07-20
 
 ### Changed
+
 - Simplified the first-time-user guides so README, installation, walkthrough, cheatsheet, and
   contribution content each have a distinct purpose with less duplication.
 - Clarified that `skill-creator` is optional and that projects may freeze contracts in OpenAPI,
@@ -63,6 +92,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   planning step, then start `sdlc {chosen direction}` so the feature enters Stage 1.
 
 ### Fixed
+
 - Restored the separate Stage 0a context-filled gate in the walkthrough.
 - Limited registry installation instructions to community skills; runtime-native capabilities use
   the agent's equivalent or the fallback in `required-skills.yml`.
@@ -72,6 +102,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 ## [0.3.0] - 2026-07-20
 
 ### Changed
+
 - Kit skills now install to `.agents/skills` by default; `.claude/skills` remains available via
   the `SKILLS_DIR` override for runtimes that use it.
 - The Stage 8 completion prompt presents its follow-up choices as a numbered list and uses the
@@ -80,6 +111,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 ## [0.2.0] - 2026-07-18
 
 ### Added
+
 - Stage 8 (Retro) closes every retro with a concrete line surfacing the optional `improve`
   companion — scoped to what the epic touched, or `improve next` — plus the next-feature command,
   so it no longer depends on the human remembering the skill exists. Disclosure, not a gate.
@@ -88,6 +120,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   hypothetical one — ask if unsure rather than defaulting either way.
 
 ### Fixed
+
 - **Planning gates ask for commit approval.** The gate script asked only to proceed while the
   guardrail forbids commits unless asked, so approved Stage 0–2 artifacts stayed uncommitted and
   `feature-start`'s clean-tree check stalled Stage 4. Decompose is excluded and never stops — it's
@@ -155,6 +188,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 Initial release.
 
 ### Added
+
 - Plan-gated SDLC pipeline (stages 0–8) driven by the `sdlc` conductor skill, which routes each
   stage to the right skill and enforces human approval gates.
 - Right-sizing / fast-path so trivial changes skip ceremony (features run the full pipeline;

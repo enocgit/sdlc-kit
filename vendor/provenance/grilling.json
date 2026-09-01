@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skill": "grilling",
+  "source": "https://github.com/mattpocock/skills.git",
+  "commit": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+  "upstreamPath": "skills/productivity/grilling",
+  "snapshotHash": "sha256-framed-v3",
+  "contentSha256": "74b778ef8ae80aa2a8f70fcc9606c95b9547f20f8ba187b24d6b1d513a296cec",
+  "licenseSource": "LICENSE",
+  "licenseSha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
+}

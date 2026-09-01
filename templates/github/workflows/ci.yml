@@ -48,7 +48,7 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # Optional but recommended for this workflow:
+      # Enable checks that apply to this project:
       # - name: Contract check (types generated from the contract are up to date)
       #   run: pnpm generate && git diff --exit-code
       # - name: Dependency advisory scan
