@@ -4,7 +4,7 @@
 > decisions, constraints, links, and open questions before detail. Delete unused sections in the
 > filled PRD.
 
-## Scan
+## Summary
 
 - **Status:** Draft | Approved | Shipped
 - **Outcome:** {one sentence describing the intended result}
@@ -32,9 +32,11 @@
 ## Requirements
 
 ### Functional
+
 - FR1 — {requirement}
 
 ### Non-functional
+
 - NFR1 — {perf / security / availability / accessibility}
 
 ## UX notes
@@ -48,7 +50,7 @@
 
 ## Acceptance criteria
 
-<!-- Testable. These become the Definition-of-Done checks per task. -->
+<!-- Testable. Each criterion should map to a verification step. -->
 
 - [ ] {criterion}
 

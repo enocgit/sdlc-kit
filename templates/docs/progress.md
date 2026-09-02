@@ -3,10 +3,10 @@
 > Follow the documentation writing standard in AGENTS.md. Keep this file as a terse tracker, not a
 > diary. Remove completed detail that no longer helps choose the next task.
 >
-> **Only needed when you have no external tracker.** If you use GitHub Issues / Linear / Jira, that
-> tracker is your single source of truth — **delete this file** and use the `project-status` skill
-> to report status live from it. Keep this file _only_ in local/offline mode, where it **is** the
-> tracker: hand-maintain it as you work. (There is no automatic mirror to sync.)
+> **Only needed when you have no external tracker.** If you use GitHub Issues, Linear, or Jira,
+> that tracker is your single source of truth — **delete this file**. Keep it _only_ in
+> local/offline mode, where it **is** the tracker and is hand-maintained as work progresses. There
+> is no automatic mirror to sync.
 
 ## Now / Next / Blocked
 

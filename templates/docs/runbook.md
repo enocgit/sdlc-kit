@@ -15,14 +15,14 @@ For mobile, replace URLs and web previews with build channels, signing, internal
 App Store / Play Store promotion.
 
 | Env | URL | Deployed from | When |
-|-----|-----|---------------|------|
+| ----- | ----- | --------------- | ------ |
 | Preview | per-PR URL | the PR branch | automatically on each PR |
 | Staging | {url} | `main` | on every merge to `main` |
 | Prod | {url} | `main` (tagged release) | on promotion / release |
 
 ## Deploy
 
-<!-- Exact steps / command / pipeline. Who can deploy. -->
+<!-- Exact deployment steps and commands. Who can deploy. -->
 
 ## Rollback
 

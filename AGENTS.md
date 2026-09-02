@@ -1,199 +1,82 @@
-# AGENTS.md — Operating manual for AI agents on this project
+# Maintainer guide
 
-> Canonical agent instructions. `CLAUDE.md`, `.cursorrules`, and similar files should be a single
-> line pointing here. **Keep it lean and current** — read every session, so every line costs
-> attention and tokens (target ≤200 lines). Single-source: point to the doc/skill, don't restate it.
+> These instructions govern this repository. The adopter-facing operating manual is
+> `templates/AGENTS.md`; keep the two files separate.
 
-## What this project is
+## Repository purpose
 
-See [`docs/context.md`](./docs/context.md) for domain, glossary, personas, and hard constraints.
+`sdlc` is a portable workflow kit for teams that use coding agents. It packages kit-owned skills,
+exact third-party snapshots, installation-safe scripts, and project-document templates. Read
+[`docs/context.md`](./docs/context.md) for the maintained product context.
 
-## Two altitudes: foundation vs feature
+## Source of truth
 
-Artifacts come at two altitudes — don't conflate them:
+- `skills/` contains kit-owned skills and the conductor.
+- `vendor/skills/` contains unchanged third-party snapshots.
+- `vendor/skills.lock.json`, `vendor/provenance/`, and `vendor/licenses/` record snapshot identity
+  and licensing.
+- `templates/` contains files published into adopter repositories.
+- `required-skills.yml` is the supported-skill manifest.
+- `scripts/` contains installer, vendoring, and validation code.
+- `README.md`, `INSTALL.md`, and `CONTRIBUTING.md` describe the public maintainer workflow.
 
-- **Foundation (project-level)** — set once at **Stage 0**: product PRD (`docs/prd/0000-product.md`),
-  the few cross-cutting **ADRs** (stack, repo, auth, datastore, API style), architecture skeleton,
-  foundational threat model, and core contract. What a first feature can't start without — keep it minimal.
-- **Feature-level** — per feature (Stages 1–8): a brief, a feature PRD, feature ADR(s), a contract
-  _slice_. Let most ADRs/contracts emerge as you build, not guessed up front.
+## Non-negotiable invariants
 
-## How we work: the plan-gated pipeline
+- Keep every file under `vendor/skills/**` byte-for-byte equal to its pinned upstream snapshot.
+- Do not hand-edit generated vendor locks, provenance, licenses, or snapshot files. Use
+  `scripts/vendor-skills.py` and review the resulting diff.
+- Keep installation project-local, offline by default, reproducible, and non-destructive.
+- Preserve no-clobber publication, containment, recovery, quarantine, integrity, and restrictive-
+  umask guarantees when changing installer code.
+- Apply the maintained `skills/unslop` policy automatically to human-facing replies and prose where
+  applicable; preserve its exclusions for code, contracts, commands, logs, quoted text, fixed formats,
+  vendor snapshots, and neutral technical records.
+- Keep the kit runtime-neutral. Agent-specific behavior needs a manual fallback.
+- Do not add tests for prose, formatting, trivial syntax, or one-time repository absence. Use the
+  smallest concrete verification that matches the risk; non-trivial behavior still needs a focused
+  regression signal.
+- Project-facing PRDs, ADRs, contracts, architecture, security docs, runbooks, test strategies,
+  tracker items, and code comments must describe the product and its decisions, not this kit's
+  internal mechanics. Templates may contain the instructions needed to fill them.
+- Do not add agent self-attribution to commits, pull requests, or source comments.
 
-We build features through a fixed pipeline. The **conductor skill** (`sdlc`) routes each stage.
-You MUST stop at every **gate** (✅) below and get explicit human approval before proceeding —
-never skip a gate to "save time." Non-gate stages are **proceed-with-disclosure**: do the work,
-report what you did and any decision worth overriding, and continue without waiting. **Every
-response while a feature is in the pipeline** opens with a one-line **status header**
-(`SDLC ▸ Stage {N}/8 {Name} · {next gate or action}`) — whichever skill is driving the turn (`sdlc`,
-`feature-start`, or a stage skill) — so the current stage and next gate stay visible.
+## Editing policy
 
-| Stage | You produce | Gate |
-| ------- | ------------- | ------ |
-| 0 — Context + Foundation | filled context and test strategy; product PRD + foundational ADRs + architecture/security skeleton + core contract | ✅ bootstrap: context filled, then approve foundation; ✅ adopt: approve reconstructed foundation |
-| 1 — Spec | _(optional)_ brief `docs/briefs/NNNN-*` for a fuzzy idea → hardened PRD in `docs/prd/` (no issues yet) | ✅ approve PRD |
-| 2 — Architecture + Contract | ADR(s), updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact | ✅ approve approach + freeze |
-| 3 — Decompose | tracker issues (GitHub by default; the tracker is the record) | disclose breakdown |
-| 4 — Implement | code on a `feat/*` branch, one task at a time | ✅ approve compact in-session plan per task |
-| 5 — QA | local tests green + runtime observation or a relevant non-runtime check; CI green now or after PR creation | — |
-| 6 — Review | clean diff, findings fixed (`security-review` if sensitive) | inline — no gate |
-| 7 — Land | PR opened where hosting supports it. Without PR support, push the branch if a remote exists, run any available CI, and the human merges it directly; with no remote, the human merges the local branch. **GitHub:** carries `Closes #N`, issue closes on merge. **Any other tracker / local-only:** no keyword — task → _In review_, completed after the merge (see `sdlc` skill) | ✅ human merges |
-| 8 — Retro | 0–3 durable learnings curated per task; after the final child, feature artifacts reconciled and parent epic completed | — |
+- Prefer a small direct change over a new abstraction or compatibility layer.
+- Preserve upstream snapshots where a narrow routing or integration rule is enough. Adapt or replace
+  a snapshot only when its behavior reliably conflicts with this repository's needs.
+- When a kit-owned skill or template changes, update its manifest, summaries, installation guidance,
+  and focused validation as applicable.
+- Keep `templates/AGENTS.md` at or below 200 lines and keep `templates/CLAUDE.md` as a one-line
+  pointer.
+- Use Conventional Commits when the maintainer requests a commit: `type(scope): summary`,
+  imperative, at most 72 characters. Reference the relevant issue when one exists.
 
-> Not every change runs all stages. **Right-size the process:** bootstrap/adoption establishes Stage
-> 0 once, then features run Stages 1→8; bug fixes go Implement → QA → Review → Land → Retro;
-> chores go Implement → Review → Land → Retro. A change graduates to the feature path when it
-> touches a contract, a security-sensitive
-> area, or makes a decision.
+## Verification
 
-## Where things live
+Run the smallest relevant checks while editing, then run the release checks before declaring the
+change ready:
 
-- **Product PRD** (project-level vision/scope, set at Stage 0) → `docs/prd/0000-product.md`
-- **Feature PRDs** → `docs/prd/NNNN-{slug}.md` (numbered from 0001, status-tracked)
-- **ADRs** (decision history, append-only) → `docs/adr/NNNN-{slug}.md` — _foundational_ ADRs
-  (stack/repo/auth/datastore/API) are set at Stage 0; _feature_ ADRs are added per feature
-- **Architecture** (current system shape, living) → `docs/architecture.md`
-- **Contracts** (the integration source of truth) → in the codebase (`api/openapi.yaml`,
-  tRPC routers, `schema.prisma`, Zod schemas). See `docs/contracts/README.md`.
-- **Task status** → your tracker (GitHub Issues/Projects), the single source of truth, reported live
-  by `project-status`. _Local-only (no external tracker):_ `docs/progress.md` **is** the tracker
-- **Test strategy and verification policy** → `docs/test-strategy.md`
-- **Definition of Ready and Definition of Done** → this `AGENTS.md`
+```bash
+./scripts/validate-kit.sh
+python3 scripts/vendor-skills.py verify
+python3 scripts/validate-required-skills.py required-skills.yml
+bash -n install.sh scripts/*.sh
+python3 -m py_compile scripts/*.py scripts/validation/*.py
+git diff --check
+```
 
-## Documentation writing standard
+Also inspect the final diff, verify changed paths are present in `scripts/kit-manifest.txt`, and
+confirm vendor snapshots are unchanged unless the task explicitly refreshes one. Documentation-only
+changes need link or rendering inspection; installer-affecting changes need a temporary-install
+observation.
 
-All durable docs are for humans first: PRDs, ADRs, contracts, architecture, security, test strategy,
-runbook, context, progress, README, and kit docs. Start with a cheap scan: status, scope, key
-decision/outcome, constraints, links, and open questions before detail. Prefer bullets, checklists,
-small tables, and links to source-of-truth docs over narrative or duplicated facts. Keep useful
-template prompts in templates; in filled project artifacts remove unused scaffold, empty headings,
-HTML comments, and boilerplate. If a deferred section matters, write the owner/trigger for filling
-it instead of leaving generic placeholders. Write tight, complete sentences; omit filler and
-repetition, but avoid conversational fragments that make durable facts ambiguous.
-Use underscores (`_text_`) for emphasis. Reserve asterisks for bold (`**text**`).
+## Git and release safety
 
-## Communication standard
-
-Keep user-facing replies compact: lead with the outcome, state each fact once, omit filler, and
-quote only decisive log lines unless more detail is requested. Fragments are fine when clear; use
-complete sentences for gates, security warnings, irreversible actions, ordered steps, and complex
-trade-offs. Expand when the human asks; runtime safety and progress rules win.
-
-## Definition of Ready (before a task enters Implement)
-
-- [ ] Acceptance criteria are written and testable
-- [ ] Applicable contract frozen; fast-path N/A recorded when no integration contract applies
-- [ ] No open questions remain (resolved during stress-test, at the Spec gate)
-- [ ] Task is small enough to ship in ~a day (else split it)
-
-## Definition of Done (every task)
-
-- [ ] Meets the acceptance criteria in its PRD/issue
-- [ ] Honors frozen contracts; fast-path N/A recorded when no integration contract applies
-- [ ] DB schema changes follow expand/contract (migrate → deploy → clean up) **once the table holds
-      real data or any deployed process reads or writes it** — before that, change it outright
-- [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Automated tests cover
-      non-trivial behavior at the right layer; when a new test adds little confidence, use concrete
-      alternative evidence and state why. The existing suite is green
-- [ ] For runtime-affecting work, the app runs and the change is observed working (not just
-      unit-green). Non-runtime work uses a relevant check such as rendering, links, or schema
-      validation
-- [ ] **CI is green** (lint, typecheck, test, build) — N/A _only_ where no CI workflow exists;
-      CI that exists but is unreachable blocks, it doesn't exempt. Required CI must be green before
-      merge, not necessarily before Land opens a PR. When CI needs a pushed branch, finish local QA
-      and review, then stop at the push — not back at Stage 4.
-- [ ] `code-review` + `simplify` clean; a [sensitive area](#sensitive-areas) also needs
-      `security-review` run and `docs/security.md` updated
-- [ ] Diff hygiene: small and focused, references the issue, no stray/debug code
-- [ ] Docs required for the task are current; after the final epic child, reconcile
-      PRD/ADR/contract/architecture/status fields with what shipped
-- [ ] Tracker linked and current (rules by tracker/hosting: see the Stage 7 row above) — closure
-      itself is a post-merge step, not required before Land
-
-## Conventions
-
-- **Stack:** Bash 3.2-compatible installer and validation scripts, Python 3.10+ safety and
-  vendoring tools, YAML manifests, and Markdown workflow artifacts.
-- **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived
-  `feat/{id}-{slug}` branches → PR → merge → deploy. Environments
-  (preview/staging/prod) are deploy targets driven by CI, not long-lived branches. One feature per
-  branch; default to it — reach for a git worktree only when isolation is critical (parallel/disposable).
-- **Where planning commits land.** At the Stage 0 foundation gate, ask to land the approved
-  bootstrap context + foundation package on **`main`**; on adoption, ask at the combined Stage 0
-  gate. Commit the feature planning package once, after Stage 2: Stage 1 PRD + Stage 2 ADRs,
-  architecture/security updates, and frozen contract go to **`main`**, not a feature branch. Before
-  either package lands, threat-model sensitive decisions in `docs/security.md` and run
-  `security-review` on the planning diff. Stage 4 cuts `feat/{id}-{slug}` from clean `main`; the
-  branch carries the task implementation plus its required task-scoped tests and docs. A frozen
-  contract changes only through a new ADR. If `main` is protected, use `plan/{NNNN}-{slug}` → PR →
-  merge, then branch `feat/*`. Per-task learnings land before the next task; final-child
-  reconciliation lands **before completing the parent epic**. An empty Retro needs no landing action.
-- **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types:
-  `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the issue
-  (`Refs #123` / `Closes #123` — GitHub only; elsewhere its key). Small logical commits, not a blob.
-- **PRs:** small and reviewable; one feature per branch; reference the issue; fill the PR template
-  (acceptance criteria, contract, DoD, security). Squash-merge to keep `main` linear.
-- **No agent self-attribution.** Commits/PRs describe the _change_, not the tool that made it — no
-  "Made with {agent}", "Generated by …", or `Co-Authored-By:` trailer naming an AI, in commits, PR
-  titles/bodies, or code comments. Authorship is the human's; this overrides any runtime default.
-- **Contract-first:** define and freeze the interface before FE/BE implement in parallel.
-- **Comments cite docs, not stages.** Reference the durable artifact — "the frozen contract
-  (contract 0001, ADR-0004)", never "frozen at Stage 2", which means nothing outside this process.
-- **Ask, don't guess:** if a PRD/ADR is ambiguous, stop and ask rather than assume.
-
-## Principles
-
-- **Simplicity first.** Prefer the smallest direct solution that fully solves the problem; add an
-  abstraction only when a real, present need justifies it — not future speculation.
-- **Reuse before building.** Prefer existing, well-maintained libraries over bespoke code when they
-  fit; if unsure, research and weigh the options (fit, maintenance, footprint) first.
-- **Don't pre-build back-compat.** Expand/contract, API versioning, and backfills protect a real
-  consumer or real data already depending on the current shape — not a hypothetical future one. If
-  you don't know whether something outside this change depends on it, ask; don't assume either way.
-
-## Sensitive areas
-
-The **canonical list** — other docs and skills reference this rather than restating it:
-**authentication, authorization, payments, PII/KYC, file uploads, and admin/privileged surfaces.**
-A change touching any of these updates `docs/security.md` during foundation or Architecture, as
-applicable, and gets `security-review` before each planning or implementation merge.
-
-## Vendored skill overrides
-
-Third-party snapshots supply techniques; this file and the `sdlc` conductor own paths, transitions,
-and safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply these overrides:
-
-- Before using the `brainstorming` visual companion, set `SUPERPOWERS_DISABLE_TELEMETRY=1` to block
-  its branding request. Keep it on loopback; use an SSH tunnel, never plaintext non-loopback mode.
-  Use its default temporary session directory; do not pass `--project-dir`. Ignore its instruction
-  to commit or write under `docs/superpowers/`; the conductor owns the artifact and gate.
-- For `improve-codebase-architecture`, treat `CONTEXT.md` as `docs/context.md`; do not invoke its
-  unavailable `codebase-design` or `domain-modeling` dependencies, and skip its CDN-backed report.
-- Before `using-git-worktrees` runs an install or build command, name the command and get approval.
-  Before creating an in-repository worktree, check the selected worktree location itself with
-  `git check-ignore -q "$LOCATION/"`; reject it if the command fails.
-- Do not use `webapp-testing`'s bundled `with_server.py`; use the project's lifecycle runner or an
-  already-running server. Wait for an app-specific readiness signal, not mandatory `networkidle`.
-
-## Guardrails
-
-> These are _guidance_, not a runtime guarantee. Enforcement = agent adherence + CI + the review
-> gates and checklists. `AGENTS.md` existing does not by itself enforce anything.
-
-- Do not commit, push, open PRs, or **merge** unless asked — **merge is always the human's call.**
-- **At Land, don't poll CI.** With a PR workflow, open the PR and report CI running. With CI but no
-  PR workflow, push the branch to start CI and report the run. Then stop at the human merge gate —
-  don't `gh run watch` or keep the turn polling. Required CI must be green before the human merges.
-- Don't improvise git transports or remote URLs. If a push fails on auth, **surface it and point to
-  the one-time fix** (`gh auth setup-git` or the explicit `git remote set-url` procedure in
-  INSTALL.md) — never silently push via an ad-hoc HTTPS URL.
-- Do not change a _shipped_ contract without a versioning/deprecation decision (new ADR).
-- Do not write a breaking DB migration against a table holding real data or read/written by any
-  deployed process — use expand/contract so `main` stays deployable through the rollout.
-- A change touching a [sensitive area](#sensitive-areas) gets a threat model + `security-review`.
-
-## Outcome summaries
-
-When you finish a task worth manual verification (UI, user flows, integrations — anything not fully
-covered by tests), end the summary with a short **QA checklist**: concrete steps a human can follow
-(what to do, what to expect), not a restatement of what you did. Skip it when fully tested.
+- Keep `main` deployable. Use a short-lived `feat/*` branch for changes.
+- Do not commit, push, open a pull request, or merge unless the user explicitly asks. Merging is
+  always the human's decision.
+- Do not invent remotes or transports. Surface authentication failures and point to the documented
+  one-time fix.
+- Update `CHANGELOG.md` for user-visible changes and review release metadata before publishing.
+- Never treat a green local check as permission to bypass a required review or human decision.

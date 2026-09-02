@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); this project aims to follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Added a pinned Ponytail snapshot for minimal, reuse-first implementation guidance.
+- Added a scoped, attributed `unslop` adaptation for human-facing communication and prose.
+
+### Changed
+
+- Simplified maintainer and pull-request guidance, clarified durable-artifact and proportional-
+  verification rules, and removed unmanaged `run` and `verify` capability records.
+- Batched review fixes, replies, and thread resolution under one outward-action approval.
+
 ## [0.5.0] - 2026-09-01
 
 ### Added

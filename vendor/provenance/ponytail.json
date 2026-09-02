@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skill": "ponytail",
+  "source": "https://github.com/DietrichGebert/ponytail.git",
+  "commit": "2ed6c52c9d7e5e56942508591085fd45dea277d3",
+  "upstreamPath": "skills/ponytail",
+  "snapshotHash": "sha256-framed-v3",
+  "contentSha256": "68e15199aaa4d999e11da028be23e66e4f358f972c424610f16e6482a23fe605",
+  "licenseSource": "LICENSE",
+  "licenseSha256": "fb1bc6909ac3ef82d5c22106e32ef682b0cff66788fa915fb9b53b15c9d2f3ab"
+}

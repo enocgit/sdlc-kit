@@ -5,9 +5,8 @@ A portable, plan-gated workflow for building software with AI agents.
 The kit combines a conductor skill, an `AGENTS.md` operating manual, and project templates. The
 conductor routes work through nine stages. A one-task feature has six human approval gates for a
 fresh project or five after adoption; each additional task repeats its plan and merge gates. It
-works best for web, API, SaaS, and API-backed
-cross-platform mobile apps, but its plain Markdown skills can run in any agent that supports
-`SKILL.md` files.
+targets web, API, SaaS, and API-backed cross-platform mobile apps by default, but its plain
+Markdown skills can run in any agent that supports `SKILL.md` files.
 
 > This is a workflow kit, not one standalone skill. Its installer adds every stage-bound skill file
 > to the target project before you invoke `sdlc`.
@@ -18,9 +17,9 @@ The defaults assume a web-shaped product: contracts, CI, database migrations, an
 branches. Backend services, CLIs, libraries, and cross-platform apps can replace the UI test and
 deployment tools.
 
-The workflow uses established practices: Architecture Decision Records, C4-style architecture
-documentation, contract-first development, GitHub Flow, and phase gates. Reviewed third-party
-skills preserve their pinned upstream files unchanged. The installer adds local provenance and
+The workflow uses Architecture Decision Records, C4-style architecture documentation,
+contract-first development, GitHub Flow, and phase gates. Pinned third-party skills remain
+unchanged. The installer adds local provenance and
 license metadata; source pins live in [`vendor/skills.lock.json`](./vendor/skills.lock.json), and
 upstream terms live in [`vendor/licenses/`](./vendor/licenses/).
 
@@ -109,8 +108,9 @@ it. The conductor's `adopt` path reconstructs context and architecture without c
 ## Portability
 
 - `AGENTS.md` is canonical. Runtime-specific files such as `CLAUDE.md` should point to it.
-- Agent replies default to compact, outcome-first prose; durable docs remain concise but use complete
-  sentences. A response-compression skill can strengthen this preference but is never required.
+- Agent replies default to compact, outcome-first prose. Apply the bundled `unslop` adaptation
+  automatically to human-facing replies and prose where applicable; follow its canonical scope and
+  exclusions.
 - Skills are portable Markdown. Each stage has a manual fallback in `required-skills.yml`.
 - Stage-bound third-party skills are pinned under `vendor/skills/` and installed project-locally.
   Optional companions remain separate.
@@ -131,7 +131,7 @@ it. The conductor's `adopt` path reconstructs context and architecture without c
 | `templates/CLAUDE.md` | one-line pointer to the installed operating manual |
 | `docs/context.md` | source-repository context for maintainers and coding agents |
 | `install.sh` | merge-aware installer with `--dry-run` |
-| `skills/` | conductor, kit-owned workflow skills, and standalone `address-review` |
+| `skills/` | conductor, kit-owned workflow skills, and standalone utilities |
 | `vendor/skills/` | pinned, unmodified third-party pipeline skills |
 | `vendor/skills.lock.json` | upstream revisions, paths, content hashes, and license hashes |
 | `scripts/vendor-skills.py` | verifies, restores, and refreshes vendored snapshots |

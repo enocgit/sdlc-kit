@@ -1,12 +1,8 @@
 # Brief — {feature}
 
-> Follow the documentation writing standard in AGENTS.md. Keep this to one page: problem, who has
-> it, why now, success signal, and the few questions that decide whether to promote it.
->
-> Lightweight, pre-PRD problem statement (Stage 1, the discovery step of Spec). A page at most.
-> **Optional** — skip it for a well-understood feature and go straight to the PRD; reach for it only
-> to cheaply shape or _kill_ a fuzzy/speculative idea before investing in a full PRD (that's its whole
-> value — a one-page filter, not a warm-up). If it survives scrutiny, it graduates into a PRD.
+> Follow the documentation writing standard in AGENTS.md. Use this optional pre-PRD note only for
+> fuzzy ideas. Keep it to one page: problem, audience, why now, success signal, and open questions.
+> Skip it for a well-understood feature and go straight to the PRD.
 
 - **Date / author:** YYYY-MM-DD / {name}
 - **Status:** Exploring | Promoted to PRD | Dropped

@@ -151,6 +151,7 @@ change user-global skills.
 | `writing-plans` | obra/superpowers | Decompose |
 | `using-git-worktrees` | obra/superpowers | Implement |
 | `frontend-design` | anthropics/skills | Implement, UI only |
+| `ponytail` | DietrichGebert/ponytail | Implement, backend/domain and dependency choices |
 | `webapp-testing` | anthropics/skills | QA, browser UI only |
 | `improve-codebase-architecture` | mattpocock/skills | Adopt an existing project |
 
@@ -159,8 +160,10 @@ change user-global skills.
 last reviewed revision before its rename to `to-spec`. See
 [`vendor/skills.lock.json`](./vendor/skills.lock.json) for every pinned commit.
 
-Use the agent's equivalent for runtime capabilities such as `run`, `verify`, `code-review`,
-`simplify`, and `security-review`. `required-skills.yml` provides fallbacks where available.
+Use the runtime's available tools for runtime observation, code review, simplification, and
+security review. `required-skills.yml` provides concrete manual fallbacks where available. The
+bundled `unslop` adaptation applies automatically to human-facing communication where
+applicable; follow its canonical scope and exclusions.
 
 Skills run with the agent's permissions. Read each `SKILL.md`, then commit the project-local copies
 so every team and CI environment uses the same instructions.
@@ -231,7 +234,7 @@ server is optional and useful only for interactive browser work.
 
 ### Custom skills
 
-You may use `skill-creator` when creating or substantially changing the five maintained skills in
+You may use `skill-creator` when creating or substantially changing the maintained skills in
 `skills/`. Either way, keep each `SKILL.md` portable, validate its frontmatter, match its `name` to
 its directory, and write a specific trigger description.
 

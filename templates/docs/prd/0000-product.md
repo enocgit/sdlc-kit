@@ -1,12 +1,9 @@
 # Product PRD — {product name}
 
-> Follow the documentation writing standard in AGENTS.md. Keep the product-level view lean:
-> durable vision, boundaries, constraints, and links to foundational ADRs. Delete unused template
-> sections once filled.
->
-> **Project-level (foundation).** The product's vision and scope — set once at Stage 0 and
-> revised rarely. This is NOT a feature PRD; feature PRDs are `0001+` and reference this one.
-> Keep it short: it frames _why the product exists_, not how any one feature works.
+> Follow the documentation writing standard in AGENTS.md. This is the project-level product
+> document, not a feature PRD. Record durable vision, boundaries, constraints, and links to
+> foundational ADRs. Revise it as the product changes, and delete unused sections once filled.
+> Keep it short: explain _why the product exists_, not how one feature works.
 
 - **Status:** Draft | Approved | Living
 - **Owner / date:** {name} / YYYY-MM-DD
@@ -56,4 +53,4 @@
 
 ## Roadmap shape (optional)
 
-<!-- The rough sequence of first features that will run through the pipeline. -->
+<!-- The rough sequence of initial features, if useful. -->

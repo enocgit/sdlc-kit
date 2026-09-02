@@ -148,7 +148,8 @@ How to judge the items that need interpretation:
   endpoints/fields and derive types from the contract rather than duplicating them. For fast-path
   work with no integration contract, accept N/A only with a concrete rationale.
 - **Verification / observed working.** Evidence must match the risk and the existing suite must be
-  green. Runtime-affecting work must be run and observed (`run`/`verify`). Non-runtime work needs a
+  green. Runtime-affecting work must be exercised and observed with the available runtime tools.
+  Non-runtime work needs a
   relevant concrete check such as rendering, links, or schema validation. Non-trivial behavior needs
   automated coverage. If no new test was added, require a credible reason and concrete alternative
   evidence; do not fail a change merely because its best proof is not a new test.
