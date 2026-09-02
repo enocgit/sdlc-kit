@@ -27,7 +27,8 @@
 
 ## Rough shape (optional)
 
-<!-- A sentence or two on a likely approach — NOT a commitment, just to sanity-check feasibility. -->
+<!-- A possible approach, in one or two sentences; it is not a commitment. Use it to check
+     feasibility. -->
 
 ## Open questions
 

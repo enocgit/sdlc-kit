@@ -6,6 +6,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+### Changed
+
+- Clarified that installable contract and test-strategy templates support contract-defined types
+  that are generated or shared directly.
+
 ## [0.6.0] - 2026-09-02
 
 ### Added

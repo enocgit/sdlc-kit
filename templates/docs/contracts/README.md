@@ -4,10 +4,10 @@
 > scan-first: authoritative paths, request/response shape, auth, validation, errors, compatibility,
 > and freeze status before examples or extended notes.
 >
-> The integration **source of truth** between frontend, backend, and services. Contracts are
-> _artifacts, not prose_ — they live in the codebase and (ideally) generate the types both sides
-> consume, which reduces structural drift from the code. This folder documents where they live and
-> the rules around them.
+> Contracts are the integration **source of truth** between frontend, backend, and services.
+> They are _artifacts, not prose_: they live in the codebase and provide the types both sides
+> consume, either by generating them or sharing them directly. This reduces structural drift from
+> the code. This folder documents where they live and the rules around them.
 
 ## Where the contract artifacts live
 
@@ -26,7 +26,8 @@
 
 1. Define or extend the contract **before** implementation.
 2. **Freeze** it before consumers implement against it.
-3. Generate types from the contract; never hand-duplicate them on each side.
+3. Generate types from the contract or share contract-defined types directly; never hand-duplicate
+   them on each side.
 4. Changing a **shipped** contract endpoint/field is a decision: write a new ADR covering
    versioning/deprecation and backward compatibility. No silent breaking changes.
 
@@ -37,4 +38,4 @@
 - [ ] Auth/permission requirements per endpoint
 - [ ] Pagination/filtering conventions followed
 - [ ] Backward compatibility considered (and ADR if breaking)
-- [ ] Types regenerated; both sides compile
+- [ ] Types regenerated or shared directly from the contract; both sides compile

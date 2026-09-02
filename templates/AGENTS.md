@@ -96,8 +96,8 @@ trade-offs. Expand when the human asks; runtime safety and progress rules win.
 - [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Automated tests cover
       non-trivial behavior at the right layer; when a new test adds little confidence, use concrete
       alternative evidence and state why. The existing suite is green
-- [ ] For runtime-affecting work, the app runs and the change is observed working (not just
-      unit-green). Non-runtime work uses a relevant check such as rendering, links, or schema
+- [ ] For runtime-affecting work, run the app and observe the change; unit tests alone are
+      insufficient. Non-runtime work uses a relevant check such as rendering, links, or schema
       validation
 - [ ] **CI is green** (lint, typecheck, test, build) — N/A _only_ where no CI workflow exists;
       CI that exists but is unreachable blocks, it doesn't exempt. Required CI must be green before
