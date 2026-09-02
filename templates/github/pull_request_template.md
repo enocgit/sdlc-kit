@@ -1,39 +1,18 @@
-<!-- Copied to .github/pull_request_template.md by install.sh. Aligns PRs with the pipeline. -->
+## Summary
 
-## What & why
+<!-- What changed and why? For GitHub, include `Closes #N` for the completed issue. If another tracker uses this template, omit the keyword and use its native transition. -->
 
-<!-- One or two lines. Link the PRD and the task.
-     `Closes #N` is GitHub-only. On ANY other tracker (Linear/Jira) or in local-only mode, DELETE
-     the line below: that id isn't a GitHub issue, so it either fails to close the real task or
-     closes an unrelated repo issue of that number. Reference the task by its own key/row instead
-     and close it after the merge. -->
-Closes #
+## Notes
 
-- PRD: `docs/prd/...`
-- ADR(s): `docs/adr/...` (if a decision was made)
+<!-- Decisions, compatibility concerns, rollout details, or items reviewers should know. -->
 
-## Acceptance criteria
+- Contract impact: N/A | describe the frozen contract change.
+- Security impact: N/A | link the updated threat model or review.
 
-<!-- Copy the criteria from the PRD/issue and check them off. -->
-- [ ] {criterion}
+## Verification
 
-## Contract
+<!-- List the checks that prove this change. Explain why a new automated test adds little confidence when applicable. -->
 
-- [ ] Implements against the frozen contract; no undocumented endpoints/fields
-- [ ] Types generated from the contract, not hand-duplicated
-- [ ] N/A — this change doesn't touch a contract
-
-## Definition of Done (see AGENTS.md)
-
-- [ ] Verification matches the risk; non-trivial behavior has automated coverage; suite green
-- [ ] Any choice not to add a test is explained with concrete alternative evidence
-- [ ] App run / change observed working
-- [ ] CI green (lint, typecheck, test, build)
-- [ ] DB changes follow expand/contract — N/A if no real data and nothing deployed reads/writes it
-- [ ] Docs updated (`architecture.md` / ADR) as needed
-
-## Security
-
-- [ ] Touches a sensitive area (canonical list in `AGENTS.md` → Sensitive areas) →
-      `docs/security.md` updated + `security-review` run
-- [ ] N/A — not a sensitive area
+- [ ] Tests or another proportional check: <!-- command / evidence -->
+- [ ] Runtime observation or relevant non-runtime check: <!-- evidence -->
+- [ ] CI status: <!-- link or N/A when no workflow exists -->

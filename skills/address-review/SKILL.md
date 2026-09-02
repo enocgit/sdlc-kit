@@ -61,16 +61,24 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
      silently edit the interface.
    - **False positive** → do **not** change code. Draft a brief reply explaining why, citing the
      doc that settles it ("the frozen data contract 0001 permits null here", not "this is fine").
-   - **Out of scope** → file a `task` issue (shaped per `.github/ISSUE_TEMPLATE/task.md`) and note
-     the issue number in a reply; don't scope-creep the PR.
+   - **Out of scope** → prepare a `task` issue (shaped per `.github/ISSUE_TEMPLATE/task.md`) and
+     include its exact proposed title/body in the outward-action bundle. Use an explicit
+     `{issue-number-or-url}` placeholder for any dependent reply or action; after approval, fill it
+     from the create response within that same bundle. Do not scope-creep the PR.
 
-4. **Replies & thread resolution are outward-facing — confirm first.** Draft all replies as text
-   and show them. Only post to GitHub (`gh pr comment` / `gh api ... /replies`) or resolve threads
-   **after the user confirms**. Never resolve a thread you refuted without the reviewer/user seeing
-   the rationale, and never merge.
+4. **Prepare one outward-action bundle — confirm once.** After local fixes are validated, show
+   the proposed commit and exact message, any external issue creation with its exact title/body,
+   an explicit `{issue-number-or-url}` placeholder for dependent actions, the commit-ready diff and
+   push target, every drafted reply with its target, and each thread-resolution action with its exact
+   target. Ask for one approval covering that whole bundle. Do not create the commit or issue, push
+   fixes, post replies, or resolve threads before approval. After approval, create the approved issue
+   first, then fill its placeholder from the create response before performing dependent actions.
+   Approval authorizes only the listed actions. Never include merge in the bundle.
 
 5. **Report.** Summarize: what was **fixed** (with the commit-ready diff), what was **refuted** and
-   why, what was **deferred** (issue #s), and what still **needs the user's decision** at a gate.
+   why, what was **deferred** (including proposed issues that were not created), and what still
+   **needs the user's decision** at a gate. Distinguish created issue numbers from unapproved
+   proposals.
    End with a QA checklist if any fix warrants manual verification.
 
 ## Rules
@@ -83,6 +91,8 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
   the contract is gated behind a plan approval (auto-fix trivial, gate the rest).
 - **The contract is frozen.** A comment that wants a shipped-contract change is a new ADR, not an
   inline edit.
-- **Outward-facing = confirm.** Posting replies and resolving threads need explicit go-ahead;
-  merging is always the human's call. Don't commit or push unless asked.
+- **Outward-facing = one confirmation.** The proposed commit and message, external issue creation,
+  pushing validated fixes, posting drafted replies, and resolving listed threads share one explicit
+  approval when applicable. Do not perform any listed action outside that approved bundle. Merging is
+  always the human's call and is never part of the bundle.
 - **Cite docs, not stages** in any code comments or replies you write.

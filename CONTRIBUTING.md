@@ -15,7 +15,9 @@ files. It has no build step.
 - Strengthen existing stages before adding one. Preserve the right-sized paths for fixes and
   chores.
 - Add skills maintained by this kit under `skills/{name}/` and declare them with `kind: local` and
-  the matching `sourcePath` in `required-skills.yml`. Optionally use `skill-creator` for substantial
+  the matching `sourcePath` in `required-skills.yml`. For an adapted third-party technique, preserve
+  its attribution and license while clearly marking the maintained adaptation. Optionally use
+  `skill-creator` for substantial
   changes. Regardless of tooling, validate frontmatter, match each skill's `name` to its directory,
   and give it a clear trigger description.
 - For a third-party skill, declare `vendor/skills/{name}/` as its `sourcePath` with

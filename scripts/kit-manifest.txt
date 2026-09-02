@@ -3,6 +3,9 @@ skills/definition-of-done-review/SKILL.md
 skills/feature-start/SKILL.md
 skills/project-status/SKILL.md
 skills/sdlc/SKILL.md
+skills/unslop/LICENSE.txt
+skills/unslop/NOTICE.md
+skills/unslop/SKILL.md
 templates/AGENTS.md
 templates/CLAUDE.md
 templates/github/workflows/ci.yml

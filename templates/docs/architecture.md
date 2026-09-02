@@ -1,12 +1,9 @@
 # Architecture
 
-> Follow the documentation writing standard in AGENTS.md. Keep this as the current system shape:
-> compact summaries, diagrams or small tables when useful, and links to ADRs/contracts for detail.
-> Delete unused sections once filled.
->
-> The **current shape** of the system (living document). The decision _history_ lives in
-> `docs/adr/`; this is the decision _result_. Update when the shape changes; link the ADR that
-> caused the change.
+> Follow the documentation writing standard in AGENTS.md. This is the current system shape:
+> use compact summaries, diagrams or small tables when useful, and links to ADRs/contracts for
+> detail. Delete unused sections once filled. Decision _history_ lives in `docs/adr/`; update this
+> document when the shape changes and link the ADR that caused it.
 
 ## System context
 
@@ -17,7 +14,7 @@
 <!-- The deployable pieces and how they communicate. -->
 
 | Container | Responsibility | Tech | Talks to |
-|-----------|----------------|------|----------|
+| --------- | -------------- | ---- | -------- |
 | Web | UI | React + TS | API |
 | API | Business logic | Node + TS | DB, external services |
 | DB | Persistence | Postgres | — |

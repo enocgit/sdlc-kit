@@ -101,11 +101,11 @@ def validate_stage(entry: dict[str, Any], name: str, kind: str) -> None:
         return
 
     value = stage.strip()
-    if kind == "local" and value in {"conductor", "manual"}:
+    if kind == "local" and value in {"conductor", "communication", "manual"}:
         return
     tokens = [token.strip() for token in value.split(",")]
     if not tokens or any(not token or not STAGE_TOKEN_RE.fullmatch(token) for token in tokens):
-        fail(f"{name}: stage must use 0-8, 0a/0b, a comma-separated list, conductor, or manual")
+        fail(f"{name}: stage must use 0-8, 0a/0b, a comma-separated list, conductor, communication, or manual")
 
 
 def validate_entry(entry: Any, names: set[str]) -> None:

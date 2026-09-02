@@ -35,8 +35,8 @@ feature can't start without. Let everything else emerge per-feature.
 pipeline project. Use the project's local skill first; consult user-global directories
 (`~/.agents/skills`, `~/.claude/skills`) only when that local skill is absent, and disclose the
 fallback. If neither location has it, use your **runtime's equivalent** — several stage skills are
-named after Claude Code's commands (`code-review`, `simplify`, `verify`, `run`, `security-review`) and
-other runtimes have their own (e.g. Codex `review` ≈ `code-review`). Only when no skill or runtime
+named after Claude Code's commands (`code-review`, `simplify`, `security-review`) and other
+runtimes have their own equivalents (e.g. Codex `review` ≈ `code-review`). Only when no skill or runtime
 equivalent exists should you use the manual `fallback` in `required-skills.yml`.
 
 1. Read `AGENTS.md`, `docs/context.md`, and `docs/test-strategy.md`. **Stage 0 is incomplete** if
@@ -123,10 +123,15 @@ and **override its workflow**:
   request. Keep it on loopback; use an SSH tunnel, never plaintext non-loopback mode. Use the default
   temporary session directory; do not pass `--project-dir`. Ignore its instruction to commit or write
   under `docs/superpowers/`; this conductor owns the artifact and approval gate.
+- `to-prd` → use its synthesis method and the kit's PRD template, but write the result to
+  `docs/prd/NNNN-{slug}.md`; do not publish or label a tracker issue. Tracker work begins at Stage 3.
 - `documentation-and-adrs` → ADRs go to **`docs/adr/NNNN-{slug}.md`** (this project's convention),
   never `docs/decisions/`.
 - `writing-plans` → use its decomposition method at Stage 3, but write the result to the tracker.
   Do **not** create `docs/superpowers/plans/`; the tracker is the record.
+- `ponytail` → use only for backend/domain logic, parsers, transformations, state management,
+  tooling, and dependency choices. It cannot override contracts, security, accessibility, explicit
+  requirements, or proportional verification; its one-check rule is a minimum, never a cap.
 - `improve-codebase-architecture` → use only its code-reading and deepening heuristics. In that
   snapshot, `CONTEXT.md` means `docs/context.md`; do not invoke the unavailable `codebase-design` or
   `domain-modeling` skills. Update `docs/context.md` directly when needed, and skip its upstream HTML
@@ -147,8 +152,8 @@ If a borrowed skill's default fights an `AGENTS.md` convention, **`AGENTS.md` wi
 ## Communication and documentation writing standards
 
 Follow the communication and documentation writing standards in `AGENTS.md`; it is the single source
-for both. Apply the communication standard to replies and the documentation standard to every
-durable artifact. Trim borrowed-skill output to match before each gate.
+for both. Apply `unslop` automatically to human-facing replies and prose where applicable; follow its
+canonical scope and exclusions. Trim borrowed-skill output to match before each gate.
 
 ## The stages, skills, and gates
 
@@ -160,8 +165,8 @@ durable artifact. Trim borrowed-skill output to match before each gate.
 | 1 Spec | `brainstorming` (method only) → `to-prd` → `grilling` | **optional** Stage-1 brief `docs/briefs/NNNN-*.md` (only for a fuzzy/speculative idea — else skip straight to the PRD), then hardened PRD `docs/prd/NNNN-*.md` (no issues yet) | **GATE — approve PRD** |
 | 2 Architecture + Contract | `documentation-and-adrs` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
-| 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical), `frontend-design` (UI work only) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
-| 5 QA | tests + `run`, `verify` (`webapp-testing` for UI/browser) | verification evidence, local tests green, runtime observation or a relevant non-runtime check; CI green now or after PR creation | proceed (disclose results) |
+| 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical), `frontend-design` (UI work only), `ponytail` (backend/domain logic, parsers, transformations, state, tooling, and dependency choices) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
+| 5 QA | tests + runtime-equivalent checks (`webapp-testing` for UI/browser) | verification evidence, local tests green, runtime observation or a relevant non-runtime check; CI green now or after PR creation | proceed (disclose results) |
 | 6 Review | mandatory `code-review`, `simplify`, and local-readiness `definition-of-done-review` | clean diff, local DoD evidence, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
 | 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to _in review_ according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
 | 8 Retro | reflect + write (native) | curate **0–3** durable learnings after every task; after the final child, reconcile feature artifacts and the parent epic (see [Stage 8](#stage-8-what-a-learning-is-and-isnt)) | if repository files changed, offer to land them on `main`; otherwise continue without an empty landing action |
@@ -200,7 +205,7 @@ always interrupt. This keeps the front half rigorous and the back half moving.
 **The Stage 5 CI seam — don't over-stop.** When CI exists and needs a pushed branch, the guardrail
 says don't commit/push/PR unless asked. That is **one narrow stop at the commit/push boundary — not
 a reason to stop at the end of Stage 4.** After the Implement plan gate, keep going through
-everything that needs _no_ push: local tests, `run`/`verify`, and the whole Stage 6 pass
+everything that needs _no_ push: local tests, runtime observation, and the whole Stage 6 pass
 (`code-review`, `simplify`, `security-review` if sensitive, diff hygiene). Only _then_ stop, at the
 push. For a PR workflow, report that tree-only local checks and review are done, then ask one combined
 question: _"Approve commit, push, and opening the PR?"_ A yes authorizes exactly the actions named

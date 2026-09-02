@@ -4,11 +4,10 @@
 > policy and links to real tools; do not duplicate the canonical Definition of Done from AGENTS.md.
 > Delete placeholder runners once the stack is set.
 >
-> **STATUS: TEMPLATE** — set the tools below at Stage 0 from your **real** stack; the tool names
-> are placeholders, not a decision (e.g. the starter may be wired for Jest, not Vitest). The
-> authoritative **Definition of Done** and **Definition of Ready** live in `AGENTS.md`. Local
-> readiness is required before Land; the full Definition of Done is enforced before merge. This doc
-> only adds the test-specific bar (see "Verification bar" below).
+> **STATUS: TEMPLATE** — set the tools below from your **real** stack; the tool names are
+> placeholders, not a decision (e.g. the starter may be wired for Jest, not Vitest). The
+> authoritative completion policy lives in the project's operating manual. This doc adds only the
+> test-specific bar (see "Verification bar" below).
 
 ## Policy
 
@@ -34,11 +33,9 @@ evidence when an additional automated test would not improve confidence.
 
 ## Verification bar
 
-The **canonical Definition of Done lives in `AGENTS.md`** ("Definition of Done") — one list, no
-copies to drift; `definition-of-done-review` checks against it during Review and again before merge.
-This document adds only the test-specific bar: proportional verification per the policy above,
-automated coverage for non-trivial behavior at the **right layer**, and the existing suite fully
-green.
+The project's operating manual defines the broader completion policy. This document adds only the
+test-specific bar: proportional verification per the policy above, automated coverage for non-trivial
+behavior at the **right layer**, and the existing suite fully green.
 
 ## Conventions
 

@@ -3,12 +3,9 @@
 > Follow the documentation writing standard in AGENTS.md. This file is loaded every session, so keep
 > only durable domain facts and agent-critical gotchas. Link detail elsewhere.
 >
-> STATUS: TEMPLATE — not yet filled. **Stage 0 is incomplete** until this line is removed and
-> the sections below are completed for your project. The conductor will not advance to Spec
-> (Stage 1) while this marker (or any `{placeholder}`) remains.
-
-> The "why" that never lives in code. Read by every agent at session start — so keep it **lean and
-> curated**: prune stale entries, don't just append. Every line costs context every session.
+> STATUS: TEMPLATE — replace this marker and every `{placeholder}` while completing the project context.
+> Keep only durable facts that future contributors and agents need. This file loads every session, so
+> prune stale entries rather than append.
 
 ## Product
 
@@ -36,19 +33,15 @@
 
 - {thing we are deliberately not doing}
 
-## Learnings (curated at retros)
+## Learnings
 
-<!-- Durable gotchas ONLY: things a future agent would get wrong without this line. This file loads
-     every session, so each line is a permanent tax — curation, not a changelog.
-
-     Format: one dated bullet, <=3 lines. Flat list — no per-feature headings or
-     "What shipped / Keep doing / Process" sections (that's a retro report, not context).
-     Budget: 0-3 bullets per retro; writing nothing is normal and common.
+<!-- Durable gotchas ONLY: things a future contributor or agent would get wrong without this line.
+     Keep a flat list of dated bullets, each <=3 lines; no per-feature headings.
 
      Does NOT go here: what shipped (git/PR has it), why we chose X (ADR), system shape
-     (architecture.md), what's next (the tracker), test approach (test-strategy.md), process meta.
+     (architecture.md), what's next (the tracker), test approach (test-strategy.md), or process.
 
-     Prune when you append: delete fixed gotchas, fold covered ones into their ADR/doc, rewrite
-     superseded bullets in place. Keep under ~30 bullets — at the cap, remove one to add one. -->
+     Prune when you append: delete fixed gotchas, fold covered ones into their ADR/doc, and rewrite
+     superseded bullets in place. Keep under ~30 bullets; at the cap, remove one to add one. -->
 
 - YYYY-MM-DD — {the trap, and the rule that avoids it}

@@ -21,7 +21,7 @@ concern, or would surprise a competent newcomer.
 ## Consequences
 
 - The current system _shape_ lives in `docs/architecture.md`; the _why/history_ lives here.
-- Approving an ADR is a pipeline gate (Stage 2). A shipped-contract change requires a new ADR.
+- Approving an ADR is a project decision. A shipped-contract change requires a new ADR.
 - Small reversible choices don't need an ADR — keep the log signal-rich.
 
 ## Alternatives considered
