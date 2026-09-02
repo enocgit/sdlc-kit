@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-02
+
 ### Added
 
 - Added a pinned Ponytail snapshot for minimal, reuse-first implementation guidance.
@@ -13,6 +15,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 
+- Applied the Unslop adaptation automatically to applicable human-facing communication.
 - Simplified maintainer and pull-request guidance, clarified durable-artifact and proportional-
   verification rules, and removed unmanaged `run` and `verify` capability records.
 - Batched review fixes, replies, and thread resolution under one outward-action approval.
