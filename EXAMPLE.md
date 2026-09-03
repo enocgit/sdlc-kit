@@ -1,105 +1,112 @@
 # Workflow example
 
-This walkthrough follows a new project through the full pipeline, then shows how adoption differs
-for an existing codebase.
+This example follows TenantPay, a new rental-payment product, through the full workflow. Backticks
+mark skills, paths, branches, and commands.
 
 ## New project: TenantPay
 
-The idea: let tenants pay rent online through verified property listings.
+TenantPay lets tenants pay rent online through verified property listings.
 
-### 0a. Context
+### 0a. Fill context
 
-The agent fills `docs/context.md` with users, domain terms, and constraints. No feature code exists
-yet.
+The agent records TenantPay's users, domain terms, and constraints in `docs/context.md`. No feature
+code exists yet.
 
-**Gate:** context filled. The agent waits before starting foundation work.
+**Gate:** the context is filled. The agent stops before foundation work.
 
-### 0b. Foundation
+### 0b. Establish the foundation
 
-The agent creates the project PRD, foundational ADRs, architecture skeleton, core contract, and
-foundational threat model, then replaces the test strategy's placeholder runners with the project's
-real tools. Because authentication is sensitive, it runs `security-review` on this planning diff.
+The agent creates the product requirements document (PRD), foundational architecture decision
+records (ADRs), architecture skeleton, core contract, and threat model. It replaces the test
+strategy's placeholder runners with TenantPay's real tools. Authentication is sensitive, so it runs
+`security-review` on this planning diff.
 
-**Gate:** approve the foundation and land the context + foundation package on `main`. If `main` is
-protected, use a `plan/*` PR and wait for the human to merge it.
+**Gate:** approve the foundation and land the context-and-foundation package on `main`. If `main` is
+protected, use a `plan/*` pull request (PR) and wait for the human to merge it.
 
-### 1. Spec
+### 1. Write the feature specification
 
-The user starts with “tenants should pay rent online.” `brainstorming` resolves one question at a
-time and records an optional brief. `to-prd` turns it into `docs/prd/0001-rent-payment.md`.
-`grilling` resolves cases such as partial payments, failed callbacks, and refunds.
+The user says, "Tenants should pay rent online." `brainstorming` asks one question at a time and
+records an optional brief. `to-prd` turns the result into
+`docs/prd/0001-rent-payment.md`. `grilling` resolves partial payments, failed callbacks, and refunds.
 
-**Gate:** approve the feature PRD. No tracker issues exist yet.
+**Gate:** approve the feature PRD. No tracker tasks exist yet.
 
-### 2. Architecture and contract
+### 2. Choose the architecture and freeze the contract
 
 The agent records the payment-provider decision in an ADR, adds the payment component to
-`docs/architecture.md`, and threat-models payments and PII in `docs/security.md`. For TenantPay, it
-defines payment and webhook endpoints in `api/openapi.yaml` and generates shared types. Other
-projects freeze their actual contract source, such as tRPC routers, ts-rest contracts, schemas, or
-interface definitions. It runs `security-review` on the sensitive planning diff before landing it;
-Stage 6 reviews the implementation diff separately.
+`docs/architecture.md`, and threat-models payments and personally identifiable information (PII) in
+`docs/security.md`. For TenantPay, the contract lives in `api/openapi.yaml`; the agent generates
+shared types from it. Other projects can freeze tRPC routers, ts-rest contracts, schemas, or interface
+definitions instead.
+
+The agent runs `security-review` on this sensitive planning diff. Stage 6 reviews the implementation
+diff separately.
 
 **Gate:** approve the approach, freeze the interface, and land the Stage 1–2 planning package on
 `main`. If `main` is protected, use a `plan/*` PR and wait for the human to merge it. Frontend and
 backend can then work against the same contract.
 
-### 3. Decompose
+### 3. Break the feature into tasks
 
-`writing-plans` converts the PRD into tracker issues. `project-status` reports the breakdown. The
-agent discloses it and continues without waiting.
+`writing-plans` turns the PRD into tracker tasks. `project-status` reports the breakdown. The agent
+discloses it and continues without waiting for another approval.
 
-### 4. Implement
+### 4. Implement a task
 
 `feature-start` creates `feat/3-payment-intent` and loads the relevant PRD, ADR, and contract.
 
-**Gate:** approve the compact in-session task plan. No plan file is created unless the human asks
-for one. The agent then implements against the frozen contract.
+**Gate:** approve the compact in-session task plan. The agent creates no plan file unless the human
+asks for one. After approval, it implements against the frozen contract.
 
-### 5. QA
+### 5. Verify the change
 
-The agent runs tests, starts the app, and completes a sandbox payment. CI is green when it can run
-before a PR; otherwise it remains pending until Land opens the PR.
+The agent runs tests, starts the app, and completes a sandbox payment. Continuous integration (CI)
+runs before Land when possible. If the project needs a PR to start CI, Land opens it first.
 
-### 6. Review
+### 6. Review the diff
 
 `code-review` and `simplify` inspect the diff. Because the feature touches payments and PII, the
-agent also runs `security-review` and fixes its findings. It then runs the mandatory local-readiness
-`definition-of-done-review`; required CI is the only pending item before Land.
+agent also runs `security-review` and fixes its findings. `definition-of-done-review` confirms local
+readiness. Required CI is the only pending item before Land.
 
-### 7. Land
+### 7. Land the change
 
-After local review, the agent asks for one combined approval to commit, push, and open the PR. The
-request authorizes only those named actions, never merge. The GitHub PR uses `Closes #N`; the issue
-remains open while the PR is under review. After required CI passes, the agent runs the final DoD
-confirmation and reports whether the change is ready to merge.
+After local review, the agent asks for one approval to commit, push, and open the PR. The request
+must name those actions; it never authorizes merge. The GitHub PR uses `Closes #N`, and the issue
+stays open until merge.
 
-**Gate:** the human merges after CI is green and final DoD confirmation passes. GitHub then closes
-the issue.
+After required CI passes, the agent runs the final Definition of Done check and reports whether the
+change is ready to merge.
 
-### 8. Retro
+**Gate:** the human merges after CI is green and the final check passes. GitHub then closes the issue.
 
-After every task, the agent curates only durable learnings, such as “payment callbacks may arrive
-twice; handlers must be idempotent.” If the epic has unfinished tasks, it leaves feature artifacts
-and the epic checklist alone. A real learning is landed on the updated default branch before the
-next task; when no repository file changed, there is no extra landing action. After the final task,
-the agent reconciles and lands feature artifacts and statuses, verifies the epic DoD, and only then
-asks to update and close the parent GitHub issue. Once the parent is closed, it offers the optional
-`improve` audit, `improve next`, or the next `sdlc {feature}` run.
+### 8. Record what was learned
+
+After each task, the agent keeps only durable learnings, such as "payment callbacks may arrive twice;
+handlers must be idempotent." If tasks remain, it leaves feature artifacts and the epic checklist
+alone. If it records a durable learning in a project file, it checks out and syncs the updated default
+branch before editing, then asks to land that change before the next task. If no repository file
+changed, there is no extra landing action.
+
+After the final task, the agent checks out and syncs the updated default branch before reconciling
+feature artifacts, including the frozen contract and contract index, and updating statuses. It asks
+for approval to land those edits. After they land, it verifies the epic Definition of Done and asks
+for approval to update and close the parent GitHub issue. After that approval and verified closure,
+it offers the optional `improve` audit, `improve next`, or the next `sdlc {feature}` run.
 
 ## Existing project
 
-The `adopt` path changes only Stage 0. The agent reads the code, configures
-`docs/test-strategy.md`, and reconstructs `docs/context.md`, `docs/architecture.md`, contract
-pointers, and a few retrospective ADRs. This step documents existing behavior; it does not change
-it.
+The `adopt` path changes only Stage 0. The agent reads the code, configures `docs/test-strategy.md`,
+and reconstructs `docs/context.md`, `docs/architecture.md`, contract pointers, and retrospective
+ADRs. It documents existing behavior without changing it.
 
-After foundation approval, the next feature follows Stages 1–8 above. Architecture and contracts
-are extended instead of created. Changing a shipped contract requires a versioning or deprecation
-ADR.
+After foundation approval, the next feature follows Stages 1–8. Extend existing architecture and
+contracts instead of creating duplicates. A shipped-contract change requires a versioning or
+deprecation ADR.
 
 ## Gate behavior
 
-At each gate, the agent names the completed artifact and asks for approval. It does nothing
-downstream until the human responds. At non-gate stages, it performs the work, reports decisions
-worth overriding, and continues. The human can interrupt at any time and always controls merge.
+At every gate, the agent names the artifact and asks for approval. It does nothing downstream until
+the human responds. At other stages, it works, reports decisions worth changing, and continues. The
+human can interrupt at any time and always controls merge.

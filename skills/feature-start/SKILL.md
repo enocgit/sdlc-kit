@@ -2,8 +2,8 @@
 name: feature-start
 description: >
   Starts implementation of one decomposed task: isolates a workspace (a feature branch by default;
-  a git worktree only when isolation is critical), loads the relevant PRD, ADR, and frozen contract
-  into context, then proposes a compact in-session plan for approval before any code is written.
+  a git worktree only when isolation is critical), loads the relevant PRD, ADR, and frozen contract,
+  then proposes a compact in-session plan for approval before any code is written.
   Use at the start of Stage 4 (Implement) once scope is approved, or when the user says
   "start working on issue #N",
   "begin this task", or "let's implement {feature}".
@@ -11,8 +11,8 @@ description: >
 
 # feature-start
 
-Prepare a clean, well-contextualized starting point for implementing one task, then stop for a
-plan approval gate.
+Prepare a clean starting point with the context needed to implement one task, then stop for a plan
+approval gate.
 
 ## Steps
 

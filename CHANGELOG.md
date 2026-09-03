@@ -6,6 +6,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+### Changed
+
+- Clarified that installable contract and test-strategy templates support contract-defined types
+  that are generated or shared directly.
+- Reworked the README, cheatsheet, contribution, walkthrough, and installation guides with ordered
+  first-run steps, explicit safety and adaptation paths, and consolidated workflow guidance.
+
 ## [0.6.0] - 2026-09-02
 
 ### Added

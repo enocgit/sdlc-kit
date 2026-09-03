@@ -1,16 +1,16 @@
 ---
 name: project-status
 description: >
-  Reports where the project stands by reading the live tracker (GitHub Issues/Projects) and
-  summarizing it — read-only against external trackers, while local-only mode maintains
-  docs/progress.md as the tracker itself. Use when the user asks "what's the project status",
+  Reports project status from the live tracker (GitHub Issues/Projects). Access is read-only for
+  external trackers. In local-only mode, the skill maintains docs/progress.md as the tracker itself.
+  Use when the user asks "what's the project status",
   "where are we on {epic}", "what's next", or wants a Now/Next/Blocked view; also to disclose the
   breakdown after Decompose (Stage 3) or the state after landing a PR (Stage 7).
 ---
 
 # project-status
 
-Report the current state of the work straight from the **tracker** — GitHub Issues/Projects by
+Report the current state of the work from the **tracker** — GitHub Issues/Projects by
 default, the single source of truth. Against an external tracker, this skill **reads and summarizes;
 it does not write an in-repo mirror.** There is no `docs/progress.md` snapshot to keep in sync — a
 second copy would only drift, so the tracker stays authoritative and always live. In local-only

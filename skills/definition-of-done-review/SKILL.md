@@ -10,8 +10,8 @@ description: >
 
 # definition-of-done-review
 
-A consistent, team-specific check. Generic `code-review` and `simplify` catch bugs and cleanup;
-this verifies readiness against the team's standard. Run it after them.
+Run this team-specific check after generic `code-review` and `simplify`. Those checks catch bugs and
+cleanup issues; this one verifies readiness against the team's standard.
 
 ## Review modes
 

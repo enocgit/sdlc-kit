@@ -11,7 +11,7 @@ description: >
 
 # address-review
 
-Work through the review comments on an open PR and resolve them **deliberately**. Reviewers — and
+Work through the review comments on an open PR and resolve them with evidence. Reviewers — and
 especially bots — are high-recall, low-precision: a large share of their comments are false
 positives, style nits, or misreadings of the contract. Blindly "fixing everything a reviewer said"
 is net-negative. The job of this skill is to **triage first, challenge each comment, then act** —

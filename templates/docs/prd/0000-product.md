@@ -14,7 +14,7 @@
 
 ## Target users
 
-- **{persona}** — who they are, the job they're hiring this product for.
+- **{persona}** — who they are and the job they hire this product to do.
 
 ## Problems we solve
 

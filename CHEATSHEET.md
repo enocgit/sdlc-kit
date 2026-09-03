@@ -1,70 +1,82 @@
 # SDLC cheatsheet
 
-Use this during a run. `AGENTS.md` holds the full rules; the `sdlc` skill drives the stages.
+Use this during a run. `README.md` explains the kit; `templates/AGENTS.md` is the adopter manual
+that installs as the project's `AGENTS.md`; the root `AGENTS.md` governs this maintainer repository.
+The `sdlc` skill routes the work.
 
-## Pipeline
+## Workflow
 
-| # | Stage | Output | Gate |
-| --- | ------- | -------- | ------ |
-| 0 | Context + Foundation | context, configured test strategy, product PRD, foundational ADRs, architecture/security, core contract | bootstrap: context filled, then approve foundation; adopt: approve reconstructed foundation |
-| 1 | Spec | optional brief, hardened PRD; no issues yet | approve PRD |
-| 2 | Architecture + Contract | ADRs, architecture/security updates, frozen contract | approve and freeze |
-| 3 | Decompose | tracker issues | disclose |
-| 4 | Implement | one task on a `feat/*` branch | approve compact in-session task plan |
-| 5 | QA | tests, runtime observation or relevant non-runtime check, CI | - |
-| 6 | Review | clean diff; security review when required | inline |
-| 7 | Land | PR if supported; otherwise push if a remote exists, run available CI, and merge directly. **GitHub:** `Closes #N`. **Other trackers/local-only:** no keyword; complete after merge | **human merges** |
-| 8 | Retro | per-task learnings; final-child artifact and epic reconciliation | - |
+| # | Stage | Output | Gate or handling |
+| --- | --- | --- | --- |
+| 0 | Context + Foundation | filled context, product requirements document (PRD), test strategy, foundational ADRs, architecture/security, and core contract | fill context, then approve foundation |
+| 1 | Spec | optional brief and feature PRD | approve PRD |
+| 2 | Architecture + Contract | ADRs, architecture/security updates, and frozen contract | approve and freeze |
+| 3 | Decompose | tracker tasks | disclose |
+| 4 | Implement | one task on a `feat/*` branch | approve compact task plan |
+| 5 | Quality assurance (QA) | tests, runtime or relevant non-runtime evidence, continuous integration (CI) | none |
+| 6 | Review | clean diff and security review when required | inline; no separate gate |
+| 7 | Land | pull request (PR) or direct-merge path | human merges |
+| 8 | Retro | per-task learnings; after all feature tasks, reconcile feature artifacts, frozen contract, contract index, and parent-epic status | none |
 
-Fresh projects have six hard gates: context, foundation, PRD, architecture and contract, each task
-plan, and merge. Existing-project adoption combines Stage 0 into one approval, so it has five. Stop
-for a human “yes” at each gate. At other stages, do the work, disclose decisions, and continue.
-Repository-action approval is a safety stop, not an extra pipeline gate. One combined approval may
-cover commit, push, and PR creation when the request names all three; merge always stays separate.
+A feature's parent tracker record, often called an epic, groups its child tasks. A fresh project has
+six **hard pipeline gates** for a one-task feature: context, foundation, PRD,
+architecture and contract, the task plan, and merge. Adoption combines the first two into one Stage 0
+approval, so a one-task feature has five. Each additional task adds a task-plan approval and a merge
+approval. Repository-action approvals and external-tracker write approvals are separate safety stops,
+not extra pipeline gates. At other stages, work continues after decisions are disclosed. One approval
+may cover commit, push, and PR creation when the request names all three. Merge always stays separate.
 
-## Choose the path
+At Land, if hosting has no PR workflow, the agent pushes when a remote exists and runs available CI;
+the human merges directly. With no remote, the human merges the local branch.
 
-- **Feature, user-facing, or risky:** Stages 1–8 after one-time Stage 0 bootstrap/adoption.
+## Choose a path
+
+- **Feature, user-facing, or risky:** Stages 1–8 after Stage 0.
 - **Bug fix or small enhancement:** Implement → QA → Review → Land → Retro.
 - **Chore, docs, or dependency update:** Implement → Review → Land → Retro.
-- Use the full pipeline when a change affects a contract, sensitive area, or decision.
+- Use the full path when the change affects a contract, sensitive area, or recorded decision.
 
 ## Core rules
 
-- **Foundation versus feature:** establish only the project-wide PRD, ADRs, architecture, threat
-  model, and core contract at Stage 0. Let feature artifacts emerge per feature.
-- **Contract first:** define and freeze the interface before implementation. Generate shared types.
-  Changing a shipped contract requires a versioning or deprecation ADR.
-- **Sensitive areas:** use the canonical list in [`AGENTS.md`](./AGENTS.md#sensitive-areas).
-  Threat-model sensitive planning in `docs/security.md` and run `security-review` before landing it;
+- **Foundation:** create project-wide context, test strategy, product requirements document (PRD),
+  architecture decision records (ADRs), architecture, threat model, and core contract once. Create
+  feature artifacts per feature.
+- **Contract:** define and freeze the interface before implementation. Generate types or share
+  contract-defined types directly. Regenerate generated types after contract changes; never
+  hand-duplicate types. A shipped-contract change needs a versioning or deprecation ADR.
+- **Sensitive work:** use the canonical list in
+  [`templates/AGENTS.md`](./templates/AGENTS.md#sensitive-areas). The agent updates `docs/security.md`
+  and runs `security-review` before asking for approval to land sensitive Stage 0 or Stage 2 planning;
   review the implementation again at Stage 6.
-- **Ask instead of guessing:** stop on ambiguous PRDs, ADRs, and contracts.
+- **Ambiguity:** stop and ask instead of guessing about PRDs, ADRs, or contracts.
+- **Ready:** acceptance criteria are testable, the contract is frozen, and open questions are closed.
+  The task should fit in about one day.
+- **Migrations:** use expand/contract (migrate → deploy → clean up) when a table has real data or
+  any deployed reader/writer; direct changes are fine before then.
+- **Done:** acceptance criteria pass; the contract is honored; proportional verification, reviews,
+  architecture, ADRs, and tracker updates are complete.
+- **CI:** available continuous integration (CI) must be green. Unreachable CI blocks; it does not
+  exempt the change.
 
-## Ready and done
-
-**Ready:** testable acceptance criteria, frozen contract, no open questions, and about one day of
-work.
-
-**Done:** acceptance criteria met; contract honored; expand/contract used once real data or deployed
-readers/writers exist; proportional verification complete; available CI green; reviews clean;
-architecture, ADRs, and tracker current. Unreachable CI blocks. Tracker closure happens after merge.
-
-## Git
+## Git and trackers
 
 - Keep `main` deployable. Use short-lived `feat/{id}-{slug}` branches.
-- Use `type(scope): summary` Conventional Commits, imperative and at most 72 characters.
-- Reference GitHub issues with `Refs #N` or `Closes #N`; use native keys for other trackers and no
-  issue syntax for local-only IDs.
-- Commit the Stage 1–2 planning package to `main` once after Stage 2, before branching. Stage 0
-  foundation artifacts may be committed after their gate. If `main` is protected, merge a `plan/*`
-  PR first.
+- Use imperative Conventional Commits: `type(scope): summary`, at most 72 characters.
+- Use `Refs #N` or `Closes #N` for GitHub. Use native keys for other trackers and no issue syntax for
+  local-only IDs.
+- Commit Stage 1–2 planning artifacts once after Stage 2, before branching. Stage 0 artifacts may be
+  committed after their gate. If `main` is protected, merge a `plan/*` PR first.
 - Keep commits and PRs focused. The human always merges.
+- On GitHub, `Closes #N` closes the referenced issue when the PR merges. With a native external
+  integration, verify that it closed the task after merge; if closure did not occur, ask for approval
+  for the post-merge transition. Without Git integration, ask for approval and close the external task
+  after merge confirmation. In local-only mode, update `docs/progress.md` after merge.
 
-## Artifact map
+## Artifacts
 
 | Artifact | Location |
-| ---------- | ---------- |
-| Domain and durable learnings | `docs/context.md` |
+| --- | --- |
+| Domain context and learnings | `docs/context.md` |
 | Product and feature PRDs | `docs/prd/` |
 | Decisions | `docs/adr/` |
 | Current system shape | `docs/architecture.md` |
@@ -73,11 +85,7 @@ architecture, ADRs, and tracker current. Unreachable CI blocks. Tracker closure 
 | Test policy | `docs/test-strategy.md` |
 | Task status | external tracker, or `docs/progress.md` in local-only mode |
 
-After all descendant tasks under an epic-level group are done, optionally run `improve` for a scoped
-audit. Do not suggest it after each leaf task or small parent task. At epic completion, `improve
-next` can surface future directions; after choosing one, decline its planning step and start
-`sdlc {chosen direction}`. `improve` is code-read-only but writes `plans/`; it stays outside the
-pipeline and never replaces Stage 1.
-
-For comments on an open PR, run `address-review`. It triages human and bot feedback before fixing,
-refuting, or deferring each comment.
+The optional `improve` skill audits a completed epic. It writes plans under `plans/`, stays outside the
+pipeline, and is offered only after all tasks in the epic are complete, not after a single task. For
+`improve next`, decline its planning step and start `sdlc {chosen direction}` at Stage 1. `address-review`
+triages comments on an open PR before fixing, refuting, or deferring them.
