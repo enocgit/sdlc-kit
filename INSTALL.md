@@ -142,7 +142,7 @@ change user-global skills.
 | Skill | Upstream | Stage |
 | --- | --- | --- |
 | `brainstorming` | obra/superpowers | Spec |
-| `to-prd` | mattpocock/skills | Spec |
+| `to-spec` | mattpocock/skills | Spec |
 | `grilling` | mattpocock/skills | Spec |
 | `documentation-and-adrs` | addyosmani/agent-skills | Foundation, Architecture |
 | `writing-plans` | obra/superpowers | Decompose |
@@ -153,9 +153,9 @@ change user-global skills.
 | `improve-codebase-architecture` | mattpocock/skills | Adopt an existing project |
 
 `vendor/skills/` contains exact upstream snapshots. The installer preserves them and adds
-`$SKILLS_DIR/{skill}/.sdlc-vendor/` with provenance and license files. `to-prd` remains pinned to the
-last reviewed revision before its rename to `to-spec`. See
-[`vendor/skills.lock.json`](./vendor/skills.lock.json) for every pinned commit.
+`$SKILLS_DIR/{skill}/.sdlc-vendor/` with provenance and license files. The `to-spec` snapshot is pinned
+to a reviewed upstream revision. See [`vendor/skills.lock.json`](./vendor/skills.lock.json) for every
+pinned commit.
 
 Use the runtime's tools for runtime observation, code review, simplification, and security review.
 `required-skills.yml` provides manual fallbacks where available. The bundled `unslop` adaptation

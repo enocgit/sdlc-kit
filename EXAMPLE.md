@@ -27,7 +27,7 @@ protected, use a `plan/*` pull request (PR) and wait for the human to merge it.
 ### 1. Write the feature specification
 
 The user says, "Tenants should pay rent online." `brainstorming` asks one question at a time and
-records an optional brief. `to-prd` turns the result into
+records an optional brief. `to-spec` turns the result into
 `docs/prd/0001-rent-payment.md`. `grilling` resolves partial payments, failed callbacks, and refunds.
 
 **Gate:** approve the feature PRD. No tracker tasks exist yet.

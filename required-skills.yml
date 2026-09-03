@@ -15,153 +15,153 @@
 version: 1
 
 skills:
-    # --- local (this kit) ---
-    - { name: sdlc, kind: local, sourcePath: skills/sdlc, stage: conductor }
-    - {
-          name: feature-start,
-          kind: local,
-          sourcePath: skills/feature-start,
-          stage: 4,
-      }
-    - {
-          name: project-status,
-          kind: local,
-          sourcePath: skills/project-status,
-          stage: "3,7",
-      }
-    - {
-          name: definition-of-done-review,
-          kind: local,
-          sourcePath: skills/definition-of-done-review,
-          stage: "6,7",
-      }
-    - {
-          name: address-review,
-          kind: local,
-          sourcePath: skills/address-review,
-          stage: manual,
-          note: "standalone, user-invoked — triages external PR review comments (human + bots), not bound to a stage",
-      }
-    - {
-          name: unslop,
-          kind: local,
-          sourcePath: skills/unslop,
-          stage: communication,
-          note: "automatic communication policy; follow the canonical unslop skill for human-facing prose scope and exclusions",
-          fallback: "apply the canonical unslop policy directly when automatic skill invocation is unavailable",
-      }
+      # --- local (this kit) ---
+      - { name: sdlc, kind: local, sourcePath: skills/sdlc, stage: conductor }
+      - {
+              name: feature-start,
+              kind: local,
+              sourcePath: skills/feature-start,
+              stage: 4,
+        }
+      - {
+              name: project-status,
+              kind: local,
+              sourcePath: skills/project-status,
+              stage: "3,7",
+        }
+      - {
+              name: definition-of-done-review,
+              kind: local,
+              sourcePath: skills/definition-of-done-review,
+              stage: "6,7",
+        }
+      - {
+              name: address-review,
+              kind: local,
+              sourcePath: skills/address-review,
+              stage: manual,
+              note: "standalone, user-invoked — triages external PR review comments (human + bots), not bound to a stage",
+        }
+      - {
+              name: unslop,
+              kind: local,
+              sourcePath: skills/unslop,
+              stage: communication,
+              note: "automatic communication policy; follow the canonical unslop skill for human-facing prose scope and exclusions",
+              fallback: "apply the canonical unslop policy directly when automatic skill invocation is unavailable",
+        }
 
-    # --- vendored third-party pipeline skills ---
-    # Borrow the technique, override the workflow: the conductor owns artifact paths and transitions.
-    # See skills/sdlc/SKILL.md "Borrow the technique, not the workflow".
-    - {
-          name: brainstorming,
-          kind: vendored,
-          sourcePath: vendor/skills/brainstorming,
-          source: obra/superpowers,
-          stage: 1,
-          note: "method only — land a Stage-1 brief in docs/briefs/; ignore its commit and docs/superpowers instructions; keep the visual companion loopback-only, use its default temporary session directory, and use an SSH tunnel for remote access",
-          fallback: "ask clarifying questions and draft the brief by hand",
-      }
-    - {
-          name: documentation-and-adrs,
-          kind: vendored,
-          sourcePath: vendor/skills/documentation-and-adrs,
-          source: addyosmani/agent-skills,
-          stage: "0b,2",
-          note: "ADRs go to docs/adr/NNNN-slug.md, never docs/decisions/",
-          fallback: "use docs/adr/TEMPLATE.md + docs/contracts/README.md by hand",
-      }
-    - {
-          name: writing-plans,
-          kind: vendored,
-          sourcePath: vendor/skills/writing-plans,
-          source: obra/superpowers,
-          stage: 3,
-          note: "method only — decompose into tracker issues; do NOT write docs/superpowers/plans/",
-          fallback: "create ordered tracker issues manually with scope, acceptance criteria, dependencies, verification, and touched paths",
-      }
-    - {
-          name: using-git-worktrees,
-          kind: vendored,
-          sourcePath: vendor/skills/using-git-worktrees,
-          source: obra/superpowers,
-          stage: 4,
-          note: "opt-in — only when isolation is critical; default is a feature branch via feature-start; setup commands that execute repository code need separate approval; validate the selected in-repository location itself with git check-ignore before creation",
-          fallback: "feature-start runs its built-in branch hygiene guards",
-      }
-    - {
-          name: webapp-testing,
-          kind: vendored,
-          sourcePath: vendor/skills/webapp-testing,
-          source: anthropics/skills,
-          stage: 5,
-          note: "UI/browser checks only — skip for backend; do not use the bundled with_server.py or mandatory networkidle waits; use the project's lifecycle runner and an app-specific readiness signal, or a platform runner such as Maestro or Detox for mobile",
-          fallback: "drive the app with its platform runner (Playwright, Maestro, Detox, etc.)",
-      }
-    - {
-          name: improve-codebase-architecture,
-          kind: vendored,
-          sourcePath: vendor/skills/improve-codebase-architecture,
-          source: mattpocock/skills,
-          stage: 0,
-          note: "method only — CONTEXT.md means docs/context.md; do not invoke unavailable codebase-design/domain-modeling dependencies or generate the CDN-backed HTML report",
-          fallback: "read context, ADRs, recent-change hotspots, and current modules; record ranked structure risks and one smallest useful improvement",
-      }
-    - {
-          name: to-prd,
-          kind: vendored,
-          sourcePath: vendor/skills/to-prd,
-          source: mattpocock/skills,
-          stage: 1,
-          note: "pinned before upstream renamed this skill to to-spec; method only — write the kit PRD to docs/prd/ and do not publish or label a tracker issue until Decompose",
-          fallback: "write the PRD from docs/prd/TEMPLATE.md",
-      }
-    - {
-          name: grilling,
-          kind: vendored,
-          sourcePath: vendor/skills/grilling,
-          source: mattpocock/skills,
-          stage: 1,
-          note: "stress-test folded into Spec — harden the PRD before the gate",
-          fallback: "review each PRD assumption, requirement, dependency, and open question; record unresolved decisions before approval",
-      }
-    - {
-          name: frontend-design,
-          kind: vendored,
-          sourcePath: vendor/skills/frontend-design,
-          source: anthropics/skills,
-          stage: 4,
-          note: "UI work only — skip for backend-only projects",
-          fallback: "follow the project's UI conventions, preserve accessible behavior, and verify the required responsive states",
-      }
-    - {
-          name: ponytail,
-          kind: vendored,
-          sourcePath: vendor/skills/ponytail,
-          source: DietrichGebert/ponytail,
-          stage: 4,
-          note: "method only — apply to backend/domain logic, parsers, transformations, state management, tooling, and dependency choices; contracts, security, accessibility, explicit requirements, and proportional verification take precedence; the one-check rule is a minimum, never a cap",
-          fallback: "prefer the smallest direct implementation, reuse existing code where it fits, and add the smallest sufficient verification",
-      }
+      # --- vendored third-party pipeline skills ---
+      # Borrow the technique, override the workflow: the conductor owns artifact paths and transitions.
+      # See skills/sdlc/SKILL.md "Borrow the technique, not the workflow".
+      - {
+              name: brainstorming,
+              kind: vendored,
+              sourcePath: vendor/skills/brainstorming,
+              source: obra/superpowers,
+              stage: 1,
+              note: "method only — land a Stage-1 brief in docs/briefs/; ignore its commit and docs/superpowers instructions; keep the visual companion loopback-only, use its default temporary session directory, and use an SSH tunnel for remote access",
+              fallback: "ask clarifying questions and draft the brief by hand",
+        }
+      - {
+              name: documentation-and-adrs,
+              kind: vendored,
+              sourcePath: vendor/skills/documentation-and-adrs,
+              source: addyosmani/agent-skills,
+              stage: "0b,2",
+              note: "ADRs go to docs/adr/NNNN-slug.md, never docs/decisions/",
+              fallback: "use docs/adr/TEMPLATE.md + docs/contracts/README.md by hand",
+        }
+      - {
+              name: writing-plans,
+              kind: vendored,
+              sourcePath: vendor/skills/writing-plans,
+              source: obra/superpowers,
+              stage: 3,
+              note: "method only — decompose into tracker issues; do NOT write docs/superpowers/plans/",
+              fallback: "create ordered tracker issues manually with scope, acceptance criteria, dependencies, verification, and touched paths",
+        }
+      - {
+              name: using-git-worktrees,
+              kind: vendored,
+              sourcePath: vendor/skills/using-git-worktrees,
+              source: obra/superpowers,
+              stage: 4,
+              note: "opt-in — only when isolation is critical; default is a feature branch via feature-start; setup commands that execute repository code need separate approval; validate the selected in-repository location itself with git check-ignore before creation",
+              fallback: "feature-start runs its built-in branch hygiene guards",
+        }
+      - {
+              name: webapp-testing,
+              kind: vendored,
+              sourcePath: vendor/skills/webapp-testing,
+              source: anthropics/skills,
+              stage: 5,
+              note: "UI/browser checks only — skip for backend; do not use the bundled with_server.py or mandatory networkidle waits; use the project's lifecycle runner and an app-specific readiness signal, or a platform runner such as Maestro or Detox for mobile",
+              fallback: "drive the app with its platform runner (Playwright, Maestro, Detox, etc.)",
+        }
+      - {
+              name: improve-codebase-architecture,
+              kind: vendored,
+              sourcePath: vendor/skills/improve-codebase-architecture,
+              source: mattpocock/skills,
+              stage: 0,
+              note: "method only — CONTEXT.md means docs/context.md; do not invoke unavailable codebase-design/domain-modeling dependencies or generate the CDN-backed HTML report",
+              fallback: "read context, ADRs, recent-change hotspots, and current modules; record ranked structure risks and one smallest useful improvement",
+        }
+      - {
+              name: to-spec,
+              kind: vendored,
+              sourcePath: vendor/skills/to-spec,
+              source: mattpocock/skills,
+              stage: 1,
+              note: "method only — use the kit PRD template, write feature PRDs to docs/prd/, and do not publish or label a tracker issue until Decompose",
+              fallback: "write the PRD from docs/prd/TEMPLATE.md",
+        }
+      - {
+              name: grilling,
+              kind: vendored,
+              sourcePath: vendor/skills/grilling,
+              source: mattpocock/skills,
+              stage: 1,
+              note: "stress-test folded into Spec — harden the PRD before the gate",
+              fallback: "review each PRD assumption, requirement, dependency, and open question; record unresolved decisions before approval",
+        }
+      - {
+              name: frontend-design,
+              kind: vendored,
+              sourcePath: vendor/skills/frontend-design,
+              source: anthropics/skills,
+              stage: 4,
+              note: "UI work only — skip for backend-only projects",
+              fallback: "follow the project's UI conventions, preserve accessible behavior, and verify the required responsive states",
+        }
+      - {
+              name: ponytail,
+              kind: vendored,
+              sourcePath: vendor/skills/ponytail,
+              source: DietrichGebert/ponytail,
+              stage: 4,
+              note: "method only — apply to backend/domain logic, parsers, transformations, state management, tooling, and dependency choices; contracts, security, accessibility, explicit requirements, and proportional verification take precedence; the one-check rule is a minimum, never a cap",
+              fallback: "prefer the smallest direct implementation, reuse existing code where it fits, and add the smallest sufficient verification",
+        }
 
-    # --- claude-code (native CLI commands; not installable, not portable) ---
-    - {
-          name: code-review,
-          kind: claude-code,
-          stage: 6,
-          fallback: "inspect the complete target-to-tree diff for correctness, contract fidelity, security, tests, and unrelated changes",
-      }
-    - {
-          name: simplify,
-          kind: claude-code,
-          stage: 6,
-          fallback: "remove unnecessary complexity from changed code without changing behavior, then rerun focused checks",
-      }
-    - {
-          name: security-review,
-          kind: claude-code,
-          stage: "0,0b,2,6",
-          note: "mandatory before landing sensitive planning or implementation changes — not agent discretion",
-          fallback: "perform a structured manual review of changed trust boundaries, authentication/authorization, data exposure, abuse cases, dependencies, and hostile inputs; record findings, resolutions, and any docs/security.md updates",
-      }
+      # --- claude-code (native CLI commands; not installable, not portable) ---
+      - {
+              name: code-review,
+              kind: claude-code,
+              stage: 6,
+              fallback: "inspect the complete target-to-tree diff for correctness, contract fidelity, security, tests, and unrelated changes",
+        }
+      - {
+              name: simplify,
+              kind: claude-code,
+              stage: 6,
+              fallback: "remove unnecessary complexity from changed code without changing behavior, then rerun focused checks",
+        }
+      - {
+              name: security-review,
+              kind: claude-code,
+              stage: "0,0b,2,6",
+              note: "mandatory before landing sensitive planning or implementation changes — not agent discretion",
+              fallback: "perform a structured manual review of changed trust boundaries, authentication/authorization, data exposure, abuse cases, dependencies, and hostile inputs; record findings, resolutions, and any docs/security.md updates",
+        }

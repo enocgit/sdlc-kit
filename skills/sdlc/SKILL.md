@@ -116,14 +116,14 @@ and **override its workflow**:
 - `brainstorming` → use its discovery method (explore → **one question at a time** → approaches →
   design), but land the artifact as the **(optional) Stage-1 brief** at `docs/briefs/NNNN-{slug}.md`
   and STOP. Reach for brainstorming + a brief only when the idea is fuzzy; a well-understood feature
-  skips both and goes straight to `to-prd`.
+  skips both and goes straight to `to-spec`.
   Discovery is exploratory — **no code.** Do **not** write to `docs/superpowers/specs/`, and do
-  **not** auto-run `writing-plans`; the next step is the Stage 1 Spec (`to-prd`), then the gate. If
+  **not** auto-run `writing-plans`; the next step is the Stage 1 Spec (`to-spec`), then the gate. If
   the user approves its visual companion, set `SUPERPOWERS_DISABLE_TELEMETRY=1` to block its branding
   request. Keep it on loopback; use an SSH tunnel, never plaintext non-loopback mode. Use the default
   temporary session directory; do not pass `--project-dir`. Ignore its instruction to commit or write
   under `docs/superpowers/`; this conductor owns the artifact and approval gate.
-- `to-prd` → use its synthesis method and the kit's PRD template, but write the result to
+- `to-spec` → use its synthesis method and the kit's PRD template, but write the result to
   `docs/prd/NNNN-{slug}.md`; do not publish or label a tracker issue. Tracker work begins at Stage 3.
 - `documentation-and-adrs` → ADRs go to **`docs/adr/NNNN-{slug}.md`** (this project's convention),
   never `docs/decisions/`.
@@ -162,7 +162,7 @@ canonical scope and exclusions. Trim borrowed-skill output to match before each 
 | 0a Context (new) | installer-scaffolded templates (fill) | `AGENTS.md`, filled `docs/context.md` | **GATE — context filled** |
 | 0b Foundation (new) | `documentation-and-adrs` | `docs/prd/0000-product.md`, foundational ADRs (→ `docs/adr/`), `architecture.md` skeleton, core contract scaffold, foundational threat model in `docs/security.md`, configured `docs/test-strategy.md` (**trim `docs/contracts/README.md`** to real/`(future)` paths — never leave template examples) | **GATE — approve foundation** |
 | 0 adopt (existing) | `improve-codebase-architecture` + read-only code analysis | reconstructed product PRD, context/architecture/security, configured `docs/test-strategy.md`, and backfilled foundational ADRs (**point `docs/contracts/README.md` at the existing contract source**; note tech-debt/risks in `architecture.md`) | **GATE — approve** |
-| 1 Spec | `brainstorming` (method only) → `to-prd` → `grilling` | **optional** Stage-1 brief `docs/briefs/NNNN-*.md` (only for a fuzzy/speculative idea — else skip straight to the PRD), then hardened PRD `docs/prd/NNNN-*.md` (no issues yet) | **GATE — approve PRD** |
+| 1 Spec | `brainstorming` (method only) → `to-spec` → `grilling` | **optional** Stage-1 brief `docs/briefs/NNNN-*.md` (only for a fuzzy/speculative idea — else skip straight to the PRD), then hardened PRD `docs/prd/NNNN-*.md` (no issues yet) | **GATE — approve PRD** |
 | 2 Architecture + Contract | `documentation-and-adrs` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
 | 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical), `frontend-design` (UI work only), `ponytail` (backend/domain logic, parsers, transformations, state, tooling, and dependency choices) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |

@@ -10,12 +10,12 @@
       "licenseSource": "LICENSE",
       "licenseSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
     },
-    "to-prd": {
+    "to-spec": {
       "source": "https://github.com/mattpocock/skills.git",
-      "track": "c5a4a8c2e966e28628f56d1bfef07f401d399df0",
-      "commit": "c5a4a8c2e966e28628f56d1bfef07f401d399df0",
-      "upstreamPath": "skills/engineering/to-prd",
-      "contentSha256": "e113e37d8f5e78d7fa38d27dda9108e00c454d273108db8677cc0883aec9aa63",
+      "track": "refs/heads/main",
+      "commit": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+      "upstreamPath": "skills/engineering/to-spec",
+      "contentSha256": "b7e904ba4e2ed5c9732da7d85883d1ac176b64cfd879d76709143d71f47dfdcc",
       "licenseSource": "LICENSE",
       "licenseSha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
     },

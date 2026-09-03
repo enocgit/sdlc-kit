@@ -12,6 +12,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   that are generated or shared directly.
 - Reworked the README, cheatsheet, contribution, walkthrough, and installation guides with ordered
   first-run steps, explicit safety and adaptation paths, and consolidated workflow guidance.
+- Renamed the Stage 1 `to-prd` skill to `to-spec` and refreshed its pinned upstream snapshot.
 
 ## [0.6.0] - 2026-09-02
 
