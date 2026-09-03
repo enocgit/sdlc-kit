@@ -1,80 +1,36 @@
 # sdlc
 
-A portable, plan-gated workflow for building software with AI agents.
+`sdlc` is a project-local workflow kit for building software with AI agents. It gives an agent a
+repeatable way to plan, implement, verify, review, and land changes while recording the decisions
+in the project.
 
-The kit combines a conductor skill, an `AGENTS.md` operating manual, and project templates. The
-conductor routes work through nine stages. A one-task feature has six human approval gates for a
-fresh project or five after adoption; each additional task repeats its plan and merge gates. It
-targets web, API, SaaS, and API-backed cross-platform mobile apps by default, but its plain
-Markdown skills can run in any agent that supports `SKILL.md` files.
+The kit installs:
 
-> This is a workflow kit, not one standalone skill. Its installer adds every stage-bound skill file
-> to the target project before you invoke `sdlc`.
+- a conductor skill that routes work through the workflow;
+- a project operating manual from `templates/AGENTS.md`, installed as `AGENTS.md`;
+- templates for product, architecture, security, contract, test, runbook, and progress docs; and
+- pinned stage skills that stay in the project instead of a user's global skill directory.
 
-## Fit
+It works with web and API products, SaaS, backends, CLIs, libraries, and cross-platform mobile
+apps. The defaults assume contracts, continuous integration (CI), database migrations, and
+deployable branches. Projects can replace the UI, deployment, and test tools with their own.
 
-The defaults assume a web-shaped product: contracts, CI, database migrations, and deployable
-branches. Backend services, CLIs, libraries, and cross-platform apps can replace the UI test and
-deployment tools.
+## Start here
 
-The workflow uses Architecture Decision Records, C4-style architecture documentation,
-contract-first development, GitHub Flow, and phase gates. Pinned third-party skills remain
-unchanged. The installer adds local provenance and
-license metadata; source pins live in [`vendor/skills.lock.json`](./vendor/skills.lock.json), and
-upstream terms live in [`vendor/licenses/`](./vendor/licenses/).
+### 1. Check prerequisites
 
-## Core model
+Read the [installation prerequisites](./INSTALL.md#prerequisites).
 
-Artifacts have two levels:
+### 2. Install the kit
 
-- **Foundation:** project-wide context, configured test strategy, product PRD, foundational ADRs,
-  architecture, security threat model, and core contract. Create these once at Stage 0.
-- **Feature:** a brief, feature PRD, feature ADRs, and contract slice. Create these as each feature
-  moves through Stages 1–8.
+Clone this repository once, then enter its directory:
 
-Artifacts also have two homes:
+```bash
+git clone https://github.com/enocgit/sdlc-kit.git
+cd sdlc-kit
+```
 
-- **Repository:** durable reasoning in `docs/`.
-- **Tracker:** live tasks and status. GitHub Issues is the default; Linear and Jira require a small
-  port. Without an external tracker, `docs/progress.md` becomes the tracker.
-
-## Pipeline
-
-| # | Stage | Output | Gate |
-| --- | ------- | -------- | ------ |
-| 0 | Context + Foundation | context, test strategy, product PRD, foundational ADRs, architecture/security, core contract | bootstrap: context filled, then approve foundation; adopt: approve reconstructed foundation |
-| 1 | Spec | optional brief, hardened feature PRD | approve PRD |
-| 2 | Architecture + Contract | ADRs, architecture/security updates, frozen contract | approve and freeze |
-| 3 | Decompose | tracker issues | disclose |
-| 4 | Implement | code on a `feat/*` branch | approve each compact in-session task plan |
-| 5 | QA | tests, runtime observation or relevant non-runtime check, CI | - |
-| 6 | Review | clean diff; security review when required | inline |
-| 7 | Land | PR when supported; otherwise push if a remote exists, run available CI, and merge directly | human merges |
-| 8 | Retro | per-task learnings; final-child artifact and epic reconciliation | - |
-
-Before landing a Stage 0 or Stage 2 planning package that touches a sensitive area, update
-`docs/security.md` and run `security-review`; review the implementation diff again at Stage 6.
-
-At Land, GitHub PRs use `Closes #N`; the issue closes on merge. Other trackers use their native
-integration or a post-merge transition. Local-only projects update `docs/progress.md`. If hosting
-has no PR workflow, push when a remote exists, run available CI, and let the human merge directly.
-
-### Right-size the process
-
-| Change | Path |
-| -------- | ------ |
-| Feature, user-facing change, or risky work | Stages 1–8 after one-time Stage 0 bootstrap/adoption |
-| Bug fix or small enhancement | Implement → QA → Review → Land → Retro |
-| Chore, documentation, or dependency update | Implement → Review → Land → Retro |
-
-A change enters the full pipeline when it changes a contract, touches a sensitive area, or records
-a decision.
-
-## Quick start
-
-Check the required [installation prerequisites](./INSTALL.md#prerequisites), including the POSIX
-filesystem operations used for safe publication. Then clone this repository once and run its
-non-destructive installer against your project:
+From that checkout, run:
 
 ```bash
 ./install.sh /path/to/your/project
@@ -87,61 +43,112 @@ SKILLS_DIR=/path/to/your/project/.claude/skills \
   ./install.sh /path/to/your/project
 ```
 
-All stage-bound skills install to `{project}/.agents/skills` by default. Existing skill directories
-are never overwritten or merged.
+### 3. Prepare and start the workflow
 
-Next:
+Before starting `sdlc`, follow the [adaptation guidance](./INSTALL.md#3-adapt-the-project) if the
+project differs from the defaults.
 
-1. Ask your agent to start `sdlc`.
-2. Complete Stage 0 before starting a feature.
+Then ask your agent to start `sdlc`.
 
-For a worked run, read [`EXAMPLE.md`](./EXAMPLE.md). Keep [`CHEATSHEET.md`](./CHEATSHEET.md) nearby
-once the workflow is familiar.
+The installer adds missing files, never overwrites existing destinations, and writes only to the
+target project and any explicitly selected project-specific `SKILLS_DIR`. For a worked example,
+read [`EXAMPLE.md`](./EXAMPLE.md). Once the workflow is familiar, keep
+[`CHEATSHEET.md`](./CHEATSHEET.md) nearby. Maintainers should read
+[`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
+## How the workflow works
+
+Stage 0 establishes the project foundation once: context, test strategy, product requirements
+document (PRD), architecture, security, and the core contract. Each feature then gets its own
+optional brief, PRD, decisions, and contract slice. Durable documents live in `docs/`. GitHub Issues
+holds live tasks and status by default. Projects can use Linear or Jira; see the [tracker integration
+instructions](./INSTALL.md#tracker). Local-only projects use `docs/progress.md`.
+
+| # | Stage | Main output | Gate or handling |
+| --- | --- | --- | --- |
+| 0 | Context + Foundation | filled context, product requirements document (PRD), test strategy, foundational ADRs, architecture/security, and core contract | fill context, then approve the foundation |
+| 1 | Spec | optional brief and feature PRD | approve the PRD |
+| 2 | Architecture + Contract | ADRs, architecture/security updates, and frozen contract | approve and freeze the contract |
+| 3 | Decompose | tracker tasks | disclose the breakdown |
+| 4 | Implement | code on a `feat/*` branch | approve each task plan |
+| 5 | Quality assurance (QA) | tests, runtime or relevant non-runtime evidence, and CI | none |
+| 6 | Review | clean diff and, when required, security review | inline; no separate gate |
+| 7 | Land | pull request (PR) when supported, otherwise direct merge path | human merges |
+| 8 | Retro | per-task learnings; after all feature tasks, reconcile feature artifacts, frozen contract, contract index, and parent-epic status | none |
+
+The feature's parent tracker record, often called an epic, groups its child tasks. The workflow pauses
+for human approval at the foundation, specification, architecture and contract, task-plan, and merge
+points. Repository actions and external-tracker writes require separate approval; one approval may
+cover commit, push, and PR creation when the request names all three. Merge always stays separate.
+
+At Land, if hosting has no PR workflow, the agent pushes when a remote exists and runs available CI;
+the human merges directly. With no remote, the human merges the local branch.
+
+For a Stage 0 or Stage 2 planning package that touches a sensitive area, the agent updates
+`docs/security.md` and runs `security-review` before asking for the human's approval to land it. Stage
+6 reviews the implementation separately.
+
+## How the agent right-sizes work
+
+The agent selects the shortest safe path based on the change.
+
+| Change | Path |
+| --- | --- |
+| Feature, user-facing change, or risky work | Stages 1–8 after Stage 0 |
+| Bug fix or small enhancement | Implement → QA → Review → Land → Retro |
+| Chore, documentation, or dependency update | Implement → Review → Land → Retro |
+
+Use the full path whenever the change affects a contract, sensitive area, or recorded decision.
 
 ## Existing projects
 
-Run the same installer. It adds missing files but leaves existing ones untouched. Merge the kit's
-`AGENTS.md` and `docs/` sections into your versions instead of replacing them. Move durable runtime
-instructions into `AGENTS.md`, then keep `CLAUDE.md` as a one-line pointer when that runtime supports
-it. The conductor's `adopt` path reconstructs context and architecture without changing behavior.
+Run the same installer. It adds missing files and leaves existing files untouched. Merge
+`templates/AGENTS.md` into the project's `AGENTS.md`, and merge `templates/docs/` into the project's
+`docs/` files instead of replacing them. Move runtime instructions into `AGENTS.md`; when supported,
+keep `CLAUDE.md` as a one-line pointer.
 
-## Portability
+The `adopt` path reconstructs the project foundation from existing code without changing its
+behavior. After foundation approval, the next feature follows the normal workflow.
+
+## Defaults and portability
 
 - `AGENTS.md` is canonical. Runtime-specific files such as `CLAUDE.md` should point to it.
-- Agent replies default to compact, outcome-first prose. Apply the bundled `unslop` adaptation
-  automatically to human-facing replies and prose where applicable; follow its canonical scope and
-  exclusions.
+- The bundled `unslop` adaptation automatically applies to human-facing replies and prose. It leaves
+  code, identifiers, schemas, contracts, commands, logs, quoted text, machine-readable output, fixed
+  formats, vendor snapshots, and neutral technical records unchanged.
 - Skills are portable Markdown. Each stage has a manual fallback in `required-skills.yml`.
 - Stage-bound third-party skills are pinned under `vendor/skills/` and installed project-locally.
   Optional companions remain separate.
-- `required-skills.yml` is the kit's supported-skill manifest: pipeline dependencies, standalone
-  utilities, optional companions, and their fallbacks. You can install other skills; they do not
-  become pipeline stages unless you update the workflow and conductor.
+- `required-skills.yml` records pipeline dependencies, standalone utilities, optional companions, and
+  their fallbacks. Adding another skill does not make it a pipeline stage.
 - GitHub is the default tracker and PR host, not a runtime requirement.
 - Stack, branch names, test tools, deployment targets, Definition of Done, and gates are defaults.
-  Adapt policy in `AGENTS.md` and project docs. For branch or gate changes, also update the installed
-  conductor, `feature-start`, affected summaries, and validation checks so execution follows policy.
+  If a project changes them, update `AGENTS.md`, project docs, the installed conductor, affected
+  skills, and validation checks together.
+
+The installer records provenance and license metadata for vendored skills. Source pins live in
+[`vendor/skills.lock.json`](./vendor/skills.lock.json), and upstream terms live in
+[`vendor/licenses/`](./vendor/licenses/). Vendored snapshots remain unchanged.
 
 ## Repository map
 
 | Path | Purpose |
-| ------ | --------- |
-| `AGENTS.md` | configured maintainer-repository workflow rules |
-| `templates/AGENTS.md` | project workflow template installed with a Stage 0 stack sentinel |
-| `templates/CLAUDE.md` | one-line pointer to the installed operating manual |
-| `docs/context.md` | source-repository context for maintainers and coding agents |
+| --- | --- |
+| `AGENTS.md` | maintainer-repository workflow rules |
+| `templates/AGENTS.md` | operating-manual template installed in projects |
+| `templates/CLAUDE.md` | one-line pointer to the operating manual |
+| `docs/context.md` | repository context for maintainers and agents |
 | `install.sh` | merge-aware installer with `--dry-run` |
-| `skills/` | conductor, kit-owned workflow skills, and standalone utilities |
+| `skills/` | conductor, kit-owned workflow skills, and utilities |
 | `vendor/skills/` | pinned, unmodified third-party pipeline skills |
 | `vendor/skills.lock.json` | upstream revisions, paths, content hashes, and license hashes |
 | `scripts/vendor-skills.py` | verifies, restores, and refreshes vendored snapshots |
-| `templates/docs/` | context, PRD, ADR, architecture, security, contract, test, and runbook templates |
+| `templates/docs/` | project documentation templates |
 | `templates/github/` | CI, issue, and pull-request templates |
-| `required-skills.yml` | supported-skill manifest and manual fallbacks |
+| `required-skills.yml` | supported-skill manifest and fallbacks |
 | `scripts/validate-kit.sh` | maintainer validation and install smoke test |
 
-The optional code-read-only `improve` skill can audit a completed epic-level group and write fix
-plans under `plans/` after all descendant tasks are done. It is not suggested after each leaf task
-or small parent task. It can also
-suggest future directions after that epic-level group. It sits outside the pipeline; see
-[`INSTALL.md`](./INSTALL.md#additional-skills).
+The optional `improve` skill reads code but does not edit it. It can write plans under `plans/` when
+it audits a completed epic. Offer it only after all tasks in the epic are complete, not after a single
+task. For `improve next`, decline its planning step and start `sdlc {chosen direction}` at Stage 1. Read
+[`INSTALL.md`](./INSTALL.md#additional-skills) before adding it.

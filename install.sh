@@ -428,5 +428,4 @@ if [ "$SKIPPED" -gt 0 ]; then
   done
 fi
 echo
-echo "Next: ask your agent to \"start the sdlc\". Stage-bound skills are installed locally;"
-echo "Stage 0 isn't done until docs/context.md is filled."
+echo "Next: ask your agent to \"start the sdlc\"."
