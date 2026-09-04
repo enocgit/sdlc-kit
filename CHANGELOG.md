@@ -14,6 +14,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   first-run steps, explicit safety and adaptation paths, and consolidated workflow guidance.
 - Renamed the Stage 1 `to-prd` skill to `to-spec` and refreshed its pinned upstream snapshot.
 - Replaced the optional `using-git-worktrees` skill with a concise, manual Git-only worktree escape hatch; direct feature branches remain the default.
+- Clarified that local verification follows change risk and that full CI is a merge gate, not a default local pre-PR run.
 
 ## [0.6.0] - 2026-09-02
 

@@ -14,8 +14,10 @@
 Every task needs verification evidence; not every change needs a new automated test. For bug fixes
 and non-trivial testable behavior, begin with a failing test and follow a RED → GREEN cycle.
 Otherwise choose the smallest check that proves the change: existing tests, typecheck, build,
-schema validation, dry-run, smoke test, browser observation, or another concrete oracle. When
-adding no test, state why it would add little confidence and record the alternative evidence.
+schema validation, dry-run, smoke test, browser observation, or another concrete oracle. This is the
+local evidence bar; do not duplicate the full CI suite by default. A full configured suite is a merge
+gate when CI exists, not a local pre-PR requirement. When adding no test, state why it would add little
+confidence and record the alternative evidence.
 
 ## Test layers (the pyramid)
 
@@ -34,8 +36,9 @@ evidence when an additional automated test would not improve confidence.
 ## Verification bar
 
 The project's operating manual defines the broader completion policy. This document adds only the
-test-specific bar: proportional verification per the policy above, automated coverage for non-trivial
-behavior at the **right layer**, and the existing suite fully green.
+test-specific bar: proportional local verification per the policy above, automated coverage for
+non-trivial behavior at the **right layer**, and configured CI fully green before merge when a CI
+workflow exists.
 
 ## Conventions
 

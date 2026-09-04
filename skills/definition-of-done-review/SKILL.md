@@ -94,7 +94,8 @@ configured external CI before evaluating feature changes. Re-resolve the policy 
 recorded during local readiness. Treat that policy and its workflow set as
 a non-reducible baseline. A feature-side deletion, rename, or weakening cannot make a baseline check
 N/A without an explicit human-approved policy change. Review CI-configuration changes and add every
-approved new or modified check to the expected set. Require each lint, typecheck, test, and build result from its trusted producer and expected event.
+approved new or modified check to the expected set. Require every configured or policy-required check from its trusted producer and expected event;
+common checks include lint, typecheck, test, build, contract, dependency-advisory, and E2E.
 Baseline checks must satisfy the recorded baseline identity and definition digest; new or modified
 checks must run from the recorded candidate-side CI revision and bind to its identity and digest. CI
 is N/A only when
@@ -147,12 +148,14 @@ How to judge the items that need interpretation:
 - **Contract fidelity.** When an integration contract applies, require no undocumented
   endpoints/fields and derive types from the contract rather than duplicating them. For fast-path
   work with no integration contract, accept N/A only with a concrete rationale.
-- **Verification / observed working.** Evidence must match the risk and the existing suite must be
-  green. Runtime-affecting work must be exercised and observed with the available runtime tools.
-  Non-runtime work needs a
-  relevant concrete check such as rendering, links, or schema validation. Non-trivial behavior needs
-  automated coverage. If no new test was added, require a credible reason and concrete alternative
-  evidence; do not fail a change merely because its best proof is not a new test.
+- **Verification / observed working.** Evidence must match the risk. Require the proportional local
+  checks described in `AGENTS.md`; do not require a full local suite merely because CI defines lint,
+  typecheck, test, and build checks. Runtime-affecting work must be exercised and observed with the
+  available runtime tools. Non-runtime work needs a relevant concrete check such as rendering, links,
+  or schema validation. Non-trivial behavior needs automated coverage. If no new test was added,
+  require a credible reason and concrete alternative evidence; do not fail a change merely because
+  its best proof is not a new test. Configured CI checks remain required from their trusted producer
+  before merge.
 - **Docs.** Update `docs/architecture.md` if the system's shape changed. Add an ADR if the change
   makes a decision, and ensure the tracker issue reflects reality.
 - **Security.** Require a recorded semantic sensitive-area assessment even when `security-review` is

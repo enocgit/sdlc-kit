@@ -88,8 +88,13 @@ approval gate.
      this kit performs; the operator owns any parent-directory cleanup.
 
    - **Green baseline:** In the selected workspace, name repository-controlled setup/build commands
-     and get approval before running them. Install dependencies and run the test suite once. If the
-     baseline is red, stop and report; do not start work on a broken baseline.
+     and get approval before running them. Install dependencies as needed, then establish only a
+     change-appropriate baseline: use a focused test for behavior, a targeted render/browser or
+     manual visual check for UI or styling, and a relevant link, schema, or syntax check for docs or
+     configuration. Do not run the full suite by default; for shared paths, broaden verification to
+     all impacted packages/modules. Reserve the full suite for broad or high-risk dependency
+     fan-out or an explicit project rule. If the selected baseline is red, stop and report; do not
+     start work on a broken baseline.
 3. **Load context.** Read into context:
    - `docs/context.md` (domain, glossary, hard constraints — incl. retro learnings from prior cycles)
    - The feature's PRD in `docs/prd/`

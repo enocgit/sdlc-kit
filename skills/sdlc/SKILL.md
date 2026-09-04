@@ -166,7 +166,7 @@ canonical scope and exclusions. Trim borrowed-skill output to match before each 
 | 2 Architecture + Contract | `documentation-and-adrs` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
 | 4 Implement | `feature-start` (direct feature branch by default; manual Git-only worktree escape hatch), `frontend-design` (UI work only), `ponytail` (backend/domain logic, parsers, transformations, state, tooling, and dependency choices) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
-| 5 QA | tests + runtime-equivalent checks (`webapp-testing` for UI/browser) | verification evidence, local tests green, runtime observation or a relevant non-runtime check; CI green now or after PR creation | proceed (disclose results) |
+| 5 QA | proportional local verification + runtime-equivalent checks (`webapp-testing` for UI/browser) | change-scope evidence; CI green now or after PR creation | proceed (disclose results) |
 | 6 Review | mandatory `code-review`, `simplify`, and local-readiness `definition-of-done-review` | clean diff, local DoD evidence, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
 | 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to _in review_ according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
 | 8 Retro | reflect + write (native) | curate **0–3** durable learnings after every task; after the final child, reconcile feature artifacts and the parent epic (see [Stage 8](#stage-8-what-a-learning-is-and-isnt)) | if repository files changed, offer to land them on `main`; otherwise continue without an empty landing action |
@@ -205,7 +205,7 @@ always interrupt. This keeps the front half rigorous and the back half moving.
 **The Stage 5 CI seam — don't over-stop.** When CI exists and needs a pushed branch, the guardrail
 says don't commit/push/PR unless asked. That is **one narrow stop at the commit/push boundary — not
 a reason to stop at the end of Stage 4.** After the Implement plan gate, keep going through
-everything that needs _no_ push: local tests, runtime observation, and the whole Stage 6 pass
+everything that needs _no_ push: proportional local checks, runtime observation, and the whole Stage 6 pass
 (`code-review`, `simplify`, `security-review` if sensitive, diff hygiene). Only _then_ stop, at the
 push. For a PR workflow, report that tree-only local checks and review are done, then ask one combined
 question: _"Approve commit, push, and opening the PR?"_ A yes authorizes exactly the actions named
@@ -403,10 +403,16 @@ design or spike plan as a substitute for this pipeline's PRD path.
   Require local readiness before entering Land, then require the full Definition of Done, including
   required CI, before the human merges (see `AGENTS.md`).
 - **Every task needs proportional verification, not necessarily a new test.** Start bug fixes and
-  non-trivial testable behavior with a failing test (RED → GREEN). For changes where a new
-  automated test adds little confidence, use the concrete alternative evidence required by
-  `docs/test-strategy.md` and state why no new test was added. The external
-  `test-driven-development` skill is an optional team-wide policy, not a pipeline dependency.
+  non-trivial testable behavior with a failing test (RED → GREEN). For narrow docs/prose changes,
+  use link or rendering checks; for styling, use a targeted browser/render check or manual visual
+  inspection; for configuration or generated output, use its syntax, schema, or generation check.
+  Run the smallest local check that proves the change. For shared paths, contracts, or
+  security-sensitive areas, broaden verification to all impacted packages/modules; reserve the full
+  suite for broad or high-risk dependency fan-out or an explicit project rule. For changes where a
+  new automated test adds little confidence, use the
+  concrete alternative evidence required by `docs/test-strategy.md` and state why no new test was
+  added. The external `test-driven-development` skill is an optional team-wide policy, not a
+  pipeline dependency.
 - Contract-first: never let implementation drift from the frozen contract. Changing a shipped
   contract requires a new ADR (versioning/deprecation).
 - **Reviews run inline** during Implement/QA. Run `code-review`, `simplify`, and local readiness on a

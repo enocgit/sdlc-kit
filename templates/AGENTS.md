@@ -36,7 +36,7 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 | 2 — Architecture + Contract | ADR(s), updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact | ✅ approve approach + freeze |
 | 3 — Decompose | tracker issues (GitHub by default; the tracker is the record) | disclose breakdown |
 | 4 — Implement | code on a `feat/*` branch, one task at a time | ✅ approve compact in-session plan per task |
-| 5 — QA | local tests green + runtime observation or a relevant non-runtime check; CI green now or after PR creation | — |
+| 5 — QA | proportional local verification + runtime observation or a relevant non-runtime check; CI green now or after PR creation | — |
 | 6 — Review | clean diff, findings fixed (`security-review` if sensitive) | inline — no gate |
 | 7 — Land | PR opened where hosting supports it. Without PR support, push the branch if a remote exists, run any available CI, and the human merges it directly; with no remote, the human merges the local branch. **GitHub:** carries `Closes #N`, issue closes on merge. **Any other tracker / local-only:** no keyword — task → _In review_, completed after the merge (see `sdlc` skill) | ✅ human merges |
 | 8 — Retro | 0–3 durable learnings curated per task; after the final child, feature artifacts reconciled and parent epic completed | — |
@@ -93,16 +93,17 @@ trade-offs. Expand when the human asks; runtime safety and progress rules win.
 - [ ] Honors frozen contracts; fast-path N/A recorded when no integration contract applies
 - [ ] DB schema changes follow expand/contract (migrate → deploy → clean up) **once the table holds
       real data or any deployed process reads or writes it** — before that, change it outright
-- [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Automated tests cover
-      non-trivial behavior at the right layer; when a new test adds little confidence, use concrete
-      alternative evidence and state why. The existing suite is green
-- [ ] For runtime-affecting work, run the app and observe the change; unit tests alone are
-      insufficient. Non-runtime work uses a relevant check such as rendering, links, or schema
-      validation
-- [ ] **CI is green** (lint, typecheck, test, build) — N/A _only_ where no CI workflow exists;
-      CI that exists but is unreachable blocks, it doesn't exempt. Required CI must be green before
-      merge, not necessarily before Land opens a PR. When CI needs a pushed branch, finish local QA
-      and review, then stop at the push — not back at Stage 4.
+- [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Choose the smallest
+      concrete local check: docs/prose → links or rendering; styling → targeted render/browser or
+      manual visual inspection; configuration/generated output → syntax, schema, or generation;
+      runtime behavior → focused tests and runtime observation. Broaden local checks to all impacted
+      packages/modules for shared paths, contracts, or security-sensitive areas; reserve the full
+      suite for broad or high-risk dependency fan-out or an explicit project rule. State why no new
+      test was added.
+- [ ] **Configured CI is green before merge** (lint, typecheck, test, build, and any other
+      configured or policy-required checks); this is a remote merge gate, not a reason to duplicate
+      the full suite locally. If CI runs after PR creation, finish proportional local QA and review
+      before opening it. N/A _only_ where no CI workflow exists; unreachable required CI blocks.
 - [ ] `code-review` + `simplify` clean; a [sensitive area](#sensitive-areas) also needs
       `security-review` run and `docs/security.md` updated
 - [ ] Diff hygiene: small and focused, references the issue, no stray/debug code
