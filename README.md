@@ -118,9 +118,8 @@ behavior. After foundation approval, the next feature follows the normal workflo
   formats, vendor snapshots, and neutral technical records unchanged.
 - Skills are portable Markdown. Each stage has a manual fallback in `required-skills.yml`.
 - Stage-bound third-party skills are pinned under `vendor/skills/` and installed project-locally.
-  Optional companions remain separate.
-- `required-skills.yml` records pipeline dependencies, standalone utilities, optional companions, and
-  their fallbacks. Adding another skill does not make it a pipeline stage.
+- `required-skills.yml` records pipeline dependencies, standalone utilities, and their fallbacks.
+  Adding another skill does not make it a pipeline stage.
 - GitHub is the default tracker and PR host, not a runtime requirement.
 - Stack, branch names, test tools, deployment targets, Definition of Done, and gates are defaults.
   If a project changes them, update `AGENTS.md`, project docs, the installed conductor, affected
@@ -142,7 +141,7 @@ The installer records provenance and license metadata for vendored skills. Sourc
 | `skills/` | conductor, kit-owned workflow skills, and utilities |
 | `vendor/skills/` | pinned, unmodified third-party pipeline skills |
 | `vendor/skills.lock.json` | upstream revisions, paths, content hashes, and license hashes |
-| `scripts/vendor-skills.py` | verifies, restores, and refreshes vendored snapshots |
+| `scripts/vendor-skills.py` | verifies, restores, refreshes, and removes vendored snapshots |
 | `templates/docs/` | project documentation templates |
 | `templates/github/` | CI, issue, and pull-request templates |
 | `required-skills.yml` | supported-skill manifest and fallbacks |

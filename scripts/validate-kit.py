@@ -303,6 +303,99 @@ class Validator:
             os.mkfifo(special)
             expect_fail(fx.install(fx.target("special-target"), kit=kit), "source special file")
 
+    def vendor_removal(self) -> None:
+        with Fixture(self.kit) as fx:
+            kit = fx.kit_copy()
+            vendor_script = kit / "scripts/vendor-skills.py"
+            module_spec = importlib.util.spec_from_file_location("vendor_skills_removal", vendor_script)
+            if module_spec is None or module_spec.loader is None:
+                raise CheckError("could not load vendor script for removal test")
+            vendor_module = importlib.util.module_from_spec(module_spec)
+            module_spec.loader.exec_module(vendor_module)
+
+            vendor = kit / "vendor"
+            staging_intent = kit / vendor_module.VENDOR_STAGING_INTENT_NAME
+
+            def assert_no_removal_residue(label: str) -> None:
+                residue = [
+                    staging_intent,
+                    kit / vendor_module.VENDOR_BACKUP_NAME,
+                    kit / vendor_module.VENDOR_TRANSACTION_NAME,
+                    *kit.glob(f"{vendor_module.VENDOR_STAGING_INTENT_NAME}.tmp-*"),
+                    *kit.glob(f"{vendor_module.VENDOR_TRANSACTION_NAME}.tmp-*"),
+                    *kit.glob(".vendor-staging-*[0-9a-f]"),
+                    *kit.glob(".vendor-preserved-*"),
+                ]
+                residue = [path for path in residue if os.path.lexists(path)]
+                if residue:
+                    raise CheckError(f"{label} left transaction residue: {residue}")
+
+            removed_name = "using-git-worktrees"
+            source_name = "writing-plans"
+            copy_tree(vendor / "skills" / source_name, vendor / "skills" / removed_name)
+            (vendor / "licenses" / f"{removed_name}.txt").write_bytes(
+                (vendor / "licenses" / f"{source_name}.txt").read_bytes()
+            )
+            try:
+                data = json.loads((vendor / "skills.lock.json").read_text())
+            except (OSError, json.JSONDecodeError) as exc:
+                raise CheckError("could not load vendor lock for removal test") from exc
+            data["skills"][removed_name] = dict(data["skills"][source_name])
+            (vendor / "skills.lock.json").write_text(vendor_module.lock_text(data))
+            (vendor / "provenance" / f"{removed_name}.json").write_text(
+                vendor_module.provenance_text(removed_name, data["skills"][removed_name])
+            )
+
+            before = snapshot(vendor)
+            failed = run(
+                [sys.executable, "scripts/vendor-skills.py", "remove", "missing-skill"],
+                cwd=kit,
+            )
+            expect_fail(failed, "unknown vendor removal")
+            assert_no_changes(vendor, before)
+            assert_no_removal_residue("failed vendor removal")
+
+            final_before = snapshot(vendor)
+            final_removal = run(
+                [sys.executable, "scripts/vendor-skills.py", "remove", *data["skills"]],
+                cwd=kit,
+            )
+            expect_fail(final_removal, "final vendor removal")
+            assert_no_changes(vendor, final_before)
+            assert_no_removal_residue("failed final vendor removal")
+
+            remaining = [name for name in data["skills"] if name != removed_name]
+            remaining_skill_snapshots = {
+                name: snapshot(vendor / "skills" / name) for name in remaining
+            }
+            remaining_metadata = {
+                path: path.read_bytes()
+                for directory in (vendor / "licenses", vendor / "provenance")
+                for path in directory.iterdir()
+                if path.stem != removed_name
+            }
+            expect_ok(
+                run(
+                    [sys.executable, "scripts/vendor-skills.py", "remove", removed_name, removed_name],
+                    cwd=kit,
+                ),
+                "vendor removal",
+            )
+            assert_no_removal_residue("successful vendor removal")
+            if (vendor / "skills" / removed_name).exists():
+                raise CheckError("removed vendor snapshot still exists")
+            if (vendor / "licenses" / f"{removed_name}.txt").exists():
+                raise CheckError("removed vendor license still exists")
+            if (vendor / "provenance" / f"{removed_name}.json").exists():
+                raise CheckError("removed vendor provenance still exists")
+            expect_ok(run([sys.executable, "scripts/vendor-skills.py", "verify"], cwd=kit), "post-removal vendor verify")
+            for name, expected in remaining_skill_snapshots.items():
+                if snapshot(vendor / "skills" / name) != expected:
+                    raise CheckError(f"remaining vendor snapshot changed: {name}")
+            for path, expected in remaining_metadata.items():
+                if path.read_bytes() != expected:
+                    raise CheckError(f"remaining vendor metadata changed: {path.relative_to(vendor)}")
+
     def tamper(self) -> None:
         with Fixture(self.kit) as fx:
             target = fx.target()
@@ -320,7 +413,7 @@ class Validator:
                   ("timeout process-group cleanup", self.timeout_cleanup),
                   ("timeout exit race cleanup", self.timeout_exit_race),
                   ("target containment", self.containment), ("source entry rejection", self.source_rejection),
-                  ("installed tamper detection", self.tamper))
+                  ("vendored removal", self.vendor_removal), ("installed tamper detection", self.tamper))
         for name, function in checks:
             self.check(name, function)
         if self.failures:

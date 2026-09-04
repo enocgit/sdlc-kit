@@ -78,17 +78,8 @@ skills:
               sourcePath: vendor/skills/writing-plans,
               source: obra/superpowers,
               stage: 3,
-              note: "method only — decompose into tracker issues; do NOT write docs/superpowers/plans/",
+              note: "method only — decompose into tracker issues; do NOT write docs/superpowers/plans/; ignore the snapshot's using-git-worktrees prerequisite because Stage 4 isolation is owned by feature-start as a manual Git-only escape hatch",
               fallback: "create ordered tracker issues manually with scope, acceptance criteria, dependencies, verification, and touched paths",
-        }
-      - {
-              name: using-git-worktrees,
-              kind: vendored,
-              sourcePath: vendor/skills/using-git-worktrees,
-              source: obra/superpowers,
-              stage: 4,
-              note: "opt-in — only when isolation is critical; default is a feature branch via feature-start; setup commands that execute repository code need separate approval; validate the selected in-repository location itself with git check-ignore before creation",
-              fallback: "feature-start runs its built-in branch hygiene guards",
         }
       - {
               name: webapp-testing,

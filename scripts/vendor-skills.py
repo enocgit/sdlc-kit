@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify or refresh the kit's pinned third-party skill snapshots."""
+"""Verify, restore, refresh, or approved-remove pinned skill snapshots and metadata."""
 
 from __future__ import annotations
 
@@ -1225,6 +1225,56 @@ def materialize(data: dict[str, Any], names: list[str], update: bool) -> None:
     verify(data)
 
 
+def remove_snapshots(data: dict[str, Any], names: list[str]) -> None:
+    """Transactionally remove selected snapshots and regenerate vendor metadata."""
+    validate_vendor_container(VENDOR_DIR)
+    if not names:
+        fail("select at least one skill")
+    names = list(dict.fromkeys(names))
+    unknown = sorted(set(names) - set(data["skills"]))
+    if unknown:
+        fail(f"unknown skills: {', '.join(unknown)}")
+    verify(data)
+    remaining = {name: entry for name, entry in data["skills"].items() if name not in names}
+    if not remaining:
+        fail("cannot remove the final vendored snapshot")
+    next_data = {**data, "skills": remaining}
+    staging_name = f".vendor-staging-{secrets.token_hex(12)}"
+    staging = ROOT / staging_name
+    write_vendor_staging_intent(staging_name)
+    try:
+        staging.mkdir(mode=0o700)
+    except FileExistsError:
+        clear_vendor_staging_intent(missing_ok=True)
+        raise
+    except BaseException:
+        cleanup_failed_vendor_staging(staging)
+        raise
+    try:
+        fsync_directory(ROOT)
+        mark_vendor_staging(staging)
+        clear_vendor_staging_intent()
+    except BaseException:
+        cleanup_failed_vendor_staging(staging)
+        raise
+    try:
+        next_vendor = staging / "vendor"
+        shutil.copytree(VENDOR_DIR, next_vendor, symlinks=True, copy_function=shutil.copy2)
+        for name in names:
+            remove_path(next_vendor / "skills" / name)
+            unlink_durable(next_vendor / "licenses" / f"{name}.txt")
+            unlink_durable(next_vendor / "provenance" / f"{name}.json")
+        serialized_lock = lock_text(next_data)
+        (next_vendor / "skills.lock.json").write_text(serialized_lock)
+        verify(next_data, next_vendor)
+        fsync_tree(next_vendor)
+        expected_lock_sha256 = hashlib.sha256(serialized_lock.encode()).hexdigest()
+        replace_vendor_tree(next_vendor, expected_lock_sha256)
+    finally:
+        cleanup_vendor_staging(staging)
+    verify(next_data)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -1235,6 +1285,8 @@ def parse_args() -> argparse.Namespace:
     sync.add_argument("skills", nargs="*", help="skills to restore; defaults to all")
     update = subparsers.add_parser("update", help="refresh selected skills from their tracked refs")
     update.add_argument("skills", nargs="+", help="skills to refresh")
+    remove = subparsers.add_parser("remove", help="remove selected snapshots (never the final snapshot) and regenerate vendor metadata")
+    remove.add_argument("skills", nargs="+", help="skills to remove")
     install = subparsers.add_parser("install-locked", help=argparse.SUPPRESS)
     install.add_argument("installer_command", nargs=argparse.REMAINDER)
     preview = subparsers.add_parser("preview-locked", help=argparse.SUPPRESS)
@@ -1293,6 +1345,8 @@ def main() -> None:
             verify_installed(data, args.skills_dir)
         elif args.command == "sync":
             materialize(data, args.skills or list(data["skills"]), update=False)
+        elif args.command == "remove":
+            remove_snapshots(data, args.skills)
         else:
             materialize(data, args.skills, update=True)
 

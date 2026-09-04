@@ -19,34 +19,77 @@ approval gate.
 1. **Pick the task.** Confirm the task's **identifier and slug** with the user. The identifier is
    the GitHub issue number by default; on another tracker its key (`ENG-123`); in **local-only**
    mode the `#` column of the task table in `docs/progress.md`. Never invent one. One task per run.
+   The human must confirm the identifier and slug before any Git mutation; stop here until they do.
 2. **Isolate the workspace — default to a feature branch.** Create `feat/{id}-{slug}` directly.
-   Only reach for an isolated **git worktree** (delegating to `using-git-worktrees` if installed)
-   when isolation is genuinely critical — parallel work on multiple features, or disposable
-   experiments — or when the user asks. Either way, FIRST run these guards (the worktree skill does
-   them for you; the branch path must not skip them):
-   - **Clean tree:** `git status --porcelain` is empty — nothing uncommitted to clobber. If the
-     _only_ change is the local-only tracker (`docs/progress.md`) that Decompose just wrote, ask to
-     commit it and continue once approved — this is the gate that clears it. If the default branch
-     is PR-protected, a direct commit there can never be pushed: land it via a `plan/{NNNN}-{slug}`
-     branch → PR → merge first, same as any other planning commit (`AGENTS.md` → Where planning
-     commits land), then branch `feat/*` from the updated default branch. Anything else: stop.
-   - **Fresh base:** check out the default branch and bring it up to date before branching — a
-     stale base is as bad as a dirty tree. With an upstream (`git rev-parse --abbrev-ref
-     '@{upstream}'` succeeds), `git pull`. **With a remote but no upstream** — before the first
-     push, or after tracking was removed — don't assume local is current. First resolve _which_
-     remote is authoritative: exactly one → use it; several (`origin` plus a fork or mirror) →
-     **ask which owns the default branch**, never guess, since fast-forwarding from a fork bases
-     the work on the wrong history. Then `git fetch` that remote and fast-forward onto its
-     `{default}`, which may have advanced. **Only a repo with no remote at all is latest by
-     definition.** If the remote is unreachable (offline, expired auth), don't declare local fresh —
-     fast-forward onto its cached remote-tracking ref if that is ahead, and if freshness still can't
-     be verified, say so and let the human choose rather than branching from a maybe-stale base
-     (auth the cause? surface the one-time fix — `AGENTS.md` → Guardrails). Never fail the guard
-     over a missing upstream.
-   - **Green baseline:** install deps and run the test suite once; if it's already red, stop and
-     report — don't start work on a broken baseline.
-   Then create `feat/{id}-{slug}` using the identifier from step 1. One feature per workspace;
-   don't touch other branches.
+   Use a git worktree only as an explicit manual escape hatch for opt-in parallel or disposable
+   work, or when the user asks. Before changing anything, run `git worktree list --porcelain` and
+   identify the primary checkout. Never switch or modify another checkout.
+
+   Run these guards first:
+
+   - **Clean tree:** Direct mode requires the idle primary checkout to have no uncommitted changes.
+     Inspect ignored paths too (`git status --short --ignored`) before switching or synchronizing;
+     if any uncommitted, ignored, or ambiguous path could be overwritten, stop and ask the human.
+     A local-only `docs/progress.md` change may be committed only with explicit approval, and only
+     from the primary checkout already on the default branch. A linked or topic checkout, and every
+     temporary-worktree run, must stop until that tracker change is landed on the primary default
+     path. Never silently omit it or commit it on an implementation branch.
+
+   - **Fresh base:** Resolve `{default}` before branching. In direct mode, update the default branch
+     from its configured upstream or from the one authoritative remote, using an explicit fetched
+     target and `git merge --ff-only`; do not guess among multiple remotes. With no remote, use the
+     local `refs/heads/{default}` ref and stop if it is absent. Verify the default branch is still
+     the expected base after synchronization and rerun the clean-tree check immediately before
+     creating the feature branch. If a remote is unreachable, do not call a cached ref fresh
+     without evidence; let the human decide. A protected default uses the documented
+     `plan/{NNNN}-{slug}` route.
+
+     In temporary-worktree mode, do not switch an existing checkout. Fetch and compare the selected
+     authoritative remote base when a remote exists; if the local `refs/heads/{default}` and fetched
+     remote ref contain one another, select and record the containing full ref and its full
+     `base_oid`. If they diverge, or the remote is ambiguous or freshness cannot be established,
+     stop for a human decision. With no remote, require and use the fully qualified local
+     `refs/heads/{default}` ref. The temporary-worktree command must use the recorded full
+     `base_oid`, not re-resolve a mutable ref.
+
+   - **Direct branch:** From the synchronized default branch, run
+     `git switch -c "feat/{id}-{slug}"`; stop if it fails. Do not force checkout or overwrite
+     ignored files.
+
+   - **Opt-in temporary worktree:** This is a manual escape hatch, not an automatically provisioned
+     workspace. The operator must supply an exact path in the platform's private temporary area,
+     confirm it is new or empty, private, and outside every existing checkout, and perform any
+     platform-specific path or alias verification. This kit does not create, inspect,
+     canonicalize, ACL-protect, or otherwise enforce safety for that path.
+
+     Record the exact `base_ref` and full `base_oid` from the Fresh base guard. Confirm the feature
+     branch does not already exist, then run the generic Git-only recipe:
+
+     ```text
+     git show-ref --verify --quiet "refs/heads/feat/{id}-{slug}"
+     git worktree add -b "feat/{id}-{slug}" "{worktree_path}" "{base_oid}"
+     ```
+
+     If the branch-existence command succeeds, stop. If `git worktree add` fails, retain the branch
+     if Git created it and report the supplied path; never delete the branch automatically. Continue
+     only after successful creation, and do not switch any existing checkout.
+
+     After the task implementation is safely landed, or after setup/baseline/plan rejection before
+     implementation, inspect the worktree. Use non-forced removal only after the status is confirmed
+     clean and contains no tracked, untracked, or ignored content:
+
+     ```text
+     git -C "{worktree_path}" status --short --ignored
+     git worktree remove "{worktree_path}"
+     ```
+
+     If status is dirty or cannot be inspected, or any output is present, leave the worktree and
+     branch in place and report both for inspection. The generic removal command is the only cleanup
+     this kit performs; the operator owns any parent-directory cleanup.
+
+   - **Green baseline:** In the selected workspace, name repository-controlled setup/build commands
+     and get approval before running them. Install dependencies and run the test suite once. If the
+     baseline is red, stop and report; do not start work on a broken baseline.
 3. **Load context.** Read into context:
    - `docs/context.md` (domain, glossary, hard constraints — incl. retro learnings from prior cycles)
    - The feature's PRD in `docs/prd/`

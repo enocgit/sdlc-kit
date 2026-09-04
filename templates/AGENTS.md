@@ -115,10 +115,7 @@ trade-offs. Expand when the human asks; runtime safety and progress rules win.
 
 - **Stack (placeholder — set at Stage 0):** TypeScript + React (frontend), Node (backend) are
   illustrative defaults. Replace with your real stack when you fill `docs/context.md`.
-- **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived
-  `feat/{id}-{slug}` branches → PR → merge → deploy. Environments
-  (preview/staging/prod) are deploy targets driven by CI, not long-lived branches. One feature per
-  branch; default to it — reach for a git worktree only when isolation is critical (parallel/disposable).
+- **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{id}-{slug}` branches → PR → merge → deploy. Environments are deploy targets driven by CI, not long-lived branches. One feature per branch; use a git worktree only as an explicit manual escape hatch when requested. The operator supplies a private, new or empty path outside every checkout and runs `feature-start`'s generic Git-only recipe.
 - **Where planning commits land.** At the Stage 0 foundation gate, ask to land the approved
   bootstrap context + foundation package on **`main`**; on adoption, ask at the combined Stage 0
   gate. Commit the feature planning package once, after Stage 2: Stage 1 PRD + Stage 2 ADRs,
@@ -170,9 +167,10 @@ and safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply
   to commit or write under `docs/superpowers/`; the conductor owns the artifact and gate.
 - For `improve-codebase-architecture`, treat `CONTEXT.md` as `docs/context.md`; do not invoke its
   unavailable `codebase-design` or `domain-modeling` dependencies, and skip its CDN-backed report.
-- Before `using-git-worktrees` runs an install or build command, name the command and get approval.
-  Before creating an in-repository worktree, check the selected worktree location itself with
-  `git check-ignore -q "$LOCATION/"`; reject it if the command fails.
+- Before running a repository-controlled install or build command, name it and get approval.
+  For an opt-in worktree, use the generic Git-only `git worktree add` and non-forced
+  `git worktree remove` commands in `feature-start`; the operator owns platform-specific path
+  selection, privacy, and containment checks.
 - Do not use `webapp-testing`'s bundled `with_server.py`; use the project's lifecycle runner or an
   already-running server. Wait for an app-specific readiness signal, not mandatory `networkidle`.
 

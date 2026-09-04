@@ -27,5 +27,6 @@ run; normal validation and installation stay offline.
 - Run `./scripts/validate-kit.sh` under the default umask and `umask 077`.
 - Verify vendored snapshots and the required-skills manifest independently.
 - Confirm `vendor/skills/**` and `vendor/licenses/**` are unchanged unless the task is an approved
-  snapshot refresh.
+  snapshot refresh or snapshot removal performed with `scripts/vendor-skills.py remove`; all
+  remaining pinned snapshots must stay byte-identical.
 - Run runtime observation through a temporary installation for installer-affecting changes.

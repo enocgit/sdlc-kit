@@ -22,9 +22,10 @@ exact third-party snapshots, installation-safe scripts, and project-document tem
 
 ## Non-negotiable invariants
 
-- Keep every file under `vendor/skills/**` byte-for-byte equal to its pinned upstream snapshot.
+- Keep every file under `vendor/skills/**` byte-for-byte equal to its pinned upstream snapshot, except
+  for an explicitly approved snapshot removal performed with `scripts/vendor-skills.py remove`.
 - Do not hand-edit generated vendor locks, provenance, licenses, or snapshot files. Use
-  `scripts/vendor-skills.py` and review the resulting diff.
+  `scripts/vendor-skills.py` for refreshes or approved removals and review the resulting diff.
 - Keep installation project-local, offline by default, reproducible, and non-destructive.
 - Preserve no-clobber publication, containment, recovery, quarantine, integrity, and restrictive-
   umask guarantees when changing installer code.

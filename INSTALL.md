@@ -146,7 +146,6 @@ change user-global skills.
 | `grilling` | mattpocock/skills | Spec |
 | `documentation-and-adrs` | addyosmani/agent-skills | Foundation, Architecture |
 | `writing-plans` | obra/superpowers | Decompose |
-| `using-git-worktrees` | obra/superpowers | Implement |
 | `frontend-design` | anthropics/skills | Implement, UI only |
 | `ponytail` | DietrichGebert/ponytail | Implement, backend/domain and dependency choices |
 | `webapp-testing` | anthropics/skills | QA, browser UI only |
@@ -165,7 +164,7 @@ and other excluded content unchanged.
 Skills run with the agent's permissions. Keep the project-local copies committed so every team and
 CI environment uses the same instructions.
 
-`required-skills.yml` lists pipeline dependencies, standalone utilities, and optional companions.
+`required-skills.yml` lists pipeline dependencies and standalone utilities, with manual fallbacks.
 To add a pipeline skill, update `AGENTS.md`, `required-skills.yml`, the snapshot and provenance when
 applicable, and the installed conductor at `$SKILLS_DIR/sdlc/SKILL.md`.
 

@@ -136,10 +136,10 @@ and **override its workflow**:
   snapshot, `CONTEXT.md` means `docs/context.md`; do not invoke the unavailable `codebase-design` or
   `domain-modeling` skills. Update `docs/context.md` directly when needed, and skip its upstream HTML
   report. Write the adoption findings into this kit's foundation artifacts instead.
-- `using-git-worktrees` → isolation does not approve repository code execution. Name the exact
-  install/build command and get approval before running repository-controlled setup commands. For an
-  in-repository worktree, check the selected worktree location itself with
-  `git check-ignore -q "$LOCATION/"`; reject it if the command fails.
+- Worktree isolation is an explicit manual escape hatch for parallel or disposable work, never the
+  default. The operator supplies and verifies a private, new or empty path outside every checkout.
+  Use the generic Git-only `git worktree add` and non-forced `git worktree remove` guidance in
+  `feature-start`; the kit does not enforce platform-specific path safety.
 - `webapp-testing` → use its Playwright method, but do not use its bundled `with_server.py`; use the
   project's lifecycle runner or an already-running server so output is drained and the full process
   tree remains owned. Wait for an app-specific readiness signal, such as a locator, URL, or health
@@ -165,7 +165,7 @@ canonical scope and exclusions. Trim borrowed-skill output to match before each 
 | 1 Spec | `brainstorming` (method only) → `to-spec` → `grilling` | **optional** Stage-1 brief `docs/briefs/NNNN-*.md` (only for a fuzzy/speculative idea — else skip straight to the PRD), then hardened PRD `docs/prd/NNNN-*.md` (no issues yet) | **GATE — approve PRD** |
 | 2 Architecture + Contract | `documentation-and-adrs` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
-| 4 Implement | `feature-start` (branch; `using-git-worktrees` only if isolation is critical), `frontend-design` (UI work only), `ponytail` (backend/domain logic, parsers, transformations, state, tooling, and dependency choices) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
+| 4 Implement | `feature-start` (direct feature branch by default; manual Git-only worktree escape hatch), `frontend-design` (UI work only), `ponytail` (backend/domain logic, parsers, transformations, state, tooling, and dependency choices) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
 | 5 QA | tests + runtime-equivalent checks (`webapp-testing` for UI/browser) | verification evidence, local tests green, runtime observation or a relevant non-runtime check; CI green now or after PR creation | proceed (disclose results) |
 | 6 Review | mandatory `code-review`, `simplify`, and local-readiness `definition-of-done-review` | clean diff, local DoD evidence, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
 | 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to _in review_ according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
@@ -377,8 +377,10 @@ design or spike plan as a substitute for this pipeline's PRD path.
 
   The merge gate is unchanged in every case — never treat a missing capability as licence to skip
   it, and never invent a remote to satisfy the flow.
-- **Default to a feature branch.** Use a git worktree (`using-git-worktrees`) only when isolation
-  is genuinely critical — parallel or disposable work — not as the default.
+- **Default to a feature branch.** Use a git worktree only as an explicit manual escape hatch for
+  opt-in parallel or disposable isolation, or when the user requests it. The operator supplies and
+  verifies a private, new or empty path outside every checkout; use only the generic Git-only
+  guidance in `feature-start`.
 - **Planning commits land on `main`.** Stage 0 foundation artifacts may be committed after the
   foundation gate. For a feature, keep the approved Stage 1 PRD in the worktree, then commit the
   Stage 1–2 planning package once after Stage 2 approves the ADRs, architecture/security updates,

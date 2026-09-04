@@ -36,6 +36,13 @@ python3 scripts/vendor-skills.py update {name}
 
 Never create or edit those generated files by hand. Review the resulting diff.
 
+To remove a vendored skill and regenerate the lock, license, and provenance metadata, use this only
+for an explicitly approved snapshot removal:
+
+```bash
+python3 scripts/vendor-skills.py remove {name}
+```
+
 Maintainers need PyYAML. These commands restore locked content or verify it offline:
 
 ```bash
