@@ -26,7 +26,8 @@ exact third-party snapshots, installation-safe scripts, and project-document tem
   for an explicitly approved snapshot removal performed with `scripts/vendor-skills.py remove`.
 - Do not hand-edit generated vendor locks, provenance, licenses, or snapshot files. Use
   `scripts/vendor-skills.py` for refreshes or approved removals and review the resulting diff.
-- Keep installation project-local, offline by default, reproducible, and non-destructive.
+- Keep installation project-local by default, offline, reproducible, and non-destructive. An explicitly
+  selected `SKILLS_DIR` may be external.
 - Preserve no-clobber publication, containment, recovery, quarantine, integrity, and restrictive-
   umask guarantees when changing installer code.
 - Apply the maintained `skills/unslop` policy automatically to human-facing replies and prose where

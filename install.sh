@@ -175,23 +175,6 @@ case "$SKILLS_DIR" in
   esac
   ;;
 esac
-if [ -n "${HOME:-}" ]; then
-  HOME_NORMALIZED="$(normalize_path "$HOME")"
-  HOME_CANONICAL="$(canonical_path "$HOME_NORMALIZED")"
-  SKILLS_CANONICAL="$(canonical_path "$SKILLS_DIR")"
-  case "$SKILLS_DIR" in
-  "$HOME_NORMALIZED/.agents/skills" | "$HOME_NORMALIZED/.claude/skills")
-    echo "Refusing to install pipeline skills into a user-global skills directory: $SKILLS_DIR" >&2
-    exit 2
-    ;;
-  esac
-  case "$SKILLS_CANONICAL" in
-  "$HOME_CANONICAL/.agents/skills" | "$HOME_CANONICAL/.claude/skills")
-    echo "Refusing to install pipeline skills through a user-global alias: $SKILLS_DIR" >&2
-    exit 2
-    ;;
-  esac
-fi
 case "$SKILLS_DIR" in
 "$TARGET" | "$TARGET"/*) SKILL_WRITE_ROOT="$TARGET" ;;
 *)

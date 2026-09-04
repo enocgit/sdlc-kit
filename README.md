@@ -9,7 +9,7 @@ The kit installs:
 - a conductor skill that routes work through the workflow;
 - a project operating manual from `templates/AGENTS.md`, installed as `AGENTS.md`;
 - templates for product, architecture, security, contract, test, runbook, and progress docs; and
-- pinned stage skills that stay in the project instead of a user's global skill directory.
+- pinned stage skills installed project-locally by default for reproducible runs.
 
 It works with web and API products, SaaS, backends, CLIs, libraries, and cross-platform mobile
 apps. The defaults assume contracts, continuous integration (CI), database migrations, and
@@ -51,7 +51,7 @@ project differs from the defaults.
 Then ask your agent to start `sdlc`.
 
 The installer adds missing files, never overwrites existing destinations, and writes only to the
-target project and any explicitly selected project-specific `SKILLS_DIR`. For a worked example,
+target project and any explicitly selected `SKILLS_DIR`. For a worked example,
 read [`EXAMPLE.md`](./EXAMPLE.md). Once the workflow is familiar, keep
 [`CHEATSHEET.md`](./CHEATSHEET.md) nearby. Maintainers should read
 [`CONTRIBUTING.md`](./CONTRIBUTING.md).
@@ -117,7 +117,8 @@ behavior. After foundation approval, the next feature follows the normal workflo
   code, identifiers, schemas, contracts, commands, logs, quoted text, machine-readable output, fixed
   formats, vendor snapshots, and neutral technical records unchanged.
 - Skills are portable Markdown. Each stage has a manual fallback in `required-skills.yml`.
-- Stage-bound third-party skills are pinned under `vendor/skills/` and installed project-locally.
+- Stage-bound third-party skills are pinned under `vendor/skills/` and installed project-locally by
+  default.
 - `required-skills.yml` records pipeline dependencies, standalone utilities, and their fallbacks.
   Adding another skill does not make it a pipeline stage.
 - GitHub is the default tracker and PR host, not a runtime requirement.

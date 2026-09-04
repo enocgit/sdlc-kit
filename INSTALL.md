@@ -1,7 +1,7 @@
 # Install
 
-The installer adds the kit to one project. It writes project-local files and never overwrites an
-existing destination. It does not use a registry or user-global skill directory.
+The installer adds the kit to one project. It never overwrites an existing destination and uses a
+project-local skills directory by default. It does not use a registry.
 
 ## Prerequisites
 
@@ -67,14 +67,15 @@ The table lists the files and directories the installer publishes.
 | `templates/github/` | `.github/` |
 | `skills/`, `vendor/skills/` | `.agents/skills/` by default |
 
-Set `SKILLS_DIR` when the runtime reads another project-local directory:
+Set `SKILLS_DIR` when the runtime reads another skills directory:
 
 ```bash
 SKILLS_DIR=.claude/skills ./install.sh /path/to/your/project
 ```
 
- The installer rejects common user-global directories, including `~/.agents/skills` and
-`~/.claude/skills`, so pipeline skills cannot load in unrelated projects.
+Relative paths stay inside the target project. Explicit absolute paths may point outside the target,
+including shared or user-global directories. A project-local path remains the recommendation for
+reproducible setup.
 
 The installer copies skills into `.agents/skills` by default. If your runtime expects
 `.claude/skills`, create a symbolic link from the project root:
@@ -100,7 +101,7 @@ Re-running the installer adds new files but does not replace existing files or s
 
 1. Commit or back up the target. Update this kit checkout and review its `CHANGELOG.md` and diff.
 2. Stop agents that use the target.
-3. Record absolute paths. Keep the skills directory project-specific:
+3. Record absolute paths. Use a stable skills directory for the project:
 
    ```bash
    TARGET=/absolute/path/to/the/project
@@ -136,8 +137,8 @@ If the runtime does not read `AGENTS.md`, point its instruction file to it:
 Projects may use the defaults only when their tracker, CI commands, and skill setup match. Read the
 rest of this section when you need to know what the installer adds or when you update a bundled skill.
 
-The installer copies these stage-bound skills into the target project. It does not use a registry or
-change user-global skills.
+The installer copies these stage-bound skills to the configured `SKILLS_DIR`. It does not use a
+registry. Project-local installation remains the default recommendation.
 
 | Skill | Upstream | Stage |
 | --- | --- | --- |

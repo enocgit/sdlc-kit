@@ -281,15 +281,31 @@ class Validator:
             link = fx.root / "linked-target"
             link.symlink_to(target, target_is_directory=True)
             expect_fail(fx.install(link), "symlink target")
+            target_before = snapshot(target)
+            escape = fx.root / "escape"
             expect_fail(fx.install(target, env={"SKILLS_DIR": "../escape"}), "relative skills escape")
+            assert_no_changes(target, target_before)
+            if os.path.lexists(escape):
+                raise CheckError("relative skills escape created an external destination")
+
             home = fx.root / "home"
             global_skills = home / ".agents/skills"
             global_skills.mkdir(parents=True)
-            alias = home / "pipeline-skills"
-            alias.symlink_to(global_skills, target_is_directory=True)
-            expect_fail(
-                fx.install(target, env={"HOME": str(home), "SKILLS_DIR": str(alias)}),
-                "user-global skills alias",
+            expect_ok(
+                fx.install(target, env={"HOME": str(home), "SKILLS_DIR": str(global_skills)}),
+                "explicit external skills path",
+            )
+            if (target / ".agents/skills").exists():
+                raise CheckError("external skills install created the target's default skills directory")
+            for source in (self.kit / "skills").iterdir():
+                if source.is_dir():
+                    assert_same_tree(source, global_skills / source.name)
+            expect_ok(
+                run(
+                    [sys.executable, "scripts/vendor-skills.py", "verify-installed", str(global_skills)],
+                    cwd=self.kit,
+                ),
+                "external installed integrity",
             )
 
     def source_rejection(self) -> None:
