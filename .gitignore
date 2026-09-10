@@ -38,3 +38,6 @@ skills-lock.json
 *.log
 tmp/
 scratch/
+
+# Security review artifacts
+.pi/security-review/
