@@ -66,21 +66,21 @@ Preserve exact limits, exceptions, risks, security boundaries, failure behavior,
 Remove unused scaffold and filler; name owners/triggers for deferred sections. Use complete, plain English, not compressed fragments.
 Keep process instructions here and prompts in templates. Use underscores for emphasis and asterisks for bold; apply `unslop` with its canonical scope and exclusions.
 
-**Briefs and PRDs:** Keep both concise: state each requirement once and include only detail needed
-for approval and verification. Write for a product reader who understands the business but not the
-implementation. Describe what people need, can do, and see, and which rules apply. Explain necessary
-technical terms on first use. Keep briefs focused on the problem and desired outcome; make PRD
-requirements and acceptance criteria observable and testable. Put detailed implementation decisions
-in ADRs and contracts, linking rather than duplicating them. Preserve exact limits, exceptions, and
-privacy requirements. Before presenting either document, check: can someone approve the intended
-behavior without understanding our stack
+**Briefs and PRDs:** State each requirement once, with only the detail product readers need for approval and verification.
+Briefs explain the problem and desired outcome. PRDs describe user needs, observable behavior, and testable rules; define technical terms on first use.
+Link to ADRs and contracts for implementation decisions. Preserve exact limits, exceptions, and privacy requirements.
+Before presenting, check whether someone can approve the intended behavior without understanding the stack.
+
+**Code comments:** Explain non-obvious intent, constraints, state transitions, and failure behavior beside the relevant code.
+Keep comments focused, precise, and durable; update them with behavior changes, not to meet a quota.
+Avoid syntax narration. State essential reasons locally; link supporting decisions and workaround removal conditions when relevant.
+Put change summaries and verification results in the PR, not source comments. Review comment claims against the implementation, not as proof.
 
 ## Communication standard
 
 Keep user-facing replies compact: lead with the outcome, state each fact once, omit filler, and
-quote only decisive log lines unless more detail is requested. Fragments are fine when clear; use
-complete sentences for gates, security warnings, irreversible actions, ordered steps, and complex
-trade-offs. Expand when the human asks; runtime safety and progress rules win.
+quote only decisive log lines unless more detail is requested. Fragments are fine when clear; use complete sentences
+for gates, security warnings, irreversible actions, ordered steps, and complex trade-offs. Expand when asked; runtime safety and progress rules win.
 
 ## Definition of Ready (before a task enters Implement)
 

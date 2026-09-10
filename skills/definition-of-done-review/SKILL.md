@@ -166,6 +166,11 @@ How to judge the items that need interpretation:
   one-point writing rule; identify overloaded points rather than enforcing word or sentence quotas.
   Split independent obligations while preserving exact conditions, requirement IDs, document
   structure, and introductory paragraphs.
+- **Code comments.** Check comments in changed code against `AGENTS.md`'s comment standard.
+  Verify claims about authorization, ownership, persistence, retries, and failure guarantees against
+  the implementation and relevant evidence; comments are not proof of correctness.
+  Flag missing explanations where non-obvious constraints could cause an incorrect future change.
+  Remove stale or syntax-narrating comments rather than requiring comments on every function.
 - **Security.** Require a recorded semantic sensitive-area assessment even when `security-review` is
   N/A. For sensitive-area changes, require a completed review, resolved findings, and an updated
   `docs/security.md`. Apply the conductor's Security-review coverage protocol: reconcile the intended

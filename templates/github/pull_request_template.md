@@ -22,7 +22,9 @@
 
 ## Verification
 
-<!-- List the checks that prove this change. Explain why a new automated test adds little confidence when applicable. -->
+<!-- Record checks run, observed results, and verification gaps here, not in source comments.
+     Comments describe intended guarantees; they do not prove the implementation enforces them.
+     Explain why a new automated test adds little confidence when applicable. -->
 
 - [ ] Tests or another proportional check: <!-- command / evidence -->
 - [ ] Runtime observation or relevant non-runtime check: <!-- evidence -->
