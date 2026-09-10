@@ -6,7 +6,8 @@
 
 ## Summary
 
-- **Status:** Draft | Approved | Shipped
+- **Approval:** Draft | Approved
+- **Delivery:** Not implemented | Partially implemented | Implemented — {summary and evidence links}
 - **Outcome:** {one sentence describing the intended result}
 - **Scope:** In — {short list}; Out — {short list}
 - **Key decisions:** {decision summary or links}

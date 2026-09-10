@@ -11,6 +11,11 @@
 
 ## Threat model (per sensitive feature)
 
+For each feature, separate planned controls from currently enforced controls. Identify partial
+implementation and link verification evidence. Approval or schema tests alone do not establish
+runtime enforcement.
+Update affected controls with each implementation change, not only when the feature finishes.
+
 For each feature, capture briefly:
 
 | Asset / data | Threat | Mitigation | Owner |
@@ -35,7 +40,13 @@ trust boundary? What happens if each input is hostile? What if a dependency/webh
 
 ## Review record
 
-- **Scope / date:** {scope} / YYYY-MM-DD
+- **Scope / date:** {planning or implementation scope, intended file list} / YYYY-MM-DD
+- **Reviewed identity:** {base and revision or content identity, including uncommitted/new files}
+- **Coverage:** {each intended file: tool-reviewed, manually reviewed, or excluded with reason;
+  link a complete inventory if large. Resolve tool omissions manually; unknown coverage or
+  inaccessible required files means incomplete review, not no findings.}
+- **Verification limits:** {design/schema checks versus runtime checks; unverified controls.
+  Refresh affected review after substantive changes.}
 - **Findings:** {finding summary, or None}
 - **Resolutions:** {how findings were addressed}
 - **Residual risks / owners:** {remaining risk, owner, and follow-up, or None}

@@ -186,7 +186,8 @@ At every **GATE**, do ALL of the following and then halt:
    while Stage 2 produces the ADRs, architecture, security notes, and frozen contract. At the Stage
    2 gate, ask to commit the full Stage 1–2 planning package to `main` before decomposition. Before
    asking to land a Stage 0 or Stage 2 package that touches a sensitive area, update
-   `docs/security.md` and run `security-review` on that planning diff. Stage 6 reviews the later
+   `docs/security.md` and run `security-review` on that planning diff, completing
+   [the coverage check](#security-review-coverage). Stage 6 reviews the later
    implementation diff again. These requests satisfy the don't-commit-unless-asked guardrail; skip
    them and Stage 4's clean-tree
    check blocks the branch. Stage 3 Decompose is **not** a gate — never stop there. Tracker-backed
@@ -258,6 +259,34 @@ via a `plan/*` branch → PR like any other doc. Stage 8's learnings can ride th
 Never pre-empt any of this before the merge: until the human merges, the honest state is _in
 review_, and an abandoned or rejected PR must not leave a task reading done.
 
+## Artifact lifecycle
+
+At Stage 2, put approved future changes in a separate planned-changes section of architecture and
+security docs; do not rewrite the current system as though the design were implemented. PRD approval,
+ADR acceptance, and contract freeze are decision states. Track implementation separately using
+Not implemented, Partially implemented, or Implemented. Keep one delivery summary with links to the tracker and
+verification evidence, not another task checklist. Update affected current-behavior claims with
+each implementation task; full feature reconciliation still belongs to the final Retro.
+
+## Security-review coverage
+
+For every required planning or implementation security review, establish the intended file scope
+before invoking a tool. Include the relevant PRD, ADRs, contracts, architecture, threat model,
+implementation, and tests, including staged, unstaged, and new/untracked artifacts. Record the base
+and reviewed revision or content identity; do not stage or commit files merely to make them visible.
+
+Compare the tool's actual file coverage with that scope. Filtered Markdown, tests, untracked files,
+an empty result, or unknown coverage do not count as reviewed. Read omitted files directly and
+perform the structured manual review in `required-skills.yml`; record each file as tool-reviewed,
+manually reviewed, or excluded with a scope-specific reason. Exclusions cannot waive relevant
+sensitive changes. If required content is inaccessible, report incomplete coverage and block the
+planning landing or implementation readiness, rather than returning a clean verdict.
+
+Record coverage and verification limits in `docs/security.md` using its review-record fields.
+After substantive edits, refresh the affected review and its coverage identity. A planning review
+certifies the design only, never runtime enforcement. This check applies even when a tool reports
+no findings; no particular agent runtime is required.
+
 ## Stage 8: Per-task learning, final epic reconciliation
 
 After the merge, complete the task transition under [Task completion by tracker](#task-completion-by-tracker),
@@ -265,8 +294,10 @@ then run the Retro learning pass after every landed task using the criteria belo
 **0–3** durable learnings per task, and writing nothing remains normal.
 
 First check whether the landed task completes its enclosing feature or epic. If child tasks remain,
-do not reconcile feature artifacts or update the parent epic checklist. A decision, contract change,
-security correction, or document required by the next task should have landed with the task PR. If
+do not perform full feature reconciliation or update the parent epic checklist. A decision,
+contract change, security correction, or document required by the next task should have landed
+with the task PR. So should corrections to current-behavior claims in architecture and security
+docs under [Artifact lifecycle](#artifact-lifecycle); this is not a second task-status tracker. If
 one is discovered only after merge, correct it before the next task; that is blocking corrective
 work, not routine reconciliation.
 
@@ -279,8 +310,9 @@ repository edit, continue to the next task without a landing action.
 When all child tasks are complete, reconcile the feature's durable artifacts with what actually
 shipped. Read the PRD, ADRs, frozen contract, architecture, security, test strategy, and tracker.
 Include `docs/contracts/README.md` when it names or indexes the contract source. Update stale
-lifecycle labels and status fields: Draft, Proposed, Approved, Accepted, Final, Current, In review,
-Done, or the local template's equivalent.
+delivery summaries and status fields against evidence. Preserve decision history: an Accepted ADR
+or frozen contract does not become implemented merely because it was approved. Distinguish partial
+implementation from completed implementation. Keep the tracker authoritative for task status.
 
 Also reconcile the parent epic: verify every child is complete, update its task checklist, and
 confirm the epic Definition of Done and end-to-end acceptance criteria. **Local-only:** make the

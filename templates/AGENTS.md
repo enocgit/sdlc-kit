@@ -11,23 +11,17 @@ See [`docs/context.md`](./docs/context.md) for domain, glossary, personas, and h
 
 ## Two altitudes: foundation vs feature
 
-Artifacts come at two altitudes — don't conflate them:
-
 - **Foundation (project-level)** — set once at **Stage 0**: product PRD (`docs/prd/0000-product.md`),
   the few cross-cutting **ADRs** (stack, repo, auth, datastore, API style), architecture skeleton,
   foundational threat model, and core contract. What a first feature can't start without — keep it minimal.
-- **Feature-level** — per feature (Stages 1–8): a brief, a feature PRD, feature ADR(s), a contract
-  _slice_. Let most ADRs/contracts emerge as you build, not guessed up front.
+- **Feature-level** (Stages 1–8): brief, PRD, ADRs, and contract slice. Design these as you build.
 
 ## How we work: the plan-gated pipeline
 
-We build features through a fixed pipeline. The **conductor skill** (`sdlc`) routes each stage.
-You MUST stop at every **gate** (✅) below and get explicit human approval before proceeding —
-never skip a gate to "save time." Non-gate stages are **proceed-with-disclosure**: do the work,
-report what you did and any decision worth overriding, and continue without waiting. **Every
-response while a feature is in the pipeline** opens with a one-line **status header**
-(`SDLC ▸ Stage {N}/8 {Name} · {next gate or action}`) — whichever skill is driving the turn (`sdlc`,
-`feature-start`, or a stage skill) — so the current stage and next gate stay visible.
+The conductor (`sdlc`) routes each stage. Stop at every gate (✅) for explicit human approval.
+At non-gate stages, do the work, disclose results and decisions worth overriding, then continue.
+Every pipeline response, whichever skill drives it, opens with this one-line status header:
+`SDLC ▸ Stage {N}/8 {Name} · {next gate or action}`
 
 | Stage | You produce | Gate |
 | ------- | ------------- | ------ |
@@ -41,11 +35,9 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 | 7 — Land | PR opened where hosting supports it. Without PR support, push the branch if a remote exists, run any available CI, and the human merges it directly; with no remote, the human merges the local branch. **GitHub:** carries `Closes #N`, issue closes on merge. **Any other tracker / local-only:** no keyword — task → _In review_, completed after the merge (see `sdlc` skill) | ✅ human merges |
 | 8 — Retro | 0–3 durable learnings curated per task; after the final child, feature artifacts reconciled and parent epic completed | — |
 
-> Not every change runs all stages. **Right-size the process:** bootstrap/adoption establishes Stage
-> 0 once, then features run Stages 1→8; bug fixes go Implement → QA → Review → Land → Retro;
-> chores go Implement → Review → Land → Retro. A change graduates to the feature path when it
-> touches a contract, a security-sensitive
-> area, or makes a decision.
+> Establish Stage 0 once; features then run Stages 1→8. Bug fixes run Implement → QA → Review → Land → Retro;
+> chores run Implement → Review → Land → Retro. Contract changes, sensitive areas, and decisions
+> require the full feature path.
 
 ## Where things live
 
@@ -115,10 +107,10 @@ trade-offs. Expand when the human asks; runtime safety and progress rules win.
       the full suite locally. If CI runs after PR creation, finish proportional local QA and review
       before opening it. N/A _only_ where no CI workflow exists; unreachable required CI blocks.
 - [ ] `code-review` + `simplify` clean; a [sensitive area](#sensitive-areas) also needs
-      `security-review` run and `docs/security.md` updated
+      `security-review` with complete scoped coverage per `sdlc`, recorded in `docs/security.md`
 - [ ] Diff hygiene: small and focused, references the issue, no stray/debug code
-- [ ] Docs required for the task are current; after the final epic child, reconcile
-      PRD/ADR/contract/architecture/status fields with what shipped
+- [ ] Current-behavior claims stay accurate per task; distinguish approved from implemented behavior
+      per `sdlc`. After the final child, reconcile all feature artifacts with implementation evidence
 - [ ] Tracker linked and current (rules by tracker/hosting: see the Stage 7 row above) — closure
       itself is a post-merge step, not required before Land
 

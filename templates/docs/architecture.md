@@ -31,6 +31,13 @@
 
 <!-- 1–3 important sequences (e.g. payment, signup). Prose or sequence diagram. -->
 
+## Planned changes
+
+<!-- Approved future changes only. Link the decision and contract; keep current behavior in the
+     sections above. Separate decision status from delivery: Not implemented, Partially implemented,
+     or Implemented. Link partial-delivery evidence rather than copying tracker checklists. Update
+     affected current-behavior claims with each task. Remove this section when no plans remain. -->
+
 ## Cross-cutting concerns
 
 - **Auth:** {approach}

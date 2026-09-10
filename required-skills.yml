@@ -154,5 +154,5 @@ skills:
               kind: claude-code,
               stage: "0,0b,2,6",
               note: "mandatory before landing sensitive planning or implementation changes — not agent discretion",
-              fallback: "perform a structured manual review of changed trust boundaries, authentication/authorization, data exposure, abuse cases, dependencies, and hostile inputs; record findings, resolutions, and any docs/security.md updates",
+              fallback: "perform a structured manual review of changed trust boundaries, authentication/authorization, data exposure, abuse cases, dependencies, and hostile inputs; reconcile intended file scope with actual coverage under sdlc, including docs/tests and new files; record reviewed identity, exclusions, limits, findings, and resolutions in docs/security.md; inaccessible required files block readiness",
         }

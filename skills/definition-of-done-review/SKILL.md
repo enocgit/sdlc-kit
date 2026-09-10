@@ -157,10 +157,18 @@ How to judge the items that need interpretation:
   its best proof is not a new test. Configured CI checks remain required from their trusted producer
   before merge.
 - **Docs.** Update `docs/architecture.md` if the system's shape changed. Add an ADR if the change
-  makes a decision, and ensure the tracker issue reflects reality.
+  makes a decision, and ensure the tracker issue reflects reality. Check decision and delivery
+  status separately: approval, acceptance, or freeze does not prove implementation.
+  Current-behavior claims and security controls must reflect the task's evidence,
+  with planned and partial behavior identified. Full epic reconciliation may wait for the final
+  child; inaccurate claims about enforced behavior may not. Link evidence, not duplicate task lists.
 - **Security.** Require a recorded semantic sensitive-area assessment even when `security-review` is
   N/A. For sensitive-area changes, require a completed review, resolved findings, and an updated
-  `docs/security.md`.
+  `docs/security.md`. Apply the conductor's Security-review coverage protocol: reconcile the intended
+  scope with actual tool/manual coverage at the reviewed revision or content identity, including
+  new files and relevant docs/tests. Require reasons for exclusions, manual review for tool omissions,
+  and refreshed review after substantive edits. Empty or unknown tool coverage is not a pass;
+  inaccessible required files block readiness. Planning evidence does not certify runtime controls.
 
 ## Output
 

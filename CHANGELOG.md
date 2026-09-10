@@ -14,6 +14,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 
+- Require intended-file coverage for security reviews, including manual review of tool omissions,
+  reviewed identity, exclusions, and verification limits; inaccessible required files block readiness.
+- Separate decision approval from implementation evidence. Keep current architecture
+  and security claims accurate per task while reserving full feature reconciliation for final Retro.
 - Made documentation contributor-focused: concise points and paragraphs, linked details, useful
   tables, and preserved requirements without fixed length limits.
 - Clarified that installable contract and test-strategy templates support contract-defined types
