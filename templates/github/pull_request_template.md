@@ -23,4 +23,4 @@
 
 - [ ] Tests or another proportional check: <!-- command / evidence -->
 - [ ] Runtime observation or relevant non-runtime check: <!-- evidence -->
-- [ ] CI status: <!-- link or N/A when no workflow exists -->
+- [ ] CI green

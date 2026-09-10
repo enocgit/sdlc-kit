@@ -16,10 +16,12 @@ approval gate.
 
 ## Steps
 
-1. **Pick the task.** Confirm the task's **identifier and slug** with the user. The identifier is
-   the GitHub issue number by default; on another tracker its key (`ENG-123`); in **local-only**
-   mode the `#` column of the task table in `docs/progress.md`. Never invent one. One task per run.
-   The human must confirm the identifier and slug before any Git mutation; stop here until they do.
+1. **Pick the task — infer, don't interrogate.** Resolve the task's **identifier and slug** from
+   the tracker and the user's request. The identifier is the GitHub issue number by default; on
+   another tracker its key (`ENG-123`); in **local-only** mode the `#` column of the task table in
+   `docs/progress.md`. Never invent one. One task per run. State the identifier and slug you
+   resolved, then proceed; ask only when the request is genuinely ambiguous or no tracker entry
+   matches.
 2. **Isolate the workspace — default to a feature branch.** Create `feat/{id}-{slug}` directly.
    Use a git worktree only as an explicit manual escape hatch for opt-in parallel or disposable
    work, or when the user asks. Before changing anything, run `git worktree list --porcelain` and
@@ -87,11 +89,10 @@ approval gate.
      branch in place and report both for inspection. The generic removal command is the only cleanup
      this kit performs; the operator owns any parent-directory cleanup.
 
-   - **Green baseline:** In the selected workspace, name repository-controlled setup/build commands
-     and get approval before running them. Install dependencies as needed, then establish only a
-     change-appropriate baseline: use a focused test for behavior, a targeted render/browser or
-     manual visual check for UI or styling, and a relevant link, schema, or syntax check for docs or
-     configuration. Do not run the full suite by default; for shared paths, broaden verification to
+   - **Green baseline:** In the selected workspace, install dependencies and run the project's
+     setup and build commands as needed, then establish only a change-appropriate baseline: use a
+     focused test for behavior, a targeted render/browser or manual visual check for UI or styling,
+     and a relevant link, schema, or syntax check for docs or configuration. Do not run the full suite by default; for shared paths, broaden verification to
      all impacted packages/modules. Reserve the full suite for broad or high-risk dependency
      fan-out or an explicit project rule. If the selected baseline is red, stop and report; do not
      start work on a broken baseline.
