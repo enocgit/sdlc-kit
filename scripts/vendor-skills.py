@@ -777,7 +777,21 @@ def preserve_stale_staging(root_fd: int, name: str, staging_fd: int) -> str:
     return preserved
 
 
+def rewind_directory(directory_fd: int) -> None:
+    """Reset a directory descriptor to its first entry before every enumeration.
+
+    A descriptor opened while its directory was still empty can otherwise report no
+    entries for names created through it afterwards (btrfs caches the last directory
+    index at open time). Rewinding is `rewinddir(3)` semantics and refreshes that cache.
+    """
+    try:
+        os.lseek(directory_fd, 0, os.SEEK_SET)
+    except OSError as error:
+        fail(f"could not rewind directory before listing: {error}")
+
+
 def remove_vendor_staging_contents(directory_fd: int) -> None:
+    rewind_directory(directory_fd)
     try:
         names = os.listdir(directory_fd)
     except OSError as error:
@@ -857,6 +871,7 @@ def clear_vendor_staging_intent(root: Path = ROOT, missing_ok: bool = False) -> 
 
 
 def validate_vendor_intent_recovery_state(staging_fd: int) -> tuple[int, int] | None:
+    rewind_directory(staging_fd)
     try:
         names = os.listdir(staging_fd)
     except OSError as error:
@@ -929,6 +944,7 @@ def recover_vendor_staging(root: Path = ROOT) -> None:
         fail(f"could not open repository directory for staging recovery: {error}")
     try:
         recover_vendor_staging_intent(root_fd, root)
+        rewind_directory(root_fd)
         try:
             names = os.listdir(root_fd)
         except OSError as error:

@@ -63,15 +63,25 @@ response while a feature is in the pipeline** opens with a one-line **status hea
 
 ## Documentation writing standard
 
-All durable docs are for humans first: PRDs, ADRs, contracts, architecture, security, test strategy,
-runbook, context, progress, README, and other project documentation. Start with a cheap scan: status, scope, key
-decision/outcome, constraints, links, and open questions before detail. Prefer bullets, checklists,
-small tables, and links to source-of-truth docs over narrative or duplicated facts. Keep useful
-template prompts in templates; in filled project artifacts remove unused scaffold, empty headings,
-HTML comments, and boilerplate. If a deferred section matters, write the owner/trigger for filling
-it instead of leaving generic placeholders. Write tight, complete sentences; omit filler and
-repetition, but avoid conversational fragments that make durable facts ambiguous.
+Write durable docs for what contributors need to decide, implement, or verify, not narrative.
+Lead with status, scope, decision/outcome, and essential rationale; surface constraints and open questions.
+Prefer short points and one-topic paragraphs of one or two complete sentences; expand for clarity, not quotas.
+State each fact once. Summarize and link to source-of-truth details rather than duplicating them.
+Give each section only the detail its content requires; impose no fixed word or line limits.
+Use tables, bullets, or checklists when they make comparisons, mappings, or structured facts easier to scan.
+Preserve requirements, risks, security boundaries, failure behavior, compatibility, verification limits, and fixed formats.
+Keep prompts in templates; remove unused scaffold, empty headings, HTML comments, and boilerplate from filled docs. Name owners/triggers for necessary deferred sections.
+Before finishing, cut sentences that change neither contributor understanding nor action. Use normal English, not compressed jargon or fragments.
 Use underscores (`_text_`) for emphasis. Reserve asterisks for bold (`**text**`). Apply the bundled `unslop` policy automatically to human-facing text and replies where applicable; follow its canonical scope and exclusions. Keep process instructions here, not in durable product artifacts.
+
+**Briefs and PRDs:** Keep both concise: state each requirement once and include only detail needed
+for approval and verification. Write for a product reader who understands the business but not the
+implementation. Describe what people need, can do, and see, and which rules apply. Explain necessary
+technical terms on first use. Keep briefs focused on the problem and desired outcome; make PRD
+requirements and acceptance criteria observable and testable. Put detailed implementation decisions
+in ADRs and contracts, linking rather than duplicating them. Preserve exact limits, exceptions, and
+privacy requirements. Before presenting either document, check: can someone approve the intended
+behavior without understanding our stack
 
 ## Communication standard
 
@@ -168,8 +178,7 @@ and safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply
   to commit or write under `docs/superpowers/`; the conductor owns the artifact and gate.
 - For `improve-codebase-architecture`, treat `CONTEXT.md` as `docs/context.md`; do not invoke its
   unavailable `codebase-design` or `domain-modeling` dependencies, and skip its CDN-backed report.
-- Before running a repository-controlled install or build command, name it and get approval.
-  For an opt-in worktree, use the generic Git-only `git worktree add` and non-forced
+- For an opt-in worktree, use the generic Git-only `git worktree add` and non-forced
   `git worktree remove` commands in `feature-start`; the operator owns platform-specific path
   selection, privacy, and containment checks.
 - Do not use `webapp-testing`'s bundled `with_server.py`; use the project's lifecycle runner or an

@@ -6,8 +6,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+### Added
+
+- The release gate now verifies that every directory enumeration rewinds its descriptor first, and
+  exercises a no-clobber publication on the kit's own filesystem instead of only the shared
+  temporary directory.
+
 ### Changed
 
+- Made documentation contributor-focused: concise points and paragraphs, linked details, useful
+  tables, and preserved requirements without fixed length limits.
 - Clarified that installable contract and test-strategy templates support contract-defined types
   that are generated or shared directly.
 - Reworked the README, cheatsheet, contribution, walkthrough, and installation guides with ordered
@@ -16,6 +24,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - Replaced the optional `using-git-worktrees` skill with a concise, manual Git-only worktree escape hatch; direct feature branches remain the default.
 - Clarified that local verification follows change risk and that full CI is a merge gate, not a default local pre-PR run.
 - Allow explicit `SKILLS_DIR` paths, including shared or user-global directories; project-local installation remains the default recommendation.
+
+### Fixed
+
+- Fixed installation aborting on btrfs. A directory descriptor opened before its contents were
+  written reported no entries, so staging cleanup removed nothing, left a `.sdlc-file-*` directory
+  behind, and failed the install; the same defect could read a staged skill tree as empty during
+  symlink rejection, timestamp normalization, and snapshot hashing. The installer and the vendoring
+  tool now rewind every directory descriptor before enumerating it.
 
 ## [0.6.0] - 2026-09-02
 

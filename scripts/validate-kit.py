@@ -7,8 +7,10 @@ import concurrent.futures
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -420,6 +422,48 @@ class Validator:
             payload.write_text(payload.read_text() + "tampered\n")
             expect_fail(run([sys.executable, "scripts/vendor-skills.py", "verify-installed", str(target / ".agents/skills")], cwd=self.kit), "tampered payload")
 
+    def enumeration_rewind(self) -> None:
+        """Directory descriptors must be rewound before every readdir.
+
+        A descriptor opened while its directory was empty can otherwise report no entries
+        for names created through it afterwards (btrfs caches the last directory index at
+        open time), which silently skips staging cleanup and tree verification.
+        """
+        for name in ("scripts/install-safe.py", "scripts/vendor-skills.py"):
+            tree = ast.parse((self.kit / name).read_text(), filename=name)
+            for function in ast.walk(tree):
+                if not isinstance(function, ast.FunctionDef):
+                    continue
+                calls = [node for node in ast.walk(function) if isinstance(node, ast.Call)]
+                rewinds = any(isinstance(node.func, ast.Name) and node.func.id == "rewind_directory"
+                              for node in calls)
+                if rewinds:
+                    continue
+                for node in calls:
+                    if (isinstance(node.func, ast.Attribute) and node.func.attr in {"scandir", "listdir"}
+                            and isinstance(node.func.value, ast.Name) and node.func.value.id == "os"):
+                        raise CheckError(
+                            f"{name}:{node.lineno} enumerates a directory without rewinding it first"
+                        )
+        # Exercise the real publication path on the kit's own filesystem; the shared temp
+        # directory may be a tmpfs that never reproduces the cached-index behaviour.
+        staging = Path(tempfile.mkdtemp(prefix="sdlc-validate-fs-", dir=self.kit.parent))
+        try:
+            destination = staging / "required-skills.yml"
+            destination.write_text("keep\n")
+            result = run([sys.executable, "scripts/install-safe.py", "file", str(staging),
+                          str(self.kit / "required-skills.yml"), str(destination)], cwd=self.kit)
+            expect_ok(result, "publish over an existing file")
+            if result.stdout.strip() != "exists":
+                raise CheckError(f"expected a no-clobber skip, got: {result.stdout.strip()}")
+            if destination.read_text() != "keep\n":
+                raise CheckError("existing file was overwritten")
+            leftovers = [entry.name for entry in staging.iterdir() if entry.name.startswith(".sdlc-")]
+            if leftovers:
+                raise CheckError(f"publication left staging behind: {leftovers}")
+        finally:
+            shutil.rmtree(staging, ignore_errors=True)
+
     def run(self) -> int:
         checks = (("syntax, schemas, and provenance", self.static), ("clean install", self.smoke),
                   ("dry-run immutability", self.dry_run), ("restrictive umask", self.umask),
@@ -429,7 +473,8 @@ class Validator:
                   ("timeout process-group cleanup", self.timeout_cleanup),
                   ("timeout exit race cleanup", self.timeout_exit_race),
                   ("target containment", self.containment), ("source entry rejection", self.source_rejection),
-                  ("vendored removal", self.vendor_removal), ("installed tamper detection", self.tamper))
+                  ("vendored removal", self.vendor_removal), ("installed tamper detection", self.tamper),
+                  ("directory enumeration rewind", self.enumeration_rewind))
         for name, function in checks:
             self.check(name, function)
         if self.failures:

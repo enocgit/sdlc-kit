@@ -13,6 +13,7 @@ import re
 import secrets
 import stat
 import sys
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, BinaryIO
 
@@ -488,7 +489,7 @@ def copy_tree_entries_from_fd(
     display: Path,
     relative_parent: tuple[str, ...] = (),
 ) -> None:
-    for entry in os.scandir(source_fd):
+    for entry in scan_entries(source_fd):
         source_entry = display / entry.name
         entry_stat = entry.stat(follow_symlinks=False)
         if stat.S_ISLNK(entry_stat.st_mode):
@@ -542,7 +543,7 @@ def copy_tree_entries(source: Path, destination_fd: int) -> None:
 
 
 def reject_staged_symlinks(directory_fd: int, relative_prefix: str = "") -> None:
-    for entry in os.scandir(directory_fd):
+    for entry in scan_entries(directory_fd):
         relative = f"{relative_prefix}/{entry.name}" if relative_prefix else entry.name
         entry_stat = entry.stat(follow_symlinks=False)
         if stat.S_ISLNK(entry_stat.st_mode):
@@ -560,7 +561,7 @@ def staged_symlink_targets(
     relative_parent: tuple[str, ...] = (),
 ) -> dict[tuple[str, ...], str]:
     targets: dict[tuple[str, ...], str] = {}
-    for entry in os.scandir(directory_fd):
+    for entry in scan_entries(directory_fd):
         entry_path = (*relative_parent, entry.name)
         entry_stat = entry.stat(follow_symlinks=False)
         if stat.S_ISLNK(entry_stat.st_mode):
@@ -614,7 +615,7 @@ def collect_tree_entries(
     relative_prefix: str = "",
 ) -> list[tuple[str, int]]:
     entries: list[tuple[str, int]] = []
-    for entry in os.scandir(directory_fd):
+    for entry in scan_entries(directory_fd):
         relative = f"{relative_prefix}/{entry.name}" if relative_prefix else entry.name
         entry_stat = entry.stat(follow_symlinks=False)
         entries.append((relative, entry_stat.st_mode))
@@ -753,7 +754,26 @@ def check_atomic_rename_support(path: Path, write_probe: bool) -> None:
             os.close(directory_fd)
 
 
+def rewind_directory(directory_fd: int) -> None:
+    """Reset a directory descriptor to its first entry before every enumeration.
+
+    A descriptor opened while its directory was still empty can otherwise report no
+    entries for names created through it afterwards (btrfs caches the last directory
+    index at open time). Rewinding is `rewinddir(3)` semantics and refreshes that cache.
+    """
+    try:
+        os.lseek(directory_fd, 0, os.SEEK_SET)
+    except OSError as error:
+        raise RuntimeError("could not rewind directory before listing") from error
+
+
+def scan_entries(directory_fd: int) -> Iterator[os.DirEntry]:
+    rewind_directory(directory_fd)
+    return os.scandir(directory_fd)
+
+
 def list_entries(directory_fd: int) -> list[str]:
+    rewind_directory(directory_fd)
     try:
         return os.listdir(directory_fd)
     except OSError as error:
@@ -902,7 +922,7 @@ def add_vendor_metadata(
 
 
 def normalize_tree_timestamps(directory_fd: int) -> None:
-    for entry in os.scandir(directory_fd):
+    for entry in scan_entries(directory_fd):
         entry_stat = entry.stat(follow_symlinks=False)
         if stat.S_ISLNK(entry_stat.st_mode):
             os.utime(
