@@ -108,7 +108,9 @@ Re-running the installer adds new files but does not replace existing files or s
    SKILLS_DIR_ABS=/absolute/path/to/the/project/.agents/skills
    ```
 
-4. Preview with those paths. Merge changes to existing root and `docs/` files by hand:
+4. Preview with those paths. Merge changes to existing root, `docs/`, and `.github/` templates by hand:
+   - For point-level writing guidance, update `AGENTS.md` and the issue/PR prompts together.
+   - Preserve existing document structure, introductory paragraphs, and project-specific rules.
 
    ```bash
    SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh --dry-run "$TARGET"

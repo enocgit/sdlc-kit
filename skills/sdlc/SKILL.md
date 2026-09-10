@@ -155,6 +155,11 @@ Follow the communication and documentation writing standards in `AGENTS.md`; it 
 for both. Apply `unslop` automatically to human-facing replies and prose where applicable; follow its
 canonical scope and exclusions. Trim borrowed-skill output to match before each gate.
 
+Before presenting gate artifacts, tracker issues, or PR text, review each point against the
+one-point writing rule in `AGENTS.md`. Split independently actionable obligations without losing
+conditions or changing requirement IDs. This is an editorial review, not a sentence-count test;
+keep document structure and PRD/ADR introductions intact.
+
 ## The stages, skills, and gates
 
 | Stage | Use skill | Output | After producing output |

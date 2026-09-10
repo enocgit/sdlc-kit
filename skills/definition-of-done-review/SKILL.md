@@ -162,6 +162,10 @@ How to judge the items that need interpretation:
   Current-behavior claims and security controls must reflect the task's evidence,
   with planned and partial behavior identified. Full epic reconciliation may wait for the final
   child; inaccurate claims about enforced behavior may not. Link evidence, not duplicate task lists.
+- **Readability.** Review changed docs, issue criteria, and proposed PR text against `AGENTS.md`'s
+  one-point writing rule; identify overloaded points rather than enforcing word or sentence quotas.
+  Split independent obligations while preserving exact conditions, requirement IDs, document
+  structure, and introductory paragraphs.
 - **Security.** Require a recorded semantic sensitive-area assessment even when `security-review` is
   N/A. For sensitive-area changes, require a completed review, resolved findings, and an updated
   `docs/security.md`. Apply the conductor's Security-review coverage protocol: reconcile the intended

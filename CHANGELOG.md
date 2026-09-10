@@ -14,6 +14,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 
+- Make each documentation, issue, and PR point express one rule, decision, or outcome, with independently verifiable checkboxes.
+- Review overloaded points before gates and publication without changing document structure, introductions, or requirement meaning.
 - Require intended-file coverage for security reviews, including manual review of tool omissions,
   reviewed identity, exclusions, and verification limits; inaccessible required files block readiness.
 - Separate decision approval from implementation evidence. Keep current architecture

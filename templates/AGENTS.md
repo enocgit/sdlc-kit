@@ -55,16 +55,16 @@ Every pipeline response, whichever skill drives it, opens with this one-line sta
 
 ## Documentation writing standard
 
-Write durable docs for what contributors need to decide, implement, or verify, not narrative.
-Lead with status, scope, decision/outcome, and essential rationale; surface constraints and open questions.
-Prefer short points and one-topic paragraphs of one or two complete sentences; expand for clarity, not quotas.
-State each fact once. Summarize and link to source-of-truth details rather than duplicating them.
-Give each section only the detail its content requires; impose no fixed word or line limits.
-Use tables, bullets, or checklists when they make comparisons, mappings, or structured facts easier to scan.
-Preserve requirements, risks, security boundaries, failure behavior, compatibility, verification limits, and fixed formats.
-Keep prompts in templates; remove unused scaffold, empty headings, HTML comments, and boilerplate from filled docs. Name owners/triggers for necessary deferred sections.
-Before finishing, cut sentences that change neither contributor understanding nor action. Use normal English, not compressed jargon or fragments.
-Use underscores (`_text_`) for emphasis. Reserve asterisks for bold (`**text**`). Apply the bundled `unslop` policy automatically to human-facing text and replies where applicable; follow its canonical scope and exclusions. Keep process instructions here, not in durable product artifacts.
+Write docs, issues, and PRs for contributor decisions and verification, not narrative.
+Lead with status, scope, outcome, rationale, constraints, and open questions; link authoritative details rather than duplicate facts.
+Each bullet, numbered item, checkbox, or table cell should express one clear rule, decision, or outcome.
+Prefer one sentence per point; use a second only to explain or qualify that same point.
+Split additional obligations into separate points or sub-points; do not hide them in semicolons or long inline lists.
+Each checkbox should have one independently verifiable outcome. Preserve requirement IDs when splitting their supporting rules.
+Keep existing document structure and PRD/ADR introductory paragraphs; impose no point-count, word, or line quotas.
+Preserve exact limits, exceptions, risks, security boundaries, failure behavior, compatibility, verification limits, and fixed formats.
+Remove unused scaffold and filler; name owners/triggers for deferred sections. Use complete, plain English, not compressed fragments.
+Keep process instructions here and prompts in templates. Use underscores for emphasis and asterisks for bold; apply `unslop` with its canonical scope and exclusions.
 
 **Briefs and PRDs:** Keep both concise: state each requirement once and include only detail needed
 for approval and verification. Write for a product reader who understands the business but not the

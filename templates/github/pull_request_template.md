@@ -7,14 +7,17 @@
 
 ## Notes
 
-<!-- Decisions, compatibility concerns, rollout details, or items reviewers should know. -->
+<!-- Follow AGENTS.md's one-point writing rule for decisions, compatibility, and review notes.
+     Do not pack scope, safeguards, review results, and outstanding work into one impact bullet. -->
 
 - Contract impact: N/A | describe the frozen contract change.
 - Security impact: N/A | link the updated threat model or review.
 
 ## Acceptance criteria
 
-<!-- Copy the issue or PRD criteria here. Delete this section when the change has none. -->
+<!-- Carry over the issue or PRD criteria, splitting bundled obligations into independently
+     verifiable checkboxes without changing meaning, limits, exceptions, or source references.
+     Delete this section when the change has none. -->
 - [ ] {criterion}
 
 ## Verification

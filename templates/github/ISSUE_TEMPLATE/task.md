@@ -14,13 +14,15 @@ Depends on #NN. Follow `{skill}` skills.
 
 ## Scope
 
-<!-- What this task delivers — concrete bullets (endpoints, fields, screens). Note anything
-     explicitly deferred or out of scope. -->
+<!-- Follow AGENTS.md's one-point writing rule: one clear deliverable per bullet.
+     Keep qualifications with their rule; split additional obligations into separate points.
+     Note anything explicitly deferred or out of scope. -->
 
 -
 
 ## Definition of Done
 
-<!-- Testable acceptance criteria — these are the per-task DoD checks. -->
+<!-- One independently verifiable outcome per checkbox. Split bundled criteria without dropping
+     limits, exceptions, or source requirement references; these are the per-task DoD checks. -->
 
 - [ ] {criterion}
