@@ -189,7 +189,8 @@ At every **GATE**, do ALL of the following and then halt:
    package on `main`. For adoption, ask to land the reconstructed package at the combined Stage 0
    gate. Stage 1 approval also does not ask for a commit; the approved PRD stays in the worktree
    while Stage 2 produces the ADRs, architecture, security notes, and frozen contract. At the Stage
-   2 gate, ask to commit the full Stage 1–2 planning package to `main` before decomposition. Before
+   2 gate, ask to land the full Stage 1–2 planning package on `main` before decomposition, using the
+   remote-state landing action in [Rules](#rules) → Default-branch landings. Before
    asking to land a Stage 0 or Stage 2 package that touches a sensitive area, update
    `docs/security.md` and run `security-review` on that planning diff, completing
    [the coverage check](#security-review-coverage). Stage 6 reviews the later
@@ -262,8 +263,8 @@ writing, same as at Land.
 **Local-only** needs the `docs/progress.md` row moved to `Done` —
 and that file _is_ the tracker, so **check out the default branch and sync it first**: you're still
 standing on the just-merged `feat/*`, and committing there strands the update on a dead branch while
-`main` reads _In review_ for good. Then edit and ask to commit; if `main` is PR-protected, land it
-via a `plan/*` branch → PR like any other doc. Stage 8's learnings can ride the same commit.
+`main` reads _In review_ for good. Then edit and land it by remote state ([Rules](#rules) →
+Default-branch landings). Stage 8's learnings can ride the same commit.
 
 Never pre-empt any of this before the merge: until the human merges, the honest state is _in
 review_, and an abandoned or rejected PR must not leave a task reading done.
@@ -311,10 +312,10 @@ one is discovered only after merge, correct it before the next task; that is blo
 work, not routine reconciliation.
 
 If a leaf-task learning, local-only tracker transition, or blocking correction changes a repository
-file, check out and sync the default branch, then ask to land the edit there. If the default branch
-is protected, use a `plan/*` branch and the normal review path. Do not invoke `feature-start` until
-those edits are on the default branch and the worktree is clean. If the leaf-task Retro produces no
-repository edit, continue to the next task without a landing action.
+file, check out and sync the default branch, then ask to land the edit there by remote state
+([Rules](#rules) → Default-branch landings). Do not invoke `feature-start` until those edits are on
+the default branch and the worktree is clean. If the leaf-task Retro produces no repository edit,
+continue to the next task without a landing action.
 
 When all child tasks are complete, reconcile the feature's durable artifacts with what actually
 shipped. Read the PRD, ADRs, frozen contract, architecture, security, test strategy, and tracker.
@@ -422,15 +423,21 @@ design or spike plan as a substitute for this pipeline's PRD path.
   opt-in parallel or disposable isolation, or when the user requests it. The operator supplies and
   verifies a private, new or empty path outside every checkout; use only the generic Git-only
   guidance in `feature-start`.
-- **Planning commits land on `main`.** Stage 0 foundation artifacts may be committed after the
-  foundation gate. For a feature, keep the approved Stage 1 PRD in the worktree, then commit the
-  Stage 1–2 planning package once after Stage 2 approves the ADRs, architecture/security updates,
-  and frozen contract. Stage 4 branches from a clean `main` that already holds the frozen contract.
-  The branch carries the task implementation plus its required task-scoped tests and docs. If `main`
-  is PR-protected, use a `plan/*` branch → PR →
-  merge, then branch `feat/*`. **Stage 8 retro learnings** (`docs/context.md`) land on `main` the
-  same way before the next task or feature branch; final feature reconciliation waits for the last
-  child. (See `AGENTS.md` → Where planning commits land.)
+- **Default-branch landings (Stage 0, Stage 2, Stage 8).** Planning packages and Retro edits land
+  on the default branch, never a feature branch, and the ref Stage 4 cuts from must already hold
+  them. Stage 0 foundation artifacts may land after the foundation gate. For a feature, keep the
+  approved Stage 1 PRD in the worktree, then land the Stage 1–2 planning package once after Stage 2
+  approves the ADRs, architecture/security updates, and frozen contract. Stage 8 retro learnings
+  (`docs/context.md`) land the same way before the next task or feature branch; final feature
+  reconciliation waits for the last child. Ask for the landing action by remote state:
+  - **No remote** → commit to the local default branch.
+  - **Remote, default branch unprotected** → commit and push it under the same approval, so the
+    shared default branch holds the frozen contract. A commit alone leaves Stage 4 branching from a
+    base the remote lacks, folding the planning package into the feature PR.
+  - **Remote, default branch protected** → `plan/{NNNN}-{slug}` → PR → merge, then branch `feat/*`;
+    wait for the human to confirm the package reached the default branch.
+  Stage 4 branches from that clean ref; the branch carries the task implementation plus its
+  required task-scoped tests and docs. (See `AGENTS.md` → Where planning commits land.)
 - One feature in flight per branch. Reference the tracker issue (its `#`/key) in commits/PRs.
 - At Decompose, create issues with `gh issue create` and **shape their bodies to match**
   `.github/ISSUE_TEMPLATE/{epic,task}.md` — one `epic` per feature, a `task` per child. (`--body`

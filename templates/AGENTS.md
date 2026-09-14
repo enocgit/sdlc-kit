@@ -117,19 +117,19 @@ Expand when asked; runtime safety and progress rules win.
 
 ## Conventions
 
-- **Stack (placeholder — set at Stage 0):** TypeScript + React (frontend), Node (backend) are
-  illustrative defaults. Replace with your real stack when you fill `docs/context.md`.
+- **Stack (placeholder — set at Stage 0):** TypeScript + React (frontend), Node (backend) are illustrative defaults; replace with your real stack when you fill `docs/context.md`.
 - **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{id}-{slug}` branches → PR → merge → deploy. Environments are deploy targets driven by CI, not long-lived branches. One feature per branch; use a git worktree only as an explicit manual escape hatch when requested. The operator supplies a private, new or empty path outside every checkout and runs `feature-start`'s generic Git-only recipe.
-- **Where planning commits land.** At the Stage 0 foundation gate, ask to land the approved
-  bootstrap context + foundation package on **`main`**; on adoption, ask at the combined Stage 0
-  gate. Commit the feature planning package once, after Stage 2: Stage 1 PRD + Stage 2 ADRs,
-  architecture/security updates, and frozen contract go to **`main`**, not a feature branch. Before
-  either package lands, threat-model sensitive decisions in `docs/security.md` and run
-  `security-review` on the planning diff. Stage 4 cuts `feat/{id}-{slug}` from clean `main`; the
-  branch carries the task implementation plus its required task-scoped tests and docs. A frozen
-  contract changes only via a new ADR. If `main` is protected, use `plan/{NNNN}-{slug}` → PR →
-  merge, then branch `feat/*`. Per-task learnings land before the next task; final-child
-  reconciliation lands **before completing the parent epic**. An empty Retro needs no landing action.
+- **Where planning commits land.** Land each planning package on **`main`**, never a feature branch:
+  the Stage 0 context + foundation package at the foundation gate (adoption: the combined Stage 0
+  gate), then the Stage 1 PRD + Stage 2 ADRs, architecture/security updates, and frozen contract
+  once after Stage 2, with a threat model in `docs/security.md` and `security-review` on the diff
+  when a sensitive area is touched. Stage 4 cuts `feat/{id}-{slug}` from a ref that must already
+  hold the frozen contract, so ask for the landing action by remote state: **no remote** → commit
+  locally; **remote, unprotected `main`** → commit and push; **protected `main`** →
+  `plan/{NNNN}-{slug}` → PR → merge, then branch `feat/*`. The branch carries the task
+  implementation plus its required task-scoped tests and docs, and a frozen contract changes only
+  via a new ADR. Per-task learnings land before the next task, and final-child reconciliation lands
+  **before completing the parent epic**; an empty Retro needs no landing action.
 - **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types:
   `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the issue
   (`Refs #123` / `Closes #123` — GitHub only; elsewhere its key). Small logical commits, not a blob.

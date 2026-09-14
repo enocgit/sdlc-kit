@@ -21,8 +21,9 @@ records (ADRs), architecture skeleton, core contract, and threat model. It repla
 strategy's placeholder runners with TenantPay's real tools. Authentication is sensitive, so it runs
 `security-review` on this planning diff.
 
-**Gate:** approve the foundation and land the context-and-foundation package on `main`. If `main` is
-protected, use a `plan/*` pull request (PR) and wait for the human to merge it.
+**Gate:** approve the foundation and land the context-and-foundation package on `main` — the commit,
+and the push when a remote's `main` is unprotected. If `main` is protected, use a `plan/*` pull
+request (PR) and wait for the human to merge it.
 
 ### 1. Write the feature specification
 
@@ -44,8 +45,9 @@ The agent runs `security-review` on this sensitive planning diff. Stage 6 review
 diff separately.
 
 **Gate:** approve the approach, freeze the interface, and land the Stage 1–2 planning package on
-`main`. If `main` is protected, use a `plan/*` PR and wait for the human to merge it. Frontend and
-backend can then work against the same contract.
+`main` — the commit, and the push when a remote's `main` is unprotected, so the shared `main` holds
+the contract. If `main` is protected, use a `plan/*` PR and wait for the human to merge it. Frontend
+and backend can then work against the same contract.
 
 ### 3. Break the feature into tasks
 

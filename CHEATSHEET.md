@@ -64,8 +64,9 @@ the human merges directly. With no remote, the human merges the local branch.
 - Use imperative Conventional Commits: `type(scope): summary`, at most 72 characters.
 - Use `Refs #N` or `Closes #N` for GitHub. Use native keys for other trackers and no issue syntax for
   local-only IDs.
-- Commit Stage 1–2 planning artifacts once after Stage 2, before branching. Stage 0 artifacts may be
-  committed after their gate. If `main` is protected, merge a `plan/*` PR first.
+- Land Stage 1–2 planning artifacts once after Stage 2, before branching; Stage 0 artifacts may land
+  after their gate. With a remote, an unprotected `main` takes the commit and push under one
+  approval; a protected `main` takes a `plan/*` PR first.
 - Keep commits and PRs focused. The human always merges.
 - On GitHub, `Closes #N` closes the referenced issue when the PR merges. With a native external
   integration, verify that it closed the task after merge; if closure did not occur, ask for approval
