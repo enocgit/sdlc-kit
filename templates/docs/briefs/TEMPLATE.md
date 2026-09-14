@@ -1,4 +1,4 @@
-# Brief — {feature}
+# Brief: {feature}
 
 > Follow the documentation writing standard in AGENTS.md. Use this optional pre-PRD note only for
 > fuzzy ideas. Keep it to one page: problem, audience, why now, success signal, and open questions.
@@ -13,7 +13,7 @@
 
 ## Who has it
 
-- {persona} — when/where they hit this.
+- {persona}: when/where they hit this.
 
 ## Why now
 

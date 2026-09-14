@@ -199,6 +199,10 @@ At every **GATE**, do ALL of the following and then halt:
    it writes only issues; local-only it writes `docs/progress.md`, so just **disclose** that the file
    is uncommitted and continue. `feature-start` clears it at the Stage 4 gate, where stopping belongs.
 
+Keep this protocol concise. State the artifact, decision needed, and next action. Do not append a
+second explanation of routine permissions, merge ownership, CI polling rules, or other standing
+guardrails. Report a deviation or blocker when one exists; otherwise follow the guardrail silently.
+
 Do not run the next stage's skill until the user approves. Skills are guidance injected into
 context — only YOU enforce these stops, so be explicit every time.
 

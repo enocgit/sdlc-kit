@@ -66,21 +66,22 @@ Preserve exact limits, exceptions, risks, security boundaries, failure behavior,
 Remove unused scaffold and filler; name owners/triggers for deferred sections. Use complete, plain English, not compressed fragments.
 Keep process instructions here and prompts in templates. Use underscores for emphasis and asterisks for bold; apply `unslop` with its canonical scope and exclusions.
 
-**Briefs and PRDs:** State each requirement once, with only the detail product readers need for approval and verification.
-Briefs explain the problem and desired outcome. PRDs describe user needs, observable behavior, and testable rules; define technical terms on first use.
-Link to ADRs and contracts for implementation decisions. Preserve exact limits, exceptions, and privacy requirements.
-Before presenting, check whether someone can approve the intended behavior without understanding the stack.
+**Briefs and PRDs:** State each requirement once, with only the detail needed for approval and verification.
+Briefs explain the problem; PRDs describe observable behavior and testable rules. Define technical terms on first use.
+Link implementation decisions to ADRs/contracts and preserve exact limits, exceptions, and privacy.
 
-**Code comments:** Explain non-obvious intent, constraints, state transitions, and failure behavior beside the relevant code.
-Keep comments focused, precise, and durable; update them with behavior changes, not to meet a quota.
-Avoid syntax narration. State essential reasons locally; link supporting decisions and workaround removal conditions when relevant.
-Put change summaries and verification results in the PR, not source comments. Review comment claims against the implementation, not as proof.
+**Code comments:** Explain non-obvious intent, constraints, state transitions, and failure behavior beside relevant code.
+Keep comments precise and durable; avoid syntax narration and quotas. Link essential reasons and workaround removal conditions.
+Put change summaries and verification results in the PR; check comment claims against implementation, not as proof.
 
 ## Communication standard
 
-Keep user-facing replies compact: lead with the outcome, state each fact once, omit filler, and
-quote only decisive log lines unless more detail is requested. Fragments are fine when clear; use complete sentences
-for gates, security warnings, irreversible actions, ordered steps, and complex trade-offs. Expand when asked; runtime safety and progress rules win.
+Keep user-facing replies compact: lead with the outcome, state each fact once, and omit filler.
+Follow standing workflow rules silently; do not append compliance summaries or repeat routine permissions,
+guardrails, or planned mechanics. Report actual actions/results, blockers, deviations, and decisions needed.
+Mention a guardrail only when it changes the available action or prevents an expected action. Use complete
+sentences for gates, security warnings, irreversible actions, ordered steps, and complex trade-offs.
+Expand when asked; runtime safety and progress rules win.
 
 ## Definition of Ready (before a task enters Implement)
 
@@ -156,8 +157,8 @@ for gates, security warnings, irreversible actions, ordered steps, and complex t
 
 The **canonical list** — other docs and skills reference this rather than restating it:
 **authentication, authorization, payments, PII/KYC, file uploads, and admin/privileged surfaces.**
-A change touching any of these updates `docs/security.md` during foundation or Architecture, as
-applicable, and gets `security-review` before each planning or implementation merge.
+A change touching these updates `docs/security.md` during foundation or Architecture, as applicable,
+and gets `security-review` before each planning or implementation merge.
 
 ## Vendored skill overrides
 
@@ -178,8 +179,7 @@ and safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply
 
 ## Guardrails
 
-> These are _guidance_, not a runtime guarantee. Enforcement = agent adherence + CI + the review
-> gates and checklists. `AGENTS.md` existing does not by itself enforce anything.
+> These rules depend on agent adherence, CI, and review gates; this file alone enforces nothing.
 
 - Do not commit, push, open PRs, or **merge** unless asked — **merge is always the human's call.**
 - **At Land, don't poll CI.** With a PR workflow, open the PR and report CI running. With CI but no
@@ -196,5 +196,5 @@ and safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply
 
 ## Outcome summaries
 
-When you finish a task worth manual verification (UI, user flows, integrations), end with a short
-**QA checklist**: concrete steps and expected results, not a restatement. Skip it when fully tested.
+For tasks needing manual verification (UI, flows, integrations), end with a short **QA checklist**
+of steps and expected results; skip it when fully tested.

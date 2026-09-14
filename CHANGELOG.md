@@ -14,6 +14,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 
+- Make agent communication quiet by default: report actions, results, blockers, deviations, and decisions instead of repeating routine workflow guardrails.
 - Guide code comments toward non-obvious intent, constraints, state transitions, and failure behavior without comment quotas.
 - Require reviewers to check comment claims against implementation evidence; keep change summaries and verification results in PRs.
 - Make each documentation, issue, and PR point express one rule, decision, or outcome, with independently verifiable checkboxes.

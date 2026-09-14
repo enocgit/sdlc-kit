@@ -1,4 +1,4 @@
-# ADR NNNN — {short decision title}
+# ADR NNNN: {short decision title}
 
 > Follow the documentation writing standard in AGENTS.md. Keep ADRs decision-first: context only
 > for forces that shaped the choice, then the decision and consequences. Delete unused scaffold in
@@ -22,4 +22,4 @@
 
 ## Alternatives considered
 
-- **{option}** — why rejected.
+- **{option}**: why rejected.

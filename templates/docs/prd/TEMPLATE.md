@@ -1,4 +1,4 @@
-# PRD NNNN — {title}
+# PRD NNNN: {title}
 
 > Follow the documentation writing standard in AGENTS.md. Keep this scan-first: status, scope,
 > decisions, constraints, links, and open questions before detail. Delete unused sections in the
@@ -34,11 +34,11 @@
 
 ### Functional
 
-- FR1 — {requirement}
+- FR1: {requirement}
 
 ### Non-functional
 
-- NFR1 — {perf / security / availability / accessibility}
+- NFR1: {perf / security / availability / accessibility}
 
 ## UX notes
 

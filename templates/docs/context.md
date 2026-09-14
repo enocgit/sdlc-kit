@@ -13,7 +13,7 @@
 
 ## Personas
 
-- **{persona}** — goals, constraints, what they care about.
+- **{persona}**: goals, constraints, what they care about.
 
 ## Glossary
 
@@ -44,4 +44,4 @@
      Prune when you append: delete fixed gotchas, fold covered ones into their ADR/doc, and rewrite
      superseded bullets in place. Keep under ~30 bullets; at the cap, remove one to add one. -->
 
-- YYYY-MM-DD — {the trap, and the rule that avoids it}
+- **YYYY-MM-DD**: {the trap, and the rule that avoids it}
