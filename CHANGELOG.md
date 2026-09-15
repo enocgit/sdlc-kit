@@ -14,6 +14,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 
+- Require the Definition of Ready to confirm the frozen contract matches its accepted ADR and the
+  architecture update; merge two `Where things live` index lines in the adopter template to stay
+  within its line budget.
 - Require each default-branch planning package (Stage 0, Stage 2, Retro) to reach the shared default
   branch before Stage 4 branches, adding the commit-and-push action for an unprotected `main` on a
   remote alongside the existing no-remote commit and protected-`main` `plan/*` PR paths.

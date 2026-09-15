@@ -49,7 +49,8 @@ the human merges directly. With no remote, the human merges the local branch.
   and runs `security-review` before asking for approval to land sensitive Stage 0 or Stage 2 planning;
   review the implementation again at Stage 6.
 - **Ambiguity:** stop and ask instead of guessing about PRDs, ADRs, or contracts.
-- **Ready:** acceptance criteria are testable, the contract is frozen, and open questions are closed.
+- **Ready:** acceptance criteria are testable; the contract is frozen and matches its accepted ADR
+  and the architecture update; open questions are closed.
   The task should fit in about one day.
 - **Migrations:** use expand/contract (migrate → deploy → clean up) when a table has real data or
   any deployed reader/writer; direct changes are fine before then.

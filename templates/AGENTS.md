@@ -50,8 +50,7 @@ Every pipeline response, whichever skill drives it, opens with this one-line sta
   tRPC routers, `schema.prisma`, Zod schemas). See `docs/contracts/README.md`.
 - **Task status** → your tracker (GitHub Issues/Projects), the single source of truth, reported live
   by `project-status`. _Local-only (no external tracker):_ `docs/progress.md` **is** the tracker
-- **Test strategy and verification policy** → `docs/test-strategy.md`
-- **Definition of Ready and Definition of Done** → this `AGENTS.md`
+- **Test strategy, verification policy, and Definition of Ready/Done** → `docs/test-strategy.md` and this `AGENTS.md`
 
 ## Documentation writing standard
 
@@ -87,6 +86,7 @@ Expand when asked; runtime safety and progress rules win.
 
 - [ ] Acceptance criteria are written and testable
 - [ ] Applicable contract frozen; fast-path N/A recorded when no integration contract applies
+- [ ] Frozen contract matches its accepted ADR and the `docs/architecture.md` update
 - [ ] No open questions remain (resolved during stress-test, at the Spec gate)
 - [ ] Task is small enough to ship in ~a day (else split it)
 

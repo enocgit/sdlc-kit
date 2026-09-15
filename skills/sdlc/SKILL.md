@@ -447,7 +447,8 @@ design or spike plan as a substitute for this pipeline's PRD path.
   their `#` column, since that number is the task's identifier for the rest of the pipeline (Stage 4
   branches `feat/{id}-{slug}` from it).
 - **Definition of Ready** before Stage 4: acceptance criteria written, the applicable contract
-  frozen or explicitly N/A for fast-path work with no integration contract, and no open questions.
+  frozen or explicitly N/A for fast-path work with no integration contract, the frozen contract
+  matching its accepted ADR and the architecture update, and no open questions.
   Require local readiness before entering Land, then require the full Definition of Done, including
   required CI, before the human merges (see `AGENTS.md`).
 - **Every task needs proportional verification, not necessarily a new test.** Start bug fixes and
