@@ -219,14 +219,11 @@ a reason to stop at the end of Stage 4.** After the Implement plan gate, keep go
 everything that needs _no_ push: proportional local checks, runtime observation, and the whole Stage 6 pass
 (`code-review`, `simplify`, `security-review` if sensitive, diff hygiene). Only _then_ stop, at the
 push. For a PR workflow, report that tree-only local checks and review are done, then ask one combined
-question: _"Approve commit, push, and opening the PR?"_ A yes authorizes exactly the actions named
-in the request; it does not authorize merge or any unnamed action. With a remote but no PR workflow,
+question: _"Approve commit, push, and opening the PR?"_ With a remote but no PR workflow,
 ask _"Approve commit and push?"_ With no remote, ask only _"Approve commit?"_ After approval, create
 the commit first, verify its parent and tree, and rerun every metadata- or topology-dependent check
-against that commit. If any check fails, stop before the push. When they pass, only then push or open the PR,
-start CI when available, and return to the human merge gate instead of polling. After required CI finishes,
-run the final DoD confirmation before reporting the change ready for the human to merge. Required CI
-must be green before the human merges. If no CI workflow exists, CI is N/A.
+against that commit. If any check fails, stop before the push. When they pass, push or open the PR
+and start CI when available, then follow the Land rules below. If no CI workflow exists, CI is N/A.
 
 ## Task completion by tracker
 
@@ -450,7 +447,7 @@ design or spike plan as a substitute for this pipeline's PRD path.
   frozen or explicitly N/A for fast-path work with no integration contract, the frozen contract
   matching its accepted ADR and the architecture update, and no open questions.
   Require local readiness before entering Land, then require the full Definition of Done, including
-  required CI, before the human merges (see `AGENTS.md`).
+  required CI (see `AGENTS.md`).
 - **Every task needs proportional verification, not necessarily a new test.** Start bug fixes and
   non-trivial testable behavior with a failing test (RED → GREEN). For narrow docs/prose changes,
   use link or rendering checks; for styling, use a targeted browser/render check or manual visual
@@ -492,7 +489,8 @@ design or spike plan as a substitute for this pipeline's PRD path.
   PR workflow, push the branch to start CI and report the run. A _single_ status glance to catch an
   instant failure is fine. Then **stop — return to the human merge gate.** Don't watch the run to
   completion (`gh run watch`) or keep the turn alive polling. Required CI must be green before the
-  human merges; a later failure is handled as a normal fix, not babysat in the Land turn.
+  human merges; once it finishes, run the final DoD confirmation before reporting the change ready.
+  A later failure is a normal fix, not babysat in the Land turn.
 - Don't commit, push, open PRs, **or merge** unless asked. One combined approval may cover commit,
   push, and opening a PR when the request names all three. It authorizes exactly the actions named
   in the request; **merge is always the human's call.**
