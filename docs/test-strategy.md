@@ -4,7 +4,8 @@
 
 This repository ships a Bash installer, Python safety and vendoring tools, YAML manifests, Markdown
 workflow artifacts, and pinned third-party snapshots. The canonical Definition of Ready and
-Definition of Done remain in [`AGENTS.md`](../AGENTS.md).
+Definition of Done live in the operating manual this kit ships,
+[`templates/AGENTS.md`](../templates/AGENTS.md).
 
 ## Verification
 

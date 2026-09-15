@@ -11,6 +11,10 @@ npm-debug.log*
 pnpm-debug.log*
 yarn-error.log*
 
+# Python bytecode from validation tooling
+__pycache__/
+*.pyc
+
 # Env / secrets — never commit
 .env
 .env.*
