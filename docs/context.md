@@ -20,6 +20,7 @@ The kit aims to make agent-led feature work reproducible without changing user-g
 | Snapshot | An unchanged third-party skill tree pinned to an immutable upstream commit. |
 | Conductor | `skills/sdlc/SKILL.md`, which routes work through the pipeline. |
 | Gate | A point where work stops until a human explicitly approves the next action. |
+| Land | Getting a change onto its target branch: a default-branch commit at Stages 0, 2, and 8, or a human-merged PR at Stage 7. |
 
 ## Hard constraints
 
