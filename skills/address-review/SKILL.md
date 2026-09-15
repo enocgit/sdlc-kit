@@ -45,8 +45,8 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
    for something: a requested change, a reported defect, a question that needs an answer, or a
    raised concern. Drop the rest — praise, agreement, "LGTM", bot summary boilerplate, thread
    chatter, outdated comments on lines the diff already changed, and anything the PR author already
-   answered. Dropped comments are not triaged, not replied to, and not resolved; report their count
-   and nothing more. Where one thread mixes both, carry forward only the actionable part.
+   answered. Dropped comments are not triaged, not replied to, and not resolved. Where one thread
+   mixes both, carry forward only the actionable part.
 
 3. **Triage each actionable comment — verify and challenge.** Do not take a comment at face value.
    Check each against the actual code, the frozen contract, and the relevant ADR/PRD. Assign a
@@ -92,14 +92,14 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
 
 6. **Report.** Summarize: what was **fixed** (with the commit-ready diff), what was **refuted** and
    why, what was **deferred** (including proposed issues that were not created), how many replies
-   were posted, how many comments were dropped as non-actionable, and what still **needs the user's
-   decision** at a gate. Distinguish created issue numbers from unapproved proposals.
+   were posted, and what still **needs the user's decision** at a gate. Distinguish created issue
+   numbers from unapproved proposals.
    End with a QA checklist if any fix warrants manual verification.
 
 ## Rules
 
-- **Only actionable comments.** Praise, agreement, and boilerplate are read and counted, never
-  triaged, replied to, or resolved.
+- **Only actionable comments.** Praise, agreement, and boilerplate are read but never triaged,
+  replied to, or resolved.
 - **Triage before acting.** Always show the verdict table first; never start editing off a raw
   comment list.
 - **Challenge, don't comply.** A reviewer — human or bot — can be wrong. Refuting a comment with a

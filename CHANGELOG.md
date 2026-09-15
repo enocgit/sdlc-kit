@@ -44,7 +44,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - `feature-start` no longer stops for approval before running the project's setup, install, and
   build commands, and no longer halts to have the task identifier and slug confirmed.
 - `address-review` now acts only on actionable comments; praise, agreement, boilerplate, and stale
-  threads are counted and dropped rather than triaged or replied to.
+  threads are dropped rather than triaged, replied to, or reported.
 - `address-review` posts routine replies on the existing bundle approval and reports them by count;
   only critical replies — refutations, contract or sensitive-area claims, and declined work — are
   shown before posting.
