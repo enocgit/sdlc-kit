@@ -41,6 +41,9 @@ The agent records the payment-provider decision in an ADR, adds the payment comp
 shared types from it. Other projects can freeze tRPC routers, ts-rest contracts, schemas, or interface
 definitions instead.
 
+`grilling` stress-tests the architecture and the contract shape before the agent freezes either, so
+the interface is challenged while it is still cheap to change.
+
 The agent runs `security-review` on this sensitive planning diff. Stage 6 reviews the implementation
 diff separately.
 

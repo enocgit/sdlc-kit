@@ -22,7 +22,7 @@ is net-negative. So is answering comments that asked for nothing. The job of thi
 This is standalone and **manually invoked** — it isn't bound to a pipeline stage. But it inherits
 the kit's conventions: the frozen contract is authoritative, sensitive areas (canonical list in
 the project's `AGENTS.md` → Sensitive areas) get extra care, comments cite the durable doc
-(ADR/PRD/contract) not the pipeline, and outward-facing actions and merges stay the human's call.
+(ADR/PRD/contract) not the pipeline, and outward-facing actions and merges need explicit human approval.
 
 It is **not** a second `code-review`. `code-review` proactively audits your own diff before you
 push; this skill reactively triages what _reviewers_ already said on an open PR. If a comment
@@ -112,6 +112,5 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
   pushing validated fixes, posting replies, and resolving listed threads share one explicit approval
   when applicable. Routine replies go out on that approval unseen; critical replies — refutations,
   contract or sensitive-area claims, declined work — are shown in full first. Do not perform any
-  listed action outside that approved bundle. Merging is always the human's call and is never part
-  of the bundle.
+  listed action outside that approved bundle. Merging is never part of the bundle.
 - **Cite docs, not stages** in any code comments or replies you write.

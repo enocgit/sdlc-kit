@@ -114,7 +114,8 @@ approval gate.
    - **Verification** — name the check that proves completion: an automated test where logic
      changes, or a rendered-output, rendering, link, or schema check for markup, copy, styling, or
      configuration.
-   - **Risks or open questions** — only when real.
+   - **Risks and case against** — the failure you think most likely, the approach you rejected and
+     why, and where you are least confident. One line each; omit only what is genuinely empty.
 
    Omit implementation code, repeated PRD/ADR/contract content, speculative work, mechanical
    microsteps, and commit instructions. After approval, start a bug fix or non-trivial testable

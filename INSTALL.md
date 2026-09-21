@@ -146,7 +146,7 @@ registry. Project-local installation remains the default recommendation.
 | --- | --- | --- |
 | `brainstorming` | obra/superpowers | Spec |
 | `to-spec` | mattpocock/skills | Spec |
-| `grilling` | mattpocock/skills | Spec |
+| `grilling` | mattpocock/skills | Spec, Architecture |
 | `documentation-and-adrs` | addyosmani/agent-skills | Foundation, Architecture |
 | `writing-plans` | obra/superpowers | Decompose |
 | `frontend-design` | anthropics/skills | Implement, UI only |

@@ -42,6 +42,20 @@ exact third-party snapshots, installation-safe scripts, and project-document tem
   internal mechanics. Templates may contain the instructions needed to fill them.
 - Do not add agent self-attribution to commits, pull requests, or source comments.
 
+## Disagreement
+
+Challenge the plan before implementing it, and never open with agreement. That the maintainer asked
+for it is not evidence that it is right, and neither is the fact that you wrote it.
+
+- State the approach you rejected and why, and the failure you think most likely.
+- Point at what decides the question: an invariant, a check, a file, or a measurement. Run a cheap
+  check instead of arguing from a position.
+- Once the evidence is in, say which way it points and stop arguing. An objection with no way to
+  falsify it is noise.
+
+This mirrors the adopter-facing `Challenge before agreeing` rule in `templates/AGENTS.md`; keep the
+two in step.
+
 ## Editing policy
 
 - Prefer a small direct change over a new abstraction or compatibility layer.
@@ -49,7 +63,7 @@ exact third-party snapshots, installation-safe scripts, and project-document tem
   a snapshot only when its behavior reliably conflicts with this repository's needs.
 - When a kit-owned skill or template changes, update its manifest, summaries, installation guidance,
   and focused validation as applicable.
-- Keep `templates/AGENTS.md` at or below 200 lines and keep `templates/CLAUDE.md` as a one-line
+- Keep `templates/AGENTS.md` at or below 150 lines and keep `templates/CLAUDE.md` as a one-line
   pointer.
 - Use Conventional Commits when the maintainer requests a commit: `type(scope): summary`,
   imperative, at most 72 characters. Reference the relevant issue when one exists.
@@ -76,8 +90,7 @@ observation.
 ## Git and release safety
 
 - Keep `main` deployable. Use a short-lived `feat/*` branch for changes.
-- Do not commit, push, open a pull request, or merge unless the user explicitly asks. Merging is
-  always the human's decision.
+- Do not commit, push, open a pull request, or merge unless the user explicitly asks.
 - Do not invent remotes or transports. Surface authentication failures and point to the documented
   one-time fix.
 - Update `CHANGELOG.md` for user-visible changes and review release metadata before publishing.

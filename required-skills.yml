@@ -113,9 +113,9 @@ skills:
               kind: vendored,
               sourcePath: vendor/skills/grilling,
               source: mattpocock/skills,
-              stage: 1,
-              note: "stress-test folded into Spec — harden the PRD before the gate",
-              fallback: "review each PRD assumption, requirement, dependency, and open question; record unresolved decisions before approval",
+              stage: "1,2",
+              note: "stress-test at Spec and Architecture — harden the PRD at the Spec gate, then the architecture and contract choice before the freeze gate",
+              fallback: "review each PRD assumption, dependency, and open question at Spec, and the architecture and contract shape against the accepted ADRs at Architecture; record unresolved decisions before approval",
         }
       - {
               name: frontend-design,

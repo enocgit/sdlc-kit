@@ -125,6 +125,9 @@ and **override its workflow**:
   under `docs/superpowers/`; this conductor owns the artifact and approval gate.
 - `to-spec` → use its synthesis method and the kit's PRD template, but write the result to
   `docs/prd/NNNN-{slug}.md`; do not publish or label a tracker issue. Tracker work begins at Stage 3.
+- `grilling` → use its interview method at **Stage 1 and Stage 2**. Point it at the decision, not the
+  document: at Stage 2 the subject is the architecture and the contract shape about to freeze, and it
+  runs before that gate.
 - `documentation-and-adrs` → ADRs go to **`docs/adr/NNNN-{slug}.md`** (this project's convention),
   never `docs/decisions/`.
 - `writing-plans` → use its decomposition method at Stage 3, but write the result to the tracker.
@@ -168,7 +171,7 @@ keep document structure and PRD/ADR introductions intact.
 | 0b Foundation (new) | `documentation-and-adrs` | `docs/prd/0000-product.md`, foundational ADRs (→ `docs/adr/`), `architecture.md` skeleton, core contract scaffold, foundational threat model in `docs/security.md`, configured `docs/test-strategy.md` (**trim `docs/contracts/README.md`** to real/`(future)` paths — never leave template examples) | **GATE — approve foundation** |
 | 0 adopt (existing) | `improve-codebase-architecture` + read-only code analysis | reconstructed product PRD, context/architecture/security, configured `docs/test-strategy.md`, and backfilled foundational ADRs (**point `docs/contracts/README.md` at the existing contract source**; note tech-debt/risks in `architecture.md`) | **GATE — approve** |
 | 1 Spec | `brainstorming` (method only) → `to-spec` → `grilling` | **optional** Stage-1 brief `docs/briefs/NNNN-*.md` (only for a fuzzy/speculative idea — else skip straight to the PRD), then hardened PRD `docs/prd/NNNN-*.md` (no issues yet) | **GATE — approve PRD** |
-| 2 Architecture + Contract | `documentation-and-adrs` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
+| 2 Architecture + Contract | `documentation-and-adrs` + `grilling` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
 | 4 Implement | `feature-start` (direct feature branch by default; manual Git-only worktree escape hatch), `frontend-design` (UI work only), `ponytail` (backend/domain logic, parsers, transformations, state, tooling, and dependency choices) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
 | 5 QA | proportional local verification + runtime-equivalent checks (`webapp-testing` for UI/browser) | change-scope evidence; CI green now or after PR creation | proceed (disclose results) |
@@ -502,15 +505,15 @@ design or spike plan as a substitute for this pipeline's PRD path.
 - If a PRD/ADR is ambiguous, stop and ask — do not guess.
 - Keep the relevant doc (`architecture.md` / ADR) updated as you go; task status lives in the
   tracker (no in-repo mirror), reported via `project-status`.
-- **At Land, don't poll CI.** With a PR workflow, open the PR and report CI running; with CI but no
+- At Land, don't poll CI. With a PR workflow, open the PR and report CI running; with CI but no
   PR workflow, push the branch to start CI and report the run. A _single_ status glance to catch an
-  instant failure is fine. Then **stop — return to the human merge gate.** Don't watch the run to
-  completion (`gh run watch`) or keep the turn alive polling. Required CI must be green before the
-  human merges; once it finishes, run the final DoD confirmation before reporting the change ready.
-  A later failure is a normal fix, not babysat in the Land turn.
-- Don't commit, push, open PRs, **or merge** unless asked. One combined approval may cover commit,
+  instant failure is fine. Then stop. Don't watch the run to completion (`gh run watch`) or keep the
+  turn alive polling. Required CI must be green before merging; once it finishes, run the final DoD
+  confirmation before reporting the change ready. A later failure is a normal fix, not babysat in
+  the Land turn.
+- Don't commit, push, open PRs, or merge unless asked. One combined approval may cover commit,
   push, and opening a PR when the request names all three. It authorizes exactly the actions named
-  in the request; **merge is always the human's call.**
+  in the request.
 
 ## Referenced files
 

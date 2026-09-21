@@ -55,6 +55,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   only critical replies — refutations, contract or sensitive-area claims, and declined work — are
   shown before posting.
 
+- Challenge the plan before approval: `feature-start` requires the rejected approach, the likely
+  failure, and the least-confident area in its compact plan, and `grilling` also stress-tests the
+  architecture and contract choice before the Stage 2 freeze.
+- Add a `Challenge before agreeing` principle to the adopter template, so agents state the case
+  against an approach and the evidence that would settle it instead of opening with agreement.
+- Trim `templates/AGENTS.md` from 200 lines to under 150: one point per line, tighter wording, a
+  pointer to `sdlc` for the default-branch landing ladder, and a compact stage and gate map replacing
+  the 9-row stage table. No rule removed; the stage row detail now lives only in `sdlc`. Lower the
+  stated cap to 150 in the template and the maintainer guide.
+- Stop agents restating their own instructions back to the user. Ban sentences about the agent's
+  own constraints in the communication standard and name the exact shapes ("I am not polling",
+  "merging is your call", "per the gate protocol"), require an ask or an outcome instead, add
+  compliance narration to the `unslop` tells, and drop the bolded aphorisms ("merge is always the
+  human's call") that gave the agent a ready-made sentence to repeat.
+
 ### Fixed
 
 - Fixed installation aborting on btrfs. A directory descriptor opened before its contents were
