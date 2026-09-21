@@ -19,8 +19,10 @@ Definition of Done live in the operating manual this kit ships,
 Start behavioral fixes with a failing regression in the focused Python validation suite, then make the
 smallest implementation change that passes it. The default validator covers release-critical runtime
 invariants only; prose, routing, and duplicated parser checks belong in review, not this gate.
-Documentation-only changes need the relevant validator check
-and link or rendering inspection. Networked `sync` and `update` tests require an explicit maintenance
+Documentation changes that affect links or rendering need the relevant validator check and link or
+rendering inspection; presentation-only docs copy, styling, markup, or attributes may use a diff or one
+visual check, while accessibility, security, or interaction changes need focused behavior evidence.
+Networked `sync` and `update` tests require an explicit maintenance
 run; normal validation and installation stay offline.
 
 ## Release bar

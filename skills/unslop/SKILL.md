@@ -22,9 +22,11 @@ records where stylistic variation would reduce clarity.
 
 1. Read the surrounding text and identify the reader, purpose, and required facts.
 2. Remove filler, puffery, vague attribution, promotional language, chatbot phrases, excessive
-   hedging, and compliance narration: any sentence about the agent's own constraints, what it is
-   doing or avoiding, what it is permitted to do, or the rule behind an action. Replace it with an
-   ask or an outcome, or delete it. Prefer concrete claims and named sources.
+   hedging, and compliance narration: sentences about the agent's own permissions or constraints
+   rather than an outcome, such as "I am not polling", "merging is your call", or "per the gate
+   protocol". Preserve concise factual reports of actions, progress, blockers, results, deviations,
+   decisions, and verification evidence; turn each narration into an ask or an outcome, or delete it.
+   Prefer concrete claims and named sources.
 3. Replace inflated vocabulary, abstract metaphors, passive voice, synonym cycling, forced lists,
    and dense sentences with plain, specific language.
 4. Use sentence-case headings and ordinary punctuation. Avoid decorative formatting, unnecessary

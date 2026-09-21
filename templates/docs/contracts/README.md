@@ -28,10 +28,11 @@
 2. **Freeze** it before consumers implement against it.
 3. Generate types from the contract or share contract-defined types directly; never hand-duplicate
    them on each side.
-4. Changing a **shipped** contract endpoint/field is a decision: write a new ADR covering
-   versioning/deprecation and backward compatibility. No silent breaking changes. With no external
-   consumer yet there is nothing to version: change the contract outright and record the deferral in
-   the production register in `docs/context.md`.
+4. Changing a **shipped** contract endpoint/field with a deployed consumer is a decision: write a
+   new ADR covering versioning/deprecation and backward compatibility. No silent breaking changes.
+   With no deployed consumer, compatibility versioning can be deferred: change the contract outright
+   only under the ADR matrix, with applicable human approval and a re-freeze, and record the deferral
+   in the production register in `docs/context.md`.
 
 ## Checklist when adding/changing a contract
 

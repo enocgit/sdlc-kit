@@ -91,11 +91,22 @@ approval gate.
 
    - **Green baseline:** In the selected workspace, install dependencies and run the project's
      setup and build commands as needed, then establish only a change-appropriate baseline: use a
-     focused test for behavior, a targeted render/browser or manual visual check for UI or styling,
-     and a relevant link, schema, or syntax check for docs or configuration. Do not run the full suite by default; for shared paths, broaden verification to
+     focused test or runtime observation for behavior or interaction, a targeted render/browser or
+     manual visual check for visual UI behavior, focused behavior evidence or runtime observation for
+     accessibility or security changes in styling, markup, or attributes, and a source or context baseline for presentation-only markup,
+     copy, or styling. After the change, use a diff or one visual check for presentation-only work.
+     Use a link or rendering check for documentation that affects links or rendering, or a schema or
+     syntax check for configuration. Do not run the full suite by default; for shared paths, broaden
+     verification to
      all impacted packages/modules. Reserve the full suite for broad or high-risk dependency
      fan-out or an explicit project rule. If the selected baseline is red, stop and report; do not
-     start work on a broken baseline.
+     start work on a broken baseline. For non-trivial executable behavior, name a failing automated
+     test in the task plan and create or run it after approval; an observational check alone is not
+     sufficient. For other bug fixes, an existing focused check or observation that intentionally
+     reproduces the known bug is an expected RED signal, not a broken baseline; record that observed
+     failure in the task plan. If no such check exists, name the planned RED check and its expected
+     failure before approval, then create or run it after approval. Unrelated setup, build, or baseline
+     failures still block.
 3. **Load context.** Read into context:
    - `docs/context.md` (domain, glossary, hard constraints — incl. retro learnings from prior cycles)
    - The feature's PRD in `docs/prd/`
@@ -111,28 +122,50 @@ approval gate.
    - **Outcome** — one sentence.
    - **Affected files** — exact paths and why each changes.
    - **Approach** — a few logical implementation steps, with verification paired to the risk.
-   - **Verification** — name the check that proves completion: an automated test where logic
-     changes, or a rendered-output, rendering, link, or schema check for markup, copy, styling, or
-     configuration.
-   - **Risks and case against** — the failure you think most likely, the approach you rejected and
-     why, and where you are least confident. One line each; omit only what is genuinely empty.
+   - **Verification** — name automated coverage for non-trivial executable logic, including validation,
+     authorization or security denial, error, retry, timeout, and partial-failure branches; name focused
+     behavior evidence or runtime observation for accessibility, security, and interaction behavior in
+     styling, markup, or attributes; use a diff or one visual check for presentation-only markup,
+     attributes, copy, or styling; or a link or rendering check for documentation that affects links
+     or rendering, or a schema or generation check for configuration or generated output. For non-trivial
+     executable behavior, name the planned failing
+     automated test. For other bug fixes, name a planned failing automated test or observable reproducer
+     appropriate to the risk; if an existing check or observation already fails, record its result,
+     otherwise record the expected failure and create or run the check after approval.
+   - **Risks and case against:** record four separate facts:
+     - **Rejected approach** — what you rejected and why.
+     - **Likely failure** — the failure most likely to occur.
+     - **Least-confidence area** — where the plan is least certain.
+     - **Settling observation** — the observation or evidence that would settle the objection.
+     The plan gate requires all four elements; do not omit them. After the check runs, record its
+     observed result and resulting direction at the applicable gate; before then, name the prospective
+     observation.
 
    Omit implementation code, repeated PRD/ADR/contract content, speculative work, mechanical
-   microsteps, and commit instructions. After approval, start a bug fix or non-trivial testable
-   behavior with a failing test, then make it pass and refactor. Otherwise implement directly and
-   collect the planned proportional verification; a static attribute, copy, or layout change carries
-   no logic to cover, so inspect its rendered output rather than adding an assertion for it.
+   microsteps, and commit instructions. After approval, create or run the recorded planned RED check
+   for a bug fix; for non-trivial executable behavior, create or run the failing automated test, then
+   make it pass and refactor. Otherwise collect the
+   planned proportional verification; presentation-only styling, markup, attributes, copy, or layout
+   can use a diff or one visual check, while styling, markup, or attributes that change accessibility,
+   security, or interaction behavior need focused behavior evidence.
 5. **GATE.** Present the plan. Ask for approval before writing any code.
 
 ## Rules
 
-- Implement against the frozen contract. If it is wrong, stop and raise it: a contract change is a
-  decision (new/updated ADR), never an inline edit.
-- A wrong ADR or PRD is not a stop. Supersede it in the same change as the code and name the
-  assumption that failed; take a reversal that invalidates the rest of the plan to the plan gate.
-- Cover observed behavior, not hypothetical failures. While `docs/context.md` shows no deployed
-  consumer, real data, or production traffic, do not add failure-path, load, or compatibility cases
-  for conditions that cannot occur; put each deferral in the production register.
+- Implement against the frozen contract. If it is wrong, stop and raise it. A shipped contract with
+  a deployed consumer requires the versioning/deprecation ADR and its approval before changing the
+  interface. If there is no deployed consumer, apply the ADR matrix, obtain applicable approval, and
+  re-freeze the contract before changing the interface.
+- Amend a wrong ADR in the same change as the code and name the failed assumption. Edit a Proposed
+  or Accepted ADR in place only while it is unimplemented and dependency-free; after amending an
+  accepted ADR, renew human approval and re-freeze any affected contract. Supersede an implemented
+  or depended-on ADR regardless of status, renew human approval before implementation resumes, and
+  re-freeze any affected contract. Every PRD requirement or scope amendment returns to human approval.
+  Take a reversal that invalidates the rest of the plan to the plan gate.
+- Cover executable validation, authorization or security denial, error, retry, timeout, and
+  partial-failure behavior. Defer only cases whose required deployed consumer, real data, load,
+  staging or production traffic, deployment, compatibility, or multi-version condition is unavailable;
+  put each deferral in the production register.
 - If the task is bigger than ~a day of work, propose splitting it before starting.
 - **Keep the SDLC status header** on every user-facing message, just like the conductor — open with
   `SDLC ▸ Stage 4/8 Implement · task #N · {next: plan approval / …}`. You're inside the pipeline even

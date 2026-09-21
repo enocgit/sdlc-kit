@@ -43,7 +43,11 @@ the human merges directly. With no remote, the human merges the local branch.
   feature artifacts per feature.
 - **Contract:** define and freeze the interface before implementation. Generate types or share
   contract-defined types directly. Regenerate generated types after contract changes; never
-  hand-duplicate types. A shipped-contract change needs a versioning or deprecation ADR.
+  hand-duplicate types. A shipped-contract change with a deployed consumer needs a versioning or
+  deprecation ADR. If there is no deployed consumer, compatibility versioning may be deferred only
+  with applicable approval: follow the [contract guide](./templates/docs/contracts/README.md), re-freeze
+  the contract, and record the deferral in the [production register](./templates/docs/context.md) with
+  its owner and first-deployed-consumer trigger.
 - **Sensitive work:** use the canonical list in
   [`templates/AGENTS.md`](./templates/AGENTS.md#sensitive-areas). The agent updates `docs/security.md`
   and runs `security-review` before asking for approval to land sensitive Stage 0 or Stage 2 planning;
@@ -68,7 +72,7 @@ the human merges directly. With no remote, the human merges the local branch.
 - Land Stage 1–2 planning artifacts once after Stage 2, before branching; Stage 0 artifacts may land
   after their gate. With a remote, an unprotected `main` takes the commit and push under one
   approval; a protected `main` takes a `plan/*` PR first.
-- Keep commits and PRs focused. The human always merges.
+- Keep commits and PRs focused. The human performs every landing merge.
 - On GitHub, `Closes #N` closes the referenced issue when the PR merges. With a native external
   integration, verify that it closed the task after merge; if closure did not occur, ask for approval
   for the post-merge transition. Without Git integration, ask for approval and close the external task

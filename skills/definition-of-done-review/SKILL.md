@@ -73,7 +73,10 @@ and required check names. In prospective mode, report _tree reviewed; commit ver
 until the authorized commit exists, its parent and tree match, and every metadata- or
 topology-dependent check passes against `reviewedCommit`. Do not push or open a PR before that pass.
 Only then may local readiness report _locally ready; final confirmation blocked on CI_ when required
-CI needs a push or PR. Any other failed item blocks Land.
+CI needs a push or PR. Any other failed item blocks Land. Record the target-side Lifecycle values and
+production-register rows, triggers, and owners as the target register baseline, then apply the
+conductor's `Before Land, re-evaluate lifecycle triggers` rule, which is the canonical statement of
+the downgrade, retirement, and trigger requirements.
 
 ### Final confirmation before merge
 
@@ -125,14 +128,14 @@ metadata, `git diff HEAD^`, or `git describe`, must run on the actual landing ca
 Hosting-provider merge SHAs need the same guarantees.
 
 Immediately before the verdict, resolve both authoritative tips, the required-check policy, and the
-workflow baseline again. Reject the evidence if any changed, including a workflow identity, immutable
-revision, or content digest whose required check names stayed the same. Confirmation also fails if
-integration-tree construction is unknown, candidate trees differ, or the required-check baseline
-weakened without explicit human approval,
-or any required CI result is not bound to the accepted head, synthetic, or actual landing OID. When CI
-is N/A, all ancestry, tree, and integration-review checks
-still apply. Then confirm every pending item and give the full pass/fail verdict. Do not report the
-change as ready to merge until this confirmation passes.
+workflow baseline again. Re-apply the conductor's `Before Land, re-evaluate lifecycle triggers` rule
+against the target register baseline recorded during local readiness. Reject the evidence if any
+changed, including a workflow identity, immutable revision, or content digest whose required check
+names stayed the same. Confirmation also fails if integration-tree construction is unknown, candidate
+trees differ, or the required-check baseline weakened without explicit human approval, or any required
+CI result is not bound to the accepted head, synthetic, or actual landing OID. When CI is N/A, all
+ancestry, tree, and integration-review checks still apply. Then confirm every pending item and give the
+full pass/fail verdict. Do not report the change as ready to merge until this confirmation passes.
 
 ## Checklist — read it from AGENTS.md, don't rely on a copy
 
@@ -146,25 +149,36 @@ How to judge the items that need interpretation:
 
 - **Acceptance criteria.** Quote each criterion from the PRD/issue and map it to evidence.
 - **Contract fidelity.** When an integration contract applies, require no undocumented
-  endpoints/fields and derive types from the contract rather than duplicating them. For fast-path
-  work with no integration contract, accept N/A only with a concrete rationale.
+  endpoints/fields and derive types from the contract rather than duplicating them. A shipped contract
+  with a deployed consumer requires the versioning/deprecation ADR and compatibility decision before
+  an interface change; only when there is no deployed consumer may the ADR matrix route apply, with
+  applicable approval, a re-freeze, and a production-register deferral. For fast-path work with no
+  integration contract, accept N/A only with a concrete rationale.
 - **Verification / observed working.** Evidence must match the risk. Require the proportional local
   checks described in `AGENTS.md`; do not require a full local suite merely because CI defines lint,
   typecheck, test, and build checks. Runtime-affecting work must be exercised and observed with the
-  available runtime tools. Non-runtime work needs a relevant concrete check such as rendering, links,
-  or schema validation. Non-trivial behavior needs automated coverage; static markup,
-  attributes, copy, and layout do not, and a rendered-output check suffices for them. Do not fail a
-  change merely because its best proof is not a new test, and do not accept an assertion that only
-  restates a static attribute, copy string, or layout rule as that proof. A browser run is evidence
-  only when the change can break the flow it exercises; a run that could not have failed proves
-  nothing. Configured CI checks remain required from their trusted producer before merge. While the
-  Lifecycle block in `docs/context.md` shows no deployed consumer, real data, or traffic, do not
-  require a regression test for a failure that has not occurred; require its deferral in the
-  production register instead.
-- **Docs.** Update `docs/architecture.md` if the system's shape changed. Add an ADR if the change
-  makes a decision, and require the superseding ADR in the same change when the work disproved an
-  accepted one. Ensure the tracker issue reflects reality. Check decision and delivery
-  status separately: approval, acceptance, or freeze does not prove implementation.
+  available runtime tools. Non-runtime work that affects links or rendering needs a relevant concrete
+  check such as link or rendering inspection; presentation-only styling, static markup, attributes,
+  copy, or layout may use a diff or one visual check. Non-trivial executable behavior, including
+  validation, authorization or security denial, error, retry, timeout, and partial-failure branches,
+  needs automated coverage. Styling, markup, or attributes that change accessibility, security, or
+  interaction behavior need focused behavior evidence. Do not fail a change merely because its best
+  proof is not a new test, and do not accept an assertion that only restates a presentation rule as
+  proof. A browser run is evidence only when the change can break the flow it exercises; a run that
+  could not have failed proves nothing. Configured
+  CI checks remain required from their trusted producer before merge. While the Lifecycle block in
+  `docs/context.md` shows no deployed consumer, real data, or traffic, defer only failures whose
+  required deployed consumer, real data, deployment, load, traffic, or multi-version condition is
+  unavailable; record the deferral in the production register.
+- **Docs.** Update `docs/architecture.md` if the system's shape changed. Edit a Proposed or Accepted
+  ADR in place only while it is unimplemented and dependency-free; after amending an accepted ADR,
+  require renewed human approval and re-freeze any affected contract before implementation resumes.
+  Require a superseding ADR in the same change when an implemented or depended-on ADR was disproved,
+  regardless of status, then require human approval before implementation resumes and re-freeze any
+  affected contract. For contract changes, apply the exclusive deployed-consumer routing in Contract
+  fidelity before this generic ADR rule. Every PRD requirement or scope amendment returns to human approval.
+  Ensure the tracker issue reflects reality. Check decision and delivery status separately: approval, acceptance,
+  or freeze does not prove implementation.
   Current-behavior claims and security controls must reflect the task's evidence,
   with planned and partial behavior identified. Full epic reconciliation may wait for the final
   child; inaccurate claims about enforced behavior may not. Link evidence, not duplicate task lists.

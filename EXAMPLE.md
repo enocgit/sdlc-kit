@@ -107,8 +107,11 @@ and reconstructs `docs/context.md`, `docs/architecture.md`, contract pointers, a
 ADRs. It documents existing behavior without changing it.
 
 After foundation approval, the next feature follows Stages 1–8. Extend existing architecture and
-contracts instead of creating duplicates. A shipped-contract change requires a versioning or
-deprecation ADR.
+contracts instead of creating duplicates. A shipped-contract change with a deployed consumer
+requires a versioning or deprecation ADR. If there is no deployed consumer, compatibility versioning
+may be deferred only with applicable approval: follow the [contract guide](./templates/docs/contracts/README.md),
+re-freeze the contract, and record the deferral in the [production register](./templates/docs/context.md)
+with its owner and first-deployed-consumer trigger.
 
 ## Gate behavior
 

@@ -16,8 +16,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 - Route premature production concerns through a declared lifecycle instead of unconditional defaults:
   add a Lifecycle block and a production register with triggers to `docs/context.md`, gate
-  compatibility machinery, history narration, and unobserved-failure tests on it, keep current-state
-  docs in the present tense, and reserve ADR supersede chains for decisions the project built on.
+  compatibility machinery, active migration/deprecation guidance, and production-only failure tests on
+  their applicable triggers, keep current-state docs in the present tense, and reserve ADR supersede
+  chains for decisions the project built on.
 - Ignore Python bytecode so the release check's `py_compile` no longer dirties the tree, and point
   `docs/test-strategy.md` at `templates/AGENTS.md` for the Definition of Ready and Done.
 - Require the Definition of Ready to confirm the frozen contract matches its accepted ADR and the
@@ -28,8 +29,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   remote alongside the existing no-remote commit and protected-`main` `plan/*` PR paths.
 - Make agent communication quiet by default: report actions, results, blockers, deviations, and decisions instead of repeating routine workflow guardrails; keep internal process mechanics out of ordinary prose and
   project-facing artifacts while preserving required status headers, gate prompts, and safety messages.
-- Stop biasing verification toward new automated tests: require the smallest check that proves the change instead of a justification for omitting a test, and name static markup, attributes, copy, and layout as cases proven by inspecting rendered output.
-- Stop opening a browser for trivial UI changes: a static markup, copy, or styling tweak is proven by the diff or a single visual check, not by a Playwright run or MCP session.
+- Guide code comments toward non-obvious intent, constraints, state transitions, and failure behavior without comment quotas.
+- Stop biasing verification toward new automated tests: require the smallest check that proves the change instead of a justification for omitting a test, and name presentation-only markup, attributes, copy, and layout as cases proven by a diff or one visual check; keep behavior-changing attributes on focused evidence.
+- Stop opening a browser for trivial UI changes: a presentation-only markup, copy, or styling tweak is proven by the diff or a single visual check, not by a Playwright run or MCP session.
+- Align landing, lifecycle, and contract-amendment guidance across maintainer, adopter, skill, and
+  public workflow docs; align RED and proportional-verification rules in operating, test-strategy, and
+  PR docs, and require cited CI evidence in PRs.
 - Require reviewers to check comment claims against implementation evidence; keep change summaries and verification results in PRs.
 - Make each documentation, issue, and PR point express one rule, decision, or outcome, with independently verifiable checkboxes.
 - Review overloaded points before gates and publication without changing document structure, introductions, or requirement meaning.
@@ -56,19 +61,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   shown before posting.
 
 - Challenge the plan before approval: `feature-start` requires the rejected approach, the likely
-  failure, and the least-confident area in its compact plan, and `grilling` also stress-tests the
-  architecture and contract choice before the Stage 2 freeze.
+  failure, the least-confident area, and the evidence that would settle the objection in its compact
+  plan, and `grilling` also stress-tests the architecture and contract choice before the Stage 2 freeze.
 - Add a `Challenge before agreeing` principle to the adopter template, so agents state the case
   against an approach and the evidence that would settle it instead of opening with agreement.
-- Trim `templates/AGENTS.md` from 200 lines to under 150: one point per line, tighter wording, a
-  pointer to `sdlc` for the default-branch landing ladder, and a compact stage and gate map replacing
-  the 9-row stage table. No rule removed; the stage row detail now lives only in `sdlc`. Lower the
-  stated cap to 150 in the template and the maintainer guide.
-- Stop agents restating their own instructions back to the user. Ban sentences about the agent's
-  own constraints in the communication standard and name the exact shapes ("I am not polling",
-  "merging is your call", "per the gate protocol"), require an ask or an outcome instead, add
-  compliance narration to the `unslop` tells, and drop the bolded aphorisms ("merge is always the
-  human's call") that gave the agent a ready-made sentence to repeat.
+- Trim `templates/AGENTS.md` from 200 lines to at most 150: one point per line, tighter wording, a
+  compact stage and gate map replacing the 9-row stage table, and pointers to `sdlc` for detail the
+  template no longer carries. Lower the stated cap to 150 in the template and the maintainer guide.
+- Stop agents restating their own instructions back to the user. Keep the human merge gate in the
+  stage and landing rules without making agents repeat it; ban compliance narration with named
+  examples in both the communication standard and the `unslop` tells, while preserving factual
+  reports of actions, blockers, and verification evidence.
+- State the lifecycle downgrade, retirement, and trigger policy once in `sdlc` and point to it from
+  `definition-of-done-review`, `address-review`, and the context template instead of restating it.
 
 ### Fixed
 

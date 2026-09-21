@@ -30,7 +30,7 @@ Open every pipeline response with `SDLC ▸ Stage {N}/8 {Name} · {next gate or 
 - **Product PRD** (project-level vision/scope, set at Stage 0) → `docs/prd/0000-product.md`
 - **Feature PRDs** → `docs/prd/NNNN-{slug}.md` (numbered from 0001, status-tracked)
 - **Briefs** (optional pre-PRD note for a fuzzy idea) → `docs/briefs/NNNN-{slug}.md`
-- **ADRs** (decision history; superseded, never rewritten) → `docs/adr/NNNN-{slug}.md`
+- **ADRs** (decision history; edit Proposed or Accepted ADRs only while unimplemented and dependency-free; supersede implemented or depended-on decisions) → `docs/adr/NNNN-{slug}.md`
 - **Architecture** (current system shape, living) → `docs/architecture.md`
 - **Contracts** (the integration source of truth) → in the codebase (`api/openapi.yaml`, tRPC routers, `schema.prisma`, Zod schemas). See `docs/contracts/README.md`.
 - **Task status** → your tracker, reported live by `project-status`. _Local-only:_ `docs/progress.md` **is** the tracker
@@ -48,8 +48,9 @@ per point, use a second only to explain or qualify it, and split additional obli
 points rather than hiding them in semicolons or inline lists. Preserve requirement IDs when splitting
 their supporting rules.
 
-Write current-state docs in the present tense: no "used to", "no longer", or migration narration;
-history belongs in `docs/adr/` and git.
+Write current-state docs in the present tense: do not use "used to" or "no longer" for completed
+history. When a Lifecycle trigger requires a migration or deprecation, document the active transition,
+its owner, and its trigger; history belongs in `docs/adr/` and git.
 
 Preserve exact limits, exceptions, risks, security boundaries, failure behavior, compatibility,
 verification limits, and fixed formats. Remove unused scaffold and filler, and name owners or triggers
@@ -62,19 +63,18 @@ Define terms on first use, link implementation decisions to ADRs and contracts, 
 document structure and PRD/ADR introductions intact.
 
 **Code comments:** explain non-obvious intent, constraints, state transitions, and failure behavior
-beside the relevant code. Keep them precise and durable, avoid syntax narration, and link the reason
-and the condition that retires a workaround. Change summaries and verification results go in the PR;
+beside the relevant code. Keep them precise and durable; avoid syntax narration and quotas, and link
+the reason and the condition that retires a workaround. Change summaries and verification results go in the PR;
 a comment claim is not proof.
 
 ## Communication standard
 
 Keep user-facing replies compact: lead with the outcome, state each fact once, and omit filler.
-Follow standing workflow rules silently. Never write a sentence about your own constraints: not what
-you are doing or avoiding ("I am not polling", "I did not commit"), not what you are permitted to do
-("merging is your call", "I won't push without approval"), and not the rule behind an action ("per
-the gate protocol"). Turn each one into an ask or an outcome, or delete it. Report actions, results,
-blockers, and the decision you need, phrased as a question. Keep the status header and safety
-warnings for irreversible actions. Use complete sentences for gates and complex trade-offs; expand when asked.
+Report factual actions, progress, blockers, results, deviations, decisions, and verification evidence.
+Never narrate your own constraints or permissions: not what you are avoiding ("I am not polling"), not
+what you are permitted to do ("merging is your call"), and not the rule behind an action ("per the gate
+protocol"). Turn each one into an ask or an outcome, or delete it. Keep the status header and safety
+warnings. Use complete sentences for gates, security warnings, irreversible actions, and complex trade-offs; expand when asked.
 
 ## Definition of Ready (before a task enters Implement)
 
@@ -89,7 +89,7 @@ warnings for irreversible actions. Use complete sentences for gates and complex 
 - [ ] Meets the acceptance criteria in its PRD/issue
 - [ ] Honors frozen contracts; fast-path N/A recorded when no integration contract applies
 - [ ] DB schema changes follow expand/contract (migrate → deploy → clean up) **once the table holds real data or any deployed process reads or writes it**; before that, change it outright
-- [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Name the smallest local check that proves the change: docs → links or rendering; styling, markup, attributes, or copy → targeted render or visual inspection; config or generated output → syntax, schema, or generation; runtime behavior → focused tests and runtime observation. Broaden to all impacted packages/modules for shared paths, contracts, or sensitive areas; reserve the full suite for broad or high-risk fan-out or an explicit project rule.
+- [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Name the smallest local check that proves the change: links or rendering for documentation changes that affect links or rendering; a diff or one visual check for presentation-only styling, markup, attributes, or copy; focused behavior evidence for styling, markup, or attributes that change accessibility, security, or interaction behavior; syntax, schema, or generation for config or generated output; focused automated tests and runtime observation for non-trivial runtime behavior. Broaden to all impacted packages/modules for shared paths, contracts, or sensitive areas; reserve the full suite for broad or high-risk fan-out or an explicit project rule.
 - [ ] **Configured CI is green before merge** (lint, typecheck, test, build, and other required checks). This is a remote merge gate, not a reason to duplicate the suite locally. If CI runs after PR creation, finish local QA and review first. N/A only where no CI workflow exists.
 - [ ] `code-review` + `simplify` clean; a [sensitive area](#sensitive-areas) also needs `security-review` with complete scoped coverage recorded in `docs/security.md`
 - [ ] Diff hygiene: small and focused, references the issue, no stray or debug code
@@ -102,19 +102,19 @@ warnings for irreversible actions. Use complete sentences for gates and complex 
 - **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{id}-{slug}` branches → PR → merge → deploy. Environments are deploy targets driven by CI, not long-lived branches. One feature per branch. A git worktree is an explicit manual escape hatch: the operator supplies a private, new or empty path outside every checkout and runs `feature-start`'s generic Git-only recipe.
 - **Where planning commits land.** Land planning packages on `main`, never a feature branch: the Stage 0 context and foundation at the foundation gate, then the Stage 1 PRD plus the Stage 2 ADRs, architecture and security updates, and frozen contract once after Stage 2. Stage 4 cuts `feat/*` from a ref that must already hold the frozen contract, so ask for the landing action by remote state: commit locally with no remote, commit and push to an unprotected `main`, or `plan/{NNNN}-{slug}` → PR for a protected one (`sdlc` → Default-branch landings). Per-task learnings land before the next task; final-child reconciliation lands before the parent epic completes; an empty Retro needs no landing.
 - **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the issue (`Refs #123`, or `Closes #123` on GitHub only, elsewhere its key). Small logical commits, not one blob.
-- **PRs:** small and reviewable; one feature per branch; reference the issue; fill the PR template (contract, security impact, verification).
+- **PRs:** Keep them small and reviewable; follow the PR template and the conductor's landing gate.
+- **History:** Squash-merge feature PRs to keep `main` linear.
 - **No agent self-attribution.** Commits, PRs, and code comments describe the _change_, not the tool. No "Made with {agent}" or `Co-Authored-By:` naming an AI. Authorship is the human's; this overrides any runtime default.
 - **Contract-first:** define and freeze the interface before FE/BE implement in parallel.
 - **Project-facing artifacts cite durable docs, not process mechanics.** Reference "the frozen contract (contract 0001, ADR-0004)" and stop; a reader who never saw this process must not be able to tell it existed. Kit-owned operating docs and templates may describe the process they govern.
 - **Ask, don't guess:** if a PRD/ADR is ambiguous, stop and ask rather than assume.
-- **A wrong decision is amended, not obeyed.** Supersede it in the same change as the code and name the assumption that failed; a silently divergent implementation is worse than either choice. A _shipped_ contract still needs the Guardrails versioning decision below.
-
+- **A wrong decision is amended, not obeyed.** Follow the conductor's ADR, contract, and scope-reapproval gates.
 ## Principles
 
-- **Challenge before agreeing.** Never open with agreement. State the approach you rejected and why, the failure you think most likely, and the observation that would settle it. An objection without a concrete scenario, file, or command is noise.
+- **Challenge before agreeing.** Never open with agreement. State the approach you rejected and why, the failure you think most likely, and the observation that would settle it. Record the observed result and resulting direction at the applicable gate; an objection without a concrete scenario, file, or command is noise.
 - **Simplicity first.** Prefer the smallest direct solution that fully solves the problem; add an abstraction only when a real, present need justifies it, not future speculation.
 - **Reuse before building.** Prefer existing, well-maintained libraries over bespoke code when they fit; if unsure, research and weigh fit, maintenance, and footprint first.
-- **Pay only for what exists.** Compatibility machinery, history narration, and tests for unobserved failures protect a real consumer, real data, or an observed incident, not a hypothetical one. Read the Lifecycle block in `docs/context.md` first: while it shows nothing deployed, no real data, and no traffic, change the shape outright and record each deferral in the production register. If something outside this change might depend on it, ask.
+- **Pay only for what exists.** Compatibility machinery, migration/deprecation guidance, and tests for production-only conditions protect a real consumer, real data, traffic, or an observed incident, not a hypothetical one. Read the Lifecycle block in `docs/context.md` first: while the applicable trigger condition is absent, cover non-trivial executable behavior and record only deferrals whose required deployed consumer, real data, deployment, load, traffic, or multi-version compatibility is unavailable in the production register. If something outside this change might depend on it, ask.
 
 ## Sensitive areas
 
@@ -124,8 +124,7 @@ PII/KYC, file uploads, and admin/privileged surfaces.** A change touching these 
 
 ## Vendored skill overrides
 
-Third-party snapshots supply techniques; this file and the `sdlc` conductor own paths, transitions, and
-safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply these overrides:
+Third-party snapshots supply techniques; this file and the `sdlc` conductor own paths, transitions, and safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply these overrides:
 
 - Before using the `brainstorming` visual companion, set `SUPERPOWERS_DISABLE_TELEMETRY=1` to block its branding request. Keep it on loopback with an SSH tunnel, never plaintext non-loopback mode; use its default temporary session directory and do not pass `--project-dir`. Ignore its instruction to commit or write under `docs/superpowers/`.
 - For `improve-codebase-architecture`, treat `CONTEXT.md` as `docs/context.md`; do not invoke its unavailable `codebase-design` or `domain-modeling` dependencies, and skip its CDN-backed report.
@@ -136,10 +135,10 @@ safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply the
 
 > These rules depend on agent adherence, CI, and review gates; this file alone enforces nothing.
 
-- Do not commit, push, open PRs, or merge unless asked.
+- Do not commit, push, or open PRs unless asked. The human performs every landing merge; local default-branch synchronization by `git merge --ff-only` and review-only integration commits are not landing merges.
 - At Land, don't poll CI: open the PR and report CI running, or push the branch to start CI, then stop. Don't `gh run watch`. Required CI must be green before merging.
 - Don't improvise git transports or remote URLs. If a GitHub HTTPS push fails on auth, surface it and point to `gh auth login` then `gh auth setup-git`. Change a remote URL only after the human approves the reviewed URL, using `git remote set-url origin {url}`; never silently switch transports.
-- Do not change a _shipped_ contract without a versioning/deprecation decision (a new ADR).
+- Do not change a shipped contract with a deployed consumer without a versioning/deprecation decision (a new ADR); if there is no deployed consumer, apply the ADR matrix and re-freeze the contract.
 - Do not write a breaking DB migration against a table holding real data or read/written by any deployed process; use expand/contract so `main` stays deployable through the rollout.
 - A change touching a [sensitive area](#sensitive-areas) gets a threat model + `security-review`.
 

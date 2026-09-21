@@ -20,7 +20,23 @@ The kit aims to make agent-led feature work reproducible without changing user-g
 | Snapshot | An unchanged third-party skill tree pinned to an immutable upstream commit. |
 | Conductor | `skills/sdlc/SKILL.md`, which routes work through the pipeline. |
 | Gate | A point where work stops until a human explicitly approves the next action. |
-| Land | Getting a change onto its target branch: a default-branch commit at Stages 0, 2, and 8, or a human-merged PR at Stage 7. |
+| Land | Getting a change onto its target branch: a default-branch commit at Stages 0, 2, and 8, or a human-performed merge at Stage 7 (through a PR when available, directly when no PR workflow exists). |
+
+## Lifecycle
+
+- **Stage:** live
+- **Deployed consumers:** adopter repositories consume released kit files; this checkout has no runtime service consumers
+- **Real data:** none
+- **Production traffic:** none
+
+## Production register
+
+> This kit has no runtime service, data store, or production traffic. Re-evaluate this register if
+> the product adds one.
+
+| Deferred | Trigger that forces it | Owner |
+| --- | --- | --- |
+| None currently | First runtime service, real data, or production traffic | Maintainer |
 
 ## Hard constraints
 
@@ -28,7 +44,7 @@ The kit aims to make agent-led feature work reproducible without changing user-g
 - Automatic and stage-bound installation stays project-local. A user-global optional companion is
   allowed only through a separate command the user explicitly chooses.
 - Never overwrite an existing target file or skill directory.
-- Do not commit, push, open pull requests, or merge unless the user asks.
+- Do not commit, push, or open pull requests unless the user asks. Merge and landing ownership follow the Git and release safety rules in `AGENTS.md`.
 
 ## Out of scope
 

@@ -41,8 +41,10 @@ equivalent exists should you use the manual `fallback` in `required-skills.yml`.
 
 1. Read `AGENTS.md`, `docs/context.md`, and `docs/test-strategy.md`. **Stage 0 is incomplete** if
    the operating manual or context is missing, `AGENTS.md` still contains `Stack (placeholder`, the
-   context still has its `> STATUS: TEMPLATE` line or `{placeholder}` tokens, or the test strategy is
-   missing or the test strategy still contains its `STATUS: TEMPLATE` marker or placeholder tools.
+   context still has its `> STATUS: TEMPLATE` line or `{placeholder}` tokens, or the context lacks
+   populated `## Lifecycle` and `## Production register` sections with current values, triggers, and
+   owners, or the test strategy is missing or still contains its `STATUS: TEMPLATE` marker or
+   placeholder tools.
    Stage 0 is also incomplete when the product PRD, architecture, contracts index, or foundational ADR set is missing or still templated.
    A missing or templated security threat model also blocks completion. Check
    `docs/prd/0000-product.md`, `docs/architecture.md`, `docs/security.md`,
@@ -278,21 +280,25 @@ Not implemented, Partially implemented, or Implemented. Keep one delivery summar
 verification evidence, not another task checklist. Update affected current-behavior claims with
 each implementation task; full feature reconciliation still belongs to the final Retro.
 
-Compatibility artifacts, deprecation notes, and migration narration in current-state docs describe a
-transition someone has to make. The Lifecycle block in `docs/context.md` says whether anyone does:
-while it shows no consumer, real data, or traffic, restate the current shape and record the deferral
-in its production register.
+Compatibility artifacts, deprecation notes, and migration guidance in current-state docs describe an
+active transition someone has to make. Use the specific Lifecycle trigger in `docs/context.md`: while
+its condition is absent, state the current shape and record the deferral in the production register;
+when it is present, include and verify the transition before promotion.
 
 **Amending a decision mid-implementation.** An ADR or PRD states current intent; it is not authority
 for its own sake. When implementation shows a recorded decision is wrong, amend the record rather
-than building around it, in the same change as the code and never as a silent divergence: add a
-superseding ADR, mark the old one `Superseded by ADR-NNNN` when something depends on it, and name the
-assumption that turned out false rather than the alternative looking simpler. An ADR nobody
-implemented and nothing depends on is edited in place; supersede chains are for decisions the project
-built on. The artifact class decides the route: an internal ADR is yours to supersede, a shipped
-contract needs the versioning or deprecation decision in `AGENTS.md`, and PRD scope still needs the
-human. A reversal that invalidates the rest of the plan belongs at the plan gate, not absorbed into
-the diff. If you cannot say why the old decision was wrong, the objection is probably inconvenience.
+than building around it, in the same change as the code and never as a silent divergence. Edit a
+Proposed or Accepted ADR in place only while it is unimplemented and dependency-free. After amending
+an accepted ADR, renew human approval and re-freeze any affected contract before implementation
+resumes. For an implemented or depended-on ADR, add a superseding ADR, renew human approval before
+implementation resumes, re-freeze any affected contract, mark the old one `Superseded by ADR-NNNN`,
+and name the assumption that turned out false rather than the alternative looking simpler. The
+artifact class decides the route: an internal ADR follows this matrix; a shipped contract with a
+deployed consumer needs the versioning or deprecation decision in `AGENTS.md`, while one without a
+deployed consumer may change outright under this matrix with applicable approval and re-freeze. Every
+PRD requirement or scope amendment returns to human approval. A reversal that invalidates the rest of
+the plan belongs at the plan gate, not absorbed into the diff. If you cannot say why the old decision
+was wrong, the objection is probably inconvenience.
 
 ## Security-review coverage
 
@@ -356,9 +362,15 @@ landed. Do not report the epic done or offer `improve` until its authoritative t
 complete.
 
 If implementation drifted from the approved PRD, ADRs, or frozen contract, do not hide the drift by
-rewriting history. Record the shipped state in the artifact that owns it. A changed decision needs a
-new ADR; a changed shipped contract needs the versioning or deprecation decision required by
-`AGENTS.md`. Ask before broadening the feature beyond the approved scope.
+rewriting history. Record the shipped state in the artifact that owns it. For an ADR, apply the
+amendment matrix above: edit a Proposed or Accepted ADR only while it is unimplemented and
+dependency-free; after amending an accepted ADR, renew human approval and re-freeze any affected
+contract. Create a superseding ADR, renew human approval before implementation resumes, re-freeze any
+affected contract, and mark the old one for an implemented or depended-on decision, regardless of its
+status. For contract drift, a deployed consumer requires the versioning or deprecation decision
+required by `AGENTS.md` before changing the interface; only when there is no deployed consumer may the
+ADR matrix route apply, with applicable approval and a re-freeze. Every PRD requirement or scope change
+returns to human approval. Ask before broadening the approved scope.
 
 ## Stage 8: what a learning is (and isn't)
 
@@ -435,6 +447,21 @@ design or spike plan as a substitute for this pipeline's PRD path.
 
   The merge gate is unchanged in every case — never treat a missing capability as licence to skip
   it, and never invent a remote to satisfy the flow.
+- **Before Land, re-evaluate lifecycle triggers.** Compare the intended deployment or promotion and
+  candidate Lifecycle and production register with the target baseline recorded by
+  `definition-of-done-review` during local readiness.
+  Evaluate target rows even if the candidate deletes or weakens them. Treat any candidate Lifecycle
+  downgrade from the target baseline as a policy change requiring a durable, human-approved decision
+  recorded in the applicable ADR or production register, with factual evidence that the relevant consumer,
+  data, or traffic is absent; fulfillment of a deferred row does not itself
+  authorize the downgrade. Treat deletion or weakening of a target row or trigger as an additional
+  policy change requiring a durable, human-approved retirement decision recording factual evidence
+  that the deferred work is fulfilled and verified or that the trigger no longer applies in the applicable
+  ADR or production register. Fulfillment evidence may support that decision but does not replace it. If
+  the merge reaches a trigger, the deferred work
+  must be on the target or included in the
+  reviewed landing candidate and verified before promotion; the pre-merge lifecycle state is not
+  sufficient to defer it.
 - **Default to a feature branch.** Use a git worktree only as an explicit manual escape hatch for
   opt-in parallel or disposable isolation, or when the user requests it. The operator supplies and
   verifies a private, new or empty path outside every checkout; use only the generic Git-only
@@ -467,20 +494,27 @@ design or spike plan as a substitute for this pipeline's PRD path.
   matching its accepted ADR and the architecture update, and no open questions.
   Require local readiness before entering Land, then require the full Definition of Done, including
   required CI (see `AGENTS.md`).
-- **Every task needs proportional verification, not necessarily a new test.** Start bug fixes and
-  non-trivial testable behavior with a failing test (RED → GREEN). For narrow docs/prose changes,
-  use link or rendering checks; for styling, static markup, attributes, or copy, use a targeted
-  browser/render check or manual visual inspection; for configuration or generated output, use its
+- **Every task needs proportional verification, not necessarily a new test.** Start bug fixes with a
+  failing automated test or observable reproducer appropriate to the risk; start non-trivial executable
+  behavior with a failing test (RED → GREEN). Presentation-only copy, styling, or markup bugs may use
+  a failing diff, render, or visual reproducer. Executable validation, authorization or security denial,
+  error, retry, timeout, and partial-failure branches need focused automated
+  coverage. For documentation changes that affect links or rendering, use link or rendering checks;
+  presentation-only docs copy, styling, markup, or attributes may use a diff or one visual check;
+  styling, markup, or attributes that change accessibility, security, or interaction behavior need
+  focused behavior evidence; for configuration or generated output, use its
   syntax, schema, or generation check. Name the smallest local check that proves the change. For
   shared paths, contracts, or security-sensitive areas, broaden verification to all impacted
   packages/modules; reserve the full suite for broad or high-risk dependency fan-out or an explicit
-  project rule. A static attribute, copy, or layout change carries no logic to cover: prove it by
-  inspecting the rendered output rather than adding an assertion for it. The external
-  `test-driven-development` skill is an optional team-wide policy, not a pipeline dependency.
-- **Don't open a browser for a trivial UI change.** A static markup, copy, or styling tweak is
-  proven by the diff or a single visual check, not by a Playwright run or MCP session.
-- Contract-first: never let implementation drift from the frozen contract. Changing a shipped
-  contract requires a new ADR (versioning/deprecation).
+  project rule. Presentation-only styling, markup, attributes, copy, or layout carry no logic to
+  cover; styling, markup, or attributes that change accessibility, security, or interaction behavior
+  do and need focused behavior evidence. The external `test-driven-development` skill is an optional
+  team-wide policy, not a pipeline dependency.
+- **Don't open a browser for a trivial UI change.** A presentation-only markup, copy, or styling
+  tweak is proven by the diff or a single visual check, not by a Playwright run or MCP session.
+- Contract-first: never let implementation drift from the frozen contract. A shipped contract with a
+  deployed consumer requires a versioning/deprecation ADR; if there is no deployed consumer, apply the
+  ADR matrix and re-freeze the contract.
 - **Reviews run inline** during Implement/QA. Run `code-review`, `simplify`, and local readiness on a
   clean materialization of the complete target-to-tree delta; bind evidence to its target, parent,
   and tree. After commit, require the tree to have the same reviewed content and its parent to match.
@@ -511,9 +545,11 @@ design or spike plan as a substitute for this pipeline's PRD path.
   turn alive polling. Required CI must be green before merging; once it finishes, run the final DoD
   confirmation before reporting the change ready. A later failure is a normal fix, not babysat in
   the Land turn.
-- Don't commit, push, open PRs, or merge unless asked. One combined approval may cover commit,
-  push, and opening a PR when the request names all three. It authorizes exactly the actions named
-  in the request.
+- Don't commit, push, or open PRs unless asked. The human performs every landing merge into the target
+  branch. Local default-branch synchronization via `git merge --ff-only` and unreferenced synthetic
+  merge/integration commits used only for review evidence are not landing merges. One combined approval
+  may cover commit, push, and opening a PR when the request names all three. It authorizes exactly
+  the actions named in the request.
 
 ## Referenced files
 

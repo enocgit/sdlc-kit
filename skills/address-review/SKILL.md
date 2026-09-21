@@ -21,8 +21,9 @@ is net-negative. So is answering comments that asked for nothing. The job of thi
 
 This is standalone and **manually invoked** — it isn't bound to a pipeline stage. But it inherits
 the kit's conventions: the frozen contract is authoritative, sensitive areas (canonical list in
-the project's `AGENTS.md` → Sensitive areas) get extra care, comments cite the durable doc
-(ADR/PRD/contract) not the pipeline, and outward-facing actions and merges need explicit human approval.
+the project's `AGENTS.md` → Sensitive areas) get extra care, and comments cite the durable doc
+(ADR/PRD/contract) rather than the pipeline. Outward-facing actions need explicit human approval, and
+merge ownership follows `sdlc`'s landing rules.
 
 It is **not** a second `code-review`. `code-review` proactively audits your own diff before you
 push; this skill reactively triages what _reviewers_ already said on an open PR. If a comment
@@ -65,9 +66,9 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
    - **Nit / trivially-correct fix** (typo, rename, obviously-safe guard) → apply it and disclose
      it in the report. No gate.
    - **Valid + non-trivial** (touches logic, a sensitive area per `AGENTS.md`, or the contract)
-     → **STOP and gate**: present a short per-fix plan and get approval before editing. A comment
-     that implies changing a _shipped/frozen_ contract is a decision — raise a new ADR, don't
-     silently edit the interface.
+     → **STOP and gate**: present a short per-fix plan and get approval before editing. Apply the
+     conductor's `Amending a decision mid-implementation` rules for the ADR, contract, and PRD routes,
+     and record any deferral in the `docs/context.md` production register before approving the change.
    - **False positive** → do **not** change code. Draft a brief reply explaining why, citing the
      doc that settles it ("the frozen data contract 0001 permits null here", not "this is fine").
    - **Out of scope** → prepare a `task` issue (shaped per `.github/ISSUE_TEMPLATE/task.md`) and
@@ -106,8 +107,9 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
   clear, doc-backed rationale is a first-class outcome, not a failure to "address" it.
 - **Auto-fix only the trivial + obviously-correct.** Anything touching logic, a sensitive area, or
   the contract is gated behind a plan approval (auto-fix trivial, gate the rest).
-- **The contract is frozen.** A comment that wants a shipped-contract change is a new ADR, not an
-  inline edit.
+- **The contract is frozen.** Contract changes follow the conductor's `Amending a decision
+  mid-implementation` rules; a change to a shipped contract with a deployed consumer needs a
+  versioning/deprecation ADR, not an inline edit.
 - **Outward-facing = one confirmation.** The proposed commit and message, external issue creation,
   pushing validated fixes, posting replies, and resolving listed threads share one explicit approval
   when applicable. Routine replies go out on that approval unseen; critical replies — refutations,

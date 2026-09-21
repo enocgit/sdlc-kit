@@ -24,9 +24,9 @@
 
 <!-- Record checks run, observed results, and verification gaps here, not in source comments.
      Comments describe intended guarantees; they do not prove the implementation enforces them.
-     Name the check that proves the change. Static markup, copy, and styling are proven by
-     inspecting the rendered output, not by asserting on the attribute. -->
+     Name the check that proves the change. Presentation-only markup, attributes, copy, and styling
+     are proven by a diff or one visual check; styling, markup, or attributes that change
+     accessibility, security, or interaction behavior need focused behavior evidence. -->
 
-- [ ] Tests or another proportional check: <!-- command / evidence -->
-- [ ] Runtime observation or relevant non-runtime check: <!-- evidence -->
-- [ ] CI green
+- [ ] Proportional local verification: <!-- cite the applicable test, runtime observation, link, schema, diff, or visual check -->
+- [ ] CI verification: <!-- cite green required checks, or record that no CI workflow is configured -->

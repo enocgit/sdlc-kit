@@ -35,8 +35,14 @@ exact third-party snapshots, installation-safe scripts, and project-document tem
   vendor snapshots, and neutral technical records.
 - Keep the kit runtime-neutral. Agent-specific behavior needs a manual fallback.
 - Do not add tests for prose, formatting, trivial syntax, or one-time repository absence. Use the
-  smallest concrete verification that matches the risk; non-trivial behavior still needs a focused
-  regression signal.
+  smallest concrete verification that matches the risk; non-trivial executable behavior, including
+  validation, authorization or security denial, error, retry, timeout, and partial-failure branches,
+  still needs focused automated coverage. Start bug fixes with a
+  failing automated test or observable reproducer appropriate to the risk, and start non-trivial
+  executable behavior with a failing test (RED → GREEN); presentation-only copy, styling, or markup
+  bugs may use a failing diff, render, or visual reproducer. Defer only conditions whose required
+  deployed consumer, real data, deployment, load, traffic, or multi-version compatibility
+  is unavailable, and record each deferral.
 - Project-facing PRDs, ADRs, contracts, architecture, security docs, runbooks, test strategies,
   tracker items, and code comments must describe the product and its decisions, not this kit's
   internal mechanics. Templates may contain the instructions needed to fill them.
@@ -49,7 +55,8 @@ for it is not evidence that it is right, and neither is the fact that you wrote 
 
 - State the approach you rejected and why, and the failure you think most likely.
 - Point at what decides the question: an invariant, a check, a file, or a measurement. Run a cheap
-  check instead of arguing from a position.
+  check when one is available; before execution, name the observation that would settle the objection
+  and collect it at the applicable gate instead of arguing from a position.
 - Once the evidence is in, say which way it points and stop arguing. An objection with no way to
   falsify it is noise.
 
@@ -83,14 +90,16 @@ git diff --check
 ```
 
 Also inspect the final diff, verify changed paths are present in `scripts/kit-manifest.txt`, and
-confirm vendor snapshots are unchanged unless the task explicitly refreshes one. Documentation-only
-changes need link or rendering inspection; installer-affecting changes need a temporary-install
+confirm vendor snapshots are unchanged unless the task explicitly refreshes one. Documentation changes that affect links or rendering need link or rendering inspection;
+presentation-only styling, markup, attributes, or copy may use a diff or one visual check, while
+styling, markup, or attributes that change accessibility, security, or interaction behavior need
+focused behavior evidence. Installer-affecting changes need a temporary-install
 observation.
 
 ## Git and release safety
 
 - Keep `main` deployable. Use a short-lived `feat/*` branch for changes.
-- Do not commit, push, open a pull request, or merge unless the user explicitly asks.
+- Do not commit, push, or open a pull request unless the user explicitly asks. The human performs every landing merge into the target branch. Local default-branch synchronization via `git merge --ff-only` and unreferenced synthetic merge/integration commits used only for review evidence are not landing merges.
 - Do not invent remotes or transports. Surface authentication failures and point to the documented
   one-time fix.
 - Update `CHANGELOG.md` for user-visible changes and review release metadata before publishing.

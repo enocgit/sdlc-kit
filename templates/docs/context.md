@@ -21,17 +21,20 @@
 - **Real data:** {none | seed only | real rows in {tables}, read or written by {process}}
 - **Production traffic:** {none | staging only | live}
 
-## Deferred for production
+## Production register
 
 > Work we will owe, each with the trigger that forces it. Out of scope is a choice; this is debt
-> with an owner and a tripwire. The promotion event that trips a trigger is a gate, so land the
-> item before it.
+> with an owner and a tripwire. The promotion event that trips a trigger is a gate, so land the item
+> before it. The conductor's `Before Land, re-evaluate lifecycle triggers` rule owns the downgrade,
+> retirement, and trigger requirements; this table is the register it reads.
 
-| Deferred | Trigger that forces it |
-| --- | --- |
-| {e.g. API versioning and deprecation} | First external consumer |
-| {e.g. expand/contract migration} | First write of real data |
-| {e.g. failure-path, load, and compatibility tests} | First staging or production traffic |
+| Deferred | Trigger that forces it | Owner |
+| --- | --- | --- |
+| {e.g. API versioning and deprecation} | First deployed consumer | {owner} |
+| {e.g. expand/contract migration} | First real row or first deployed process reading from or writing to the table | {owner} |
+| {e.g. load/performance tests} | First staging or production traffic | {owner} |
+| {e.g. deployed-compatibility tests} | First deployed consumer | {owner} |
+| {e.g. multi-version tests} | First overlapping-version rollout | {owner} |
 
 ## Personas
 
