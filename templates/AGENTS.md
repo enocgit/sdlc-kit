@@ -96,13 +96,13 @@ Use complete sentences for gates, security warnings, irreversible actions, order
 - [ ] Honors frozen contracts; fast-path N/A recorded when no integration contract applies
 - [ ] DB schema changes follow expand/contract (migrate → deploy → clean up) **once the table holds
       real data or any deployed process reads or writes it** — before that, change it outright
-- [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Choose the smallest
-      concrete local check: docs/prose → links or rendering; styling → targeted render/browser or
-      manual visual inspection; configuration/generated output → syntax, schema, or generation;
-      runtime behavior → focused tests and runtime observation. Broaden local checks to all impacted
-      packages/modules for shared paths, contracts, or security-sensitive areas; reserve the full
-      suite for broad or high-risk dependency fan-out or an explicit project rule. State why no new
-      test was added.
+- [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Name the smallest
+      concrete local check that proves the change: docs/prose → links or rendering; styling, static
+      markup, attributes, or copy → targeted render/browser or manual visual inspection;
+      configuration/generated output → syntax, schema, or generation; runtime behavior → focused
+      tests and runtime observation. Broaden local checks to all impacted packages/modules for
+      shared paths, contracts, or security-sensitive areas; reserve the full suite for broad or
+      high-risk dependency fan-out or an explicit project rule.
 - [ ] **Configured CI is green before merge** (lint, typecheck, test, build, and any other
       configured or policy-required checks); this is a remote merge gate, not a reason to duplicate
       the full suite locally. If CI runs after PR creation, finish proportional local QA and review

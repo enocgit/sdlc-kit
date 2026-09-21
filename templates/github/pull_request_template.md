@@ -24,7 +24,8 @@
 
 <!-- Record checks run, observed results, and verification gaps here, not in source comments.
      Comments describe intended guarantees; they do not prove the implementation enforces them.
-     Explain why a new automated test adds little confidence when applicable. -->
+     Name the check that proves the change. Static markup, copy, and styling are proven by
+     inspecting the rendered output, not by asserting on the attribute. -->
 
 - [ ] Tests or another proportional check: <!-- command / evidence -->
 - [ ] Runtime observation or relevant non-runtime check: <!-- evidence -->

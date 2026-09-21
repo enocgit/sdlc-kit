@@ -24,7 +24,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
   remote alongside the existing no-remote commit and protected-`main` `plan/*` PR paths.
 - Make agent communication quiet by default: report actions, results, blockers, deviations, and decisions instead of repeating routine workflow guardrails; keep internal process mechanics out of ordinary prose and
   project-facing artifacts while preserving required status headers, gate prompts, and safety messages.
-- Guide code comments toward non-obvious intent, constraints, state transitions, and failure behavior without comment quotas.
+- Stop biasing verification toward new automated tests: require the smallest check that proves the change instead of a justification for omitting a test, and name static markup, attributes, copy, and layout as cases proven by inspecting rendered output.
 - Require reviewers to check comment claims against implementation evidence; keep change summaries and verification results in PRs.
 - Make each documentation, issue, and PR point express one rule, decision, or outcome, with independently verifiable checkboxes.
 - Review overloaded points before gates and publication without changing document structure, introductions, or requirement meaning.

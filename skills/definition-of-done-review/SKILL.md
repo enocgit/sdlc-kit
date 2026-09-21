@@ -2,10 +2,10 @@
 name: definition-of-done-review
 description: >
   Reviews a change against this team's Definition of Done before merge. It goes beyond generic code
-  review by checking acceptance criteria, contract fidelity, proportional verification and test
-  coverage, docs/ADR updates, and security for sensitive areas, then gives a pass/fail verdict with
-  evidence appropriate to each item. Use at Stage 6 after code-review and simplify, or when the user
-  asks "is this ready to merge" or "run the DoD check".
+  review by checking acceptance criteria, contract fidelity, proportional verification with test
+  coverage where behavior warrants it, docs/ADR updates, and security for sensitive areas, then
+  gives a pass/fail verdict with evidence appropriate to each item. Use at Stage 6 after code-review
+  and simplify, or when the user asks "is this ready to merge" or "run the DoD check".
 ---
 
 # definition-of-done-review
@@ -152,10 +152,11 @@ How to judge the items that need interpretation:
   checks described in `AGENTS.md`; do not require a full local suite merely because CI defines lint,
   typecheck, test, and build checks. Runtime-affecting work must be exercised and observed with the
   available runtime tools. Non-runtime work needs a relevant concrete check such as rendering, links,
-  or schema validation. Non-trivial behavior needs automated coverage. If no new test was added,
-  require a credible reason and concrete alternative evidence; do not fail a change merely because
-  its best proof is not a new test. Configured CI checks remain required from their trusted producer
-  before merge.
+  or schema validation. Non-trivial behavior needs automated coverage; static markup,
+  attributes, copy, and layout do not, and a rendered-output check suffices for them. Do not fail a
+  change merely because its best proof is not a new test, and do not accept an assertion that only
+  restates a static attribute, copy string, or layout rule as that proof. Configured CI checks
+  remain required from their trusted producer before merge.
 - **Docs.** Update `docs/architecture.md` if the system's shape changed. Add an ADR if the change
   makes a decision, and ensure the tracker issue reflects reality. Check decision and delivery
   status separately: approval, acceptance, or freeze does not prove implementation.

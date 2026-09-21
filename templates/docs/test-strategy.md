@@ -13,11 +13,11 @@
 
 Every task needs verification evidence; not every change needs a new automated test. For bug fixes
 and non-trivial testable behavior, begin with a failing test and follow a RED → GREEN cycle.
-Otherwise choose the smallest check that proves the change: existing tests, typecheck, build,
-schema validation, dry-run, smoke test, browser observation, or another concrete oracle. This is the
-local evidence bar; do not duplicate the full CI suite by default. A full configured suite is a merge
-gate when CI exists, not a local pre-PR requirement. When adding no test, state why it would add little
-confidence and record the alternative evidence.
+Otherwise name the smallest check that proves the change: existing tests, typecheck, build, schema
+validation, dry-run, smoke test, rendered-output inspection, or another concrete oracle. Static
+markup, attributes, copy, and layout carry no logic to cover — inspect the rendered output rather
+than adding an assertion for it. This is the local evidence bar; do not duplicate the full CI suite
+by default. A full configured suite is a merge gate when CI exists, not a local pre-PR requirement.
 
 ## Test layers (the pyramid)
 
@@ -30,8 +30,8 @@ confidence and record the alternative evidence.
 
 **Rule of thumb:** test logic at the lowest layer that gives confidence; reserve E2E for the few
 flows that matter most. Non-trivial behavior must be _covered_, not merely _touched_. Styling,
-documentation, configuration, generated output, and already-covered refactors may use more direct
-evidence when an additional automated test would not improve confidence.
+static markup or copy, documentation, configuration, generated output, and already-covered refactors
+may use more direct evidence when an additional automated test would not improve confidence.
 
 ## Verification bar
 

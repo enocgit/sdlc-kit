@@ -450,15 +450,14 @@ design or spike plan as a substitute for this pipeline's PRD path.
   required CI (see `AGENTS.md`).
 - **Every task needs proportional verification, not necessarily a new test.** Start bug fixes and
   non-trivial testable behavior with a failing test (RED → GREEN). For narrow docs/prose changes,
-  use link or rendering checks; for styling, use a targeted browser/render check or manual visual
-  inspection; for configuration or generated output, use its syntax, schema, or generation check.
-  Run the smallest local check that proves the change. For shared paths, contracts, or
-  security-sensitive areas, broaden verification to all impacted packages/modules; reserve the full
-  suite for broad or high-risk dependency fan-out or an explicit project rule. For changes where a
-  new automated test adds little confidence, use the
-  concrete alternative evidence required by `docs/test-strategy.md` and state why no new test was
-  added. The external `test-driven-development` skill is an optional team-wide policy, not a
-  pipeline dependency.
+  use link or rendering checks; for styling, static markup, attributes, or copy, use a targeted
+  browser/render check or manual visual inspection; for configuration or generated output, use its
+  syntax, schema, or generation check. Name the smallest local check that proves the change. For
+  shared paths, contracts, or security-sensitive areas, broaden verification to all impacted
+  packages/modules; reserve the full suite for broad or high-risk dependency fan-out or an explicit
+  project rule. A static attribute, copy, or layout change carries no logic to cover: prove it by
+  inspecting the rendered output rather than adding an assertion for it. The external
+  `test-driven-development` skill is an optional team-wide policy, not a pipeline dependency.
 - Contract-first: never let implementation drift from the frozen contract. Changing a shipped
   contract requires a new ADR (versioning/deprecation).
 - **Reviews run inline** during Implement/QA. Run `code-review`, `simplify`, and local readiness on a
