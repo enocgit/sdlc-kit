@@ -11,6 +11,28 @@
 
 <!-- What we're building, for whom, what success looks like. 1–2 paragraphs. -->
 
+## Lifecycle
+
+> STATUS: TEMPLATE — set the real values at Stage 0 and keep them current. Rules across the kit
+> route on this block; a stale value silently misroutes them.
+
+- **Stage:** {prototype | pre-production | internal | live}
+- **Deployed consumers:** {none | internal only | external, and who}
+- **Real data:** {none | seed only | real rows in {tables}, read or written by {process}}
+- **Production traffic:** {none | staging only | live}
+
+## Deferred for production
+
+> Work we will owe, each with the trigger that forces it. Out of scope is a choice; this is debt
+> with an owner and a tripwire. The promotion event that trips a trigger is a gate, so land the
+> item before it.
+
+| Deferred | Trigger that forces it |
+| --- | --- |
+| {e.g. API versioning and deprecation} | First external consumer |
+| {e.g. expand/contract migration} | First write of real data |
+| {e.g. failure-path, load, and compatibility tests} | First staging or production traffic |
+
 ## Personas
 
 - **{persona}**: goals, constraints, what they care about.

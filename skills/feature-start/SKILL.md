@@ -129,6 +129,9 @@ approval gate.
   decision (new/updated ADR), never an inline edit.
 - A wrong ADR or PRD is not a stop. Supersede it in the same change as the code and name the
   assumption that failed; take a reversal that invalidates the rest of the plan to the plan gate.
+- Cover observed behavior, not hypothetical failures. While `docs/context.md` shows no deployed
+  consumer, real data, or production traffic, do not add failure-path, load, or compatibility cases
+  for conditions that cannot occur; put each deferral in the production register.
 - If the task is bigger than ~a day of work, propose splitting it before starting.
 - **Keep the SDLC status header** on every user-facing message, just like the conductor — open with
   `SDLC ▸ Stage 4/8 Implement · task #N · {next: plan approval / …}`. You're inside the pipeline even

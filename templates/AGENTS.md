@@ -6,7 +6,7 @@
 
 ## What this project is
 
-<!-- One paragraph: product, users, current phase. Link docs/context.md for depth. -->
+<!-- One paragraph: product, users, current phase. Link docs/context.md for depth, including its Lifecycle block. -->
 See [`docs/context.md`](./docs/context.md) for domain, glossary, personas, and hard constraints.
 
 ## Two altitudes: foundation vs feature
@@ -57,8 +57,8 @@ Every pipeline response, whichever skill drives it, opens with this one-line sta
 Write docs, issues, and PRs for contributor decisions and verification, not narrative.
 Lead with status, scope, outcome, rationale, constraints, and open questions; link authoritative details rather than duplicate facts.
 Each bullet, numbered item, checkbox, or table cell should express one clear rule, decision, or outcome.
-Prefer one sentence per point; use a second only to explain or qualify that same point.
-Split additional obligations into separate points or sub-points; do not hide them in semicolons or long inline lists.
+Prefer one sentence per point, use a second only to explain or qualify it, and split additional obligations into separate points rather than hiding them in semicolons or inline lists.
+Write current-state docs in the present tense: no "used to", "no longer", or migration narration; history belongs in `docs/adr/` and git.
 Each checkbox should have one independently verifiable outcome. Preserve requirement IDs when splitting their supporting rules.
 Keep existing document structure and PRD/ADR introductory paragraphs; impose no point-count, word, or line quotas.
 Preserve exact limits, exceptions, risks, security boundaries, failure behavior, compatibility, verification limits, and fixed formats.
@@ -78,7 +78,7 @@ Put change summaries and verification results in the PR; check comment claims ag
 Keep user-facing replies compact: lead with the outcome, state each fact once, and omit filler.
 Follow standing workflow rules silently in ordinary prose: do not append compliance summaries, repeat routine permissions,
 guardrails, or planned mechanics, or narrate the process or rule behind an action ("per the gate protocol").
-The mandatory status header, gate/approval prompts, and safety, progress, blocker, or decision messages remain required. Report actual actions/results, blockers, deviations, and decisions needed; mention a guardrail only when it changes available action or prevents an expected action.
+The mandatory status header, gate/approval prompts, and safety, progress, blocker, or decision messages remain required. Report actual actions, results, blockers, deviations, and decisions needed; mention a guardrail only when it changes available action.
 Use complete sentences for gates, security warnings, irreversible actions, ordered steps, and complex trade-offs. Expand when asked; runtime safety and progress rules win.
 
 ## Definition of Ready (before a task enters Implement)
@@ -147,18 +147,19 @@ Use complete sentences for gates, security warnings, irreversible actions, order
 
 - **Simplicity first.** Prefer the smallest direct solution that fully solves the problem; add an
   abstraction only when a real, present need justifies it — not future speculation.
-- **Reuse before building.** Prefer existing, well-maintained libraries over bespoke code when they
-  fit; if unsure, research and weigh the options (fit, maintenance, footprint) first.
-- **Don't pre-build back-compat.** Expand/contract, API versioning, and backfills protect a real
-  consumer or real data already depending on the current shape — not a hypothetical future one. If
-  you don't know whether something outside this change depends on it, ask; don't assume either way.
+- **Reuse before building.** Prefer existing, well-maintained libraries over bespoke code when they fit; if unsure, research and weigh the options (fit, maintenance, footprint) first.
+- **Pay only for what exists.** Compatibility machinery, history narration, and tests for unobserved
+  failures protect a real consumer, real data, or an observed incident, not a hypothetical one. Read
+  the Lifecycle block in `docs/context.md` before building any of them; while it shows nothing
+  deployed, no real data, and no traffic, change the shape outright, keep current-state docs in the
+  present tense, and record each deferral in the production register instead. If you don't know
+  whether something outside this change depends on it, ask; don't assume either way.
 
 ## Sensitive areas
 
-The **canonical list** — other docs and skills reference this rather than restating it:
-**authentication, authorization, payments, PII/KYC, file uploads, and admin/privileged surfaces.**
-A change touching these updates `docs/security.md` during foundation or Architecture, as applicable,
-and gets `security-review` before each planning or implementation merge.
+**Canonical list** (other docs and skills point here): **authentication, authorization, payments,
+PII/KYC, file uploads, and admin/privileged surfaces.** A change touching these updates
+`docs/security.md` during foundation or Architecture as applicable and gets `security-review` before each planning or implementation merge.
 
 ## Vendored skill overrides
 
@@ -166,9 +167,8 @@ Third-party snapshots supply techniques; this file and the `sdlc` conductor own 
 and safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply these overrides:
 
 - Before using the `brainstorming` visual companion, set `SUPERPOWERS_DISABLE_TELEMETRY=1` to block
-  its branding request. Keep it on loopback; use an SSH tunnel, never plaintext non-loopback mode.
-  Use its default temporary session directory; do not pass `--project-dir`. Ignore its instruction
-  to commit or write under `docs/superpowers/`; the conductor owns the artifact and gate.
+  its branding request. Keep it on loopback with an SSH tunnel, never plaintext non-loopback mode;
+  use its default temporary session directory and do not pass `--project-dir`. Ignore its instruction to commit or write under `docs/superpowers/`; the conductor owns the artifact and gate.
 - For `improve-codebase-architecture`, treat `CONTEXT.md` as `docs/context.md`; do not invoke its
   unavailable `codebase-design` or `domain-modeling` dependencies, and skip its CDN-backed report.
 - For an opt-in worktree, use the generic Git-only `git worktree add` and non-forced

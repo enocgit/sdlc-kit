@@ -15,9 +15,10 @@ We will record each significant decision as a numbered ADR in `docs/adr/`, using
 `adr/TEMPLATE.md`. ADRs are append-only: we don't rewrite history. When a decision changes, we
 add a new ADR and mark the old one **Superseded by ADR-NNNN**.
 
-Superseding is normal, not a failure. When implementation shows an ADR was wrong, replace it in the
-same change as the code and record which assumption turned out false. Keep building to the recorded
-decision only while it still holds.
+Superseding is normal, not a failure. When implementation shows an implemented decision was wrong,
+add the superseding ADR in the same change as the code and record which assumption turned out false.
+A decision nobody implemented and nothing depends on is edited in place instead: this log records
+decisions the project built on, not proposals it walked away from.
 
 A decision is "significant" if it affects structure, a public API/contract, a cross-cutting
 concern, or would surprise a competent newcomer.

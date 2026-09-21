@@ -19,6 +19,11 @@ markup, attributes, copy, and layout carry no logic to cover — inspect the ren
 than adding an assertion for it. This is the local evidence bar; do not duplicate the full CI suite
 by default. A full configured suite is a merge gate when CI exists, not a local pre-PR requirement.
 
+The Lifecycle block in `docs/context.md` sets the reach of this bar. While it shows nothing deployed,
+no real data, and no traffic, cover the non-trivial logic and stop there: failure-path, load,
+compatibility, and multi-version cases protect conditions that cannot occur yet. Record each skipped
+case in the production register instead of writing the test.
+
 ## Test layers (the pyramid)
 
 | Layer | Tool | What it covers | When required |
@@ -26,6 +31,8 @@ by default. A full configured suite is a merge gate when CI exists, not a local 
 | Unit | {unit runner — e.g. Vitest or Jest} | Pure logic, edge cases | All non-trivial logic |
 | Integration | {same runner} + test DB | Module ↔ DB, API handlers against the contract | Any data/contract change |
 | Contract | (contract-defined types, generated or directly shared) + schema validation | FE/BE agree on the frozen interface | Any contract change |
+| Failure path | {same runner} | Error, retry, timeout, and partial-failure behavior | Once a trigger for the case can occur; see Lifecycle |
+| Load / perf | {tool} | Throughput, latency, saturation | When production traffic exists |
 | E2E | {e2e tool — e.g. Playwright, Cypress, Maestro, or Detox} | Critical user flows end-to-end | Per epic's key flow |
 
 **Rule of thumb:** test logic at the lowest layer that gives confidence; reserve E2E for the few
@@ -45,3 +52,8 @@ workflow exists.
 - Deterministic tests (no real network/time/randomness without control).
 - Test names describe behavior, not implementation.
 - A bug fix starts with a failing test that reproduces it (RED → GREEN).
+- A regression test earns its place by reproducing a failure that actually occurred. For a failure
+  that has not occurred, name the behavior it would protect and put it in the production register
+  instead of writing the test now.
+- Name the invariant, not the history: no "previously failed" or incident narration in test names
+  or comments.

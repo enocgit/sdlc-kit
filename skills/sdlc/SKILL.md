@@ -275,15 +275,21 @@ Not implemented, Partially implemented, or Implemented. Keep one delivery summar
 verification evidence, not another task checklist. Update affected current-behavior claims with
 each implementation task; full feature reconciliation still belongs to the final Retro.
 
+Compatibility artifacts, deprecation notes, and migration narration in current-state docs describe a
+transition someone has to make. The Lifecycle block in `docs/context.md` says whether anyone does:
+while it shows no consumer, real data, or traffic, restate the current shape and record the deferral
+in its production register.
+
 **Amending a decision mid-implementation.** An ADR or PRD states current intent; it is not authority
 for its own sake. When implementation shows a recorded decision is wrong, amend the record rather
 than building around it, in the same change as the code and never as a silent divergence: add a
-superseding ADR, mark the old one `Superseded by ADR-NNNN`, and name the assumption that turned out
-false rather than the alternative looking simpler. The artifact class decides the route: an internal
-ADR is yours to supersede, a shipped contract needs the versioning or deprecation decision in
-`AGENTS.md`, and PRD scope still needs the human. A reversal that invalidates the rest of the plan
-belongs at the plan gate, not absorbed into the diff. If you cannot say why the old decision was
-wrong, the objection is probably inconvenience.
+superseding ADR, mark the old one `Superseded by ADR-NNNN` when something depends on it, and name the
+assumption that turned out false rather than the alternative looking simpler. An ADR nobody
+implemented and nothing depends on is edited in place; supersede chains are for decisions the project
+built on. The artifact class decides the route: an internal ADR is yours to supersede, a shipped
+contract needs the versioning or deprecation decision in `AGENTS.md`, and PRD scope still needs the
+human. A reversal that invalidates the rest of the plan belongs at the plan gate, not absorbed into
+the diff. If you cannot say why the old decision was wrong, the objection is probably inconvenience.
 
 ## Security-review coverage
 

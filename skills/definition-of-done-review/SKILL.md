@@ -157,7 +157,10 @@ How to judge the items that need interpretation:
   change merely because its best proof is not a new test, and do not accept an assertion that only
   restates a static attribute, copy string, or layout rule as that proof. A browser run is evidence
   only when the change can break the flow it exercises; a run that could not have failed proves
-  nothing. Configured CI checks remain required from their trusted producer before merge.
+  nothing. Configured CI checks remain required from their trusted producer before merge. While the
+  Lifecycle block in `docs/context.md` shows no deployed consumer, real data, or traffic, do not
+  require a regression test for a failure that has not occurred; require its deferral in the
+  production register instead.
 - **Docs.** Update `docs/architecture.md` if the system's shape changed. Add an ADR if the change
   makes a decision, and require the superseding ADR in the same change when the work disproved an
   accepted one. Ensure the tracker issue reflects reality. Check decision and delivery

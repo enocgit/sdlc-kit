@@ -14,9 +14,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 
-- Let implementation supersede a wrong recorded decision instead of obeying or silently diverging
-  from it: require the superseding ADR in the same change as the code and a named failed assumption,
-  while shipped contracts and PRD scope keep their existing approval routes.
+- Route premature production concerns through a declared lifecycle instead of unconditional defaults:
+  add a Lifecycle block and a production register with triggers to `docs/context.md`, gate
+  compatibility machinery, history narration, and unobserved-failure tests on it, keep current-state
+  docs in the present tense, and reserve ADR supersede chains for decisions the project built on.
 - Ignore Python bytecode so the release check's `py_compile` no longer dirties the tree, and point
   `docs/test-strategy.md` at `templates/AGENTS.md` for the Definition of Ready and Done.
 - Require the Definition of Ready to confirm the frozen contract matches its accepted ADR and the
