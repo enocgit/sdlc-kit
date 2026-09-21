@@ -14,6 +14,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 
+- Let implementation supersede a wrong recorded decision instead of obeying or silently diverging
+  from it: require the superseding ADR in the same change as the code and a named failed assumption,
+  while shipped contracts and PRD scope keep their existing approval routes.
 - Ignore Python bytecode so the release check's `py_compile` no longer dirties the tree, and point
   `docs/test-strategy.md` at `templates/AGENTS.md` for the Definition of Ready and Done.
 - Require the Definition of Ready to confirm the frozen contract matches its accepted ADR and the

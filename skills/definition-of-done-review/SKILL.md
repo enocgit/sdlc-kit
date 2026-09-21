@@ -159,7 +159,8 @@ How to judge the items that need interpretation:
   only when the change can break the flow it exercises; a run that could not have failed proves
   nothing. Configured CI checks remain required from their trusted producer before merge.
 - **Docs.** Update `docs/architecture.md` if the system's shape changed. Add an ADR if the change
-  makes a decision, and ensure the tracker issue reflects reality. Check decision and delivery
+  makes a decision, and require the superseding ADR in the same change when the work disproved an
+  accepted one. Ensure the tracker issue reflects reality. Check decision and delivery
   status separately: approval, acceptance, or freeze does not prove implementation.
   Current-behavior claims and security controls must reflect the task's evidence,
   with planned and partial behavior identified. Full epic reconciliation may wait for the final

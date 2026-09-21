@@ -15,6 +15,10 @@ We will record each significant decision as a numbered ADR in `docs/adr/`, using
 `adr/TEMPLATE.md`. ADRs are append-only: we don't rewrite history. When a decision changes, we
 add a new ADR and mark the old one **Superseded by ADR-NNNN**.
 
+Superseding is normal, not a failure. When implementation shows an ADR was wrong, replace it in the
+same change as the code and record which assumption turned out false. Keep building to the recorded
+decision only while it still holds.
+
 A decision is "significant" if it affects structure, a public API/contract, a cross-cutting
 concern, or would surprise a competent newcomer.
 
@@ -22,6 +26,7 @@ concern, or would surprise a competent newcomer.
 
 - The current system _shape_ lives in `docs/architecture.md`; the _why/history_ lives here.
 - Approving an ADR is a project decision. A shipped-contract change requires a new ADR.
+- The log holds decisions, not a current instruction manual: read the newest ADR on a topic.
 - Small reversible choices don't need an ADR — keep the log signal-rich.
 
 ## Alternatives considered

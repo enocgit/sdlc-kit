@@ -43,7 +43,7 @@ Every pipeline response, whichever skill drives it, opens with this one-line sta
 
 - **Product PRD** (project-level vision/scope, set at Stage 0) → `docs/prd/0000-product.md`
 - **Feature PRDs** → `docs/prd/NNNN-{slug}.md` (numbered from 0001, status-tracked)
-- **ADRs** (decision history, append-only) → `docs/adr/NNNN-{slug}.md` — _foundational_ ADRs
+- **ADRs** (decision history; superseded, never rewritten) → `docs/adr/NNNN-{slug}.md` — _foundational_ ADRs
   (stack/repo/auth/datastore/API) are set at Stage 0; _feature_ ADRs are added per feature
 - **Architecture** (current system shape, living) → `docs/architecture.md`
 - **Contracts** (the integration source of truth) → in the codebase (`api/openapi.yaml`,
@@ -77,8 +77,7 @@ Put change summaries and verification results in the PR; check comment claims ag
 
 Keep user-facing replies compact: lead with the outcome, state each fact once, and omit filler.
 Follow standing workflow rules silently in ordinary prose: do not append compliance summaries, repeat routine permissions,
-guardrails, or planned mechanics, or narrate the process or rule behind an action ("merge is the human's gate",
-"I won't push until you say so", "per the gate protocol", or "as per the workflow").
+guardrails, or planned mechanics, or narrate the process or rule behind an action ("per the gate protocol").
 The mandatory status header, gate/approval prompts, and safety, progress, blocker, or decision messages remain required. Report actual actions/results, blockers, deviations, and decisions needed; mention a guardrail only when it changes available action or prevents an expected action.
 Use complete sentences for gates, security warnings, irreversible actions, ordered steps, and complex trade-offs. Expand when asked; runtime safety and progress rules win.
 
@@ -142,6 +141,7 @@ Use complete sentences for gates, security warnings, irreversible actions, order
 - **Project-facing artifacts cite durable docs, not process mechanics.** Reference the durable artifact — "the frozen contract
   (contract 0001, ADR-0004)" — and stop; a reader who never saw this process must not be able to tell it existed. Kit-owned operating documentation and templates may describe the process they govern.
 - **Ask, don't guess:** if a PRD/ADR is ambiguous, stop and ask rather than assume.
+- **A wrong decision is amended, not obeyed.** When implementation disproves a recorded decision, supersede it in the same change as the code and name the assumption that failed. A silently divergent implementation is worse than either choice; a _shipped_ contract still needs the versioning decision below.
 
 ## Principles
 

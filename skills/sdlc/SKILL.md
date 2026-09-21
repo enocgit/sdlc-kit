@@ -275,6 +275,16 @@ Not implemented, Partially implemented, or Implemented. Keep one delivery summar
 verification evidence, not another task checklist. Update affected current-behavior claims with
 each implementation task; full feature reconciliation still belongs to the final Retro.
 
+**Amending a decision mid-implementation.** An ADR or PRD states current intent; it is not authority
+for its own sake. When implementation shows a recorded decision is wrong, amend the record rather
+than building around it, in the same change as the code and never as a silent divergence: add a
+superseding ADR, mark the old one `Superseded by ADR-NNNN`, and name the assumption that turned out
+false rather than the alternative looking simpler. The artifact class decides the route: an internal
+ADR is yours to supersede, a shipped contract needs the versioning or deprecation decision in
+`AGENTS.md`, and PRD scope still needs the human. A reversal that invalidates the rest of the plan
+belongs at the plan gate, not absorbed into the diff. If you cannot say why the old decision was
+wrong, the objection is probably inconvenience.
+
 ## Security-review coverage
 
 For every required planning or implementation security review, establish the intended file scope
