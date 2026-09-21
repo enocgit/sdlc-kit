@@ -155,8 +155,9 @@ How to judge the items that need interpretation:
   or schema validation. Non-trivial behavior needs automated coverage; static markup,
   attributes, copy, and layout do not, and a rendered-output check suffices for them. Do not fail a
   change merely because its best proof is not a new test, and do not accept an assertion that only
-  restates a static attribute, copy string, or layout rule as that proof. Configured CI checks
-  remain required from their trusted producer before merge.
+  restates a static attribute, copy string, or layout rule as that proof. A browser run is evidence
+  only when the change can break the flow it exercises; a run that could not have failed proves
+  nothing. Configured CI checks remain required from their trusted producer before merge.
 - **Docs.** Update `docs/architecture.md` if the system's shape changed. Add an ADR if the change
   makes a decision, and ensure the tracker issue reflects reality. Check decision and delivery
   status separately: approval, acceptance, or freeze does not prove implementation.

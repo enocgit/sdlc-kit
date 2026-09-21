@@ -25,6 +25,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - Make agent communication quiet by default: report actions, results, blockers, deviations, and decisions instead of repeating routine workflow guardrails; keep internal process mechanics out of ordinary prose and
   project-facing artifacts while preserving required status headers, gate prompts, and safety messages.
 - Stop biasing verification toward new automated tests: require the smallest check that proves the change instead of a justification for omitting a test, and name static markup, attributes, copy, and layout as cases proven by inspecting rendered output.
+- Stop opening a browser for trivial UI changes: a static markup, copy, or styling tweak is proven by the diff or a single visual check, not by a Playwright run or MCP session.
 - Require reviewers to check comment claims against implementation evidence; keep change summaries and verification results in PRs.
 - Make each documentation, issue, and PR point express one rule, decision, or outcome, with independently verifiable checkboxes.
 - Review overloaded points before gates and publication without changing document structure, introductions, or requirement meaning.

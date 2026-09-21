@@ -458,6 +458,8 @@ design or spike plan as a substitute for this pipeline's PRD path.
   project rule. A static attribute, copy, or layout change carries no logic to cover: prove it by
   inspecting the rendered output rather than adding an assertion for it. The external
   `test-driven-development` skill is an optional team-wide policy, not a pipeline dependency.
+- **Don't open a browser for a trivial UI change.** A static markup, copy, or styling tweak is
+  proven by the diff or a single visual check, not by a Playwright run or MCP session.
 - Contract-first: never let implementation drift from the frozen contract. Changing a shipped
   contract requires a new ADR (versioning/deprecation).
 - **Reviews run inline** during Implement/QA. Run `code-review`, `simplify`, and local readiness on a
