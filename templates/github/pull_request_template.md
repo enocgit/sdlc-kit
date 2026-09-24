@@ -1,6 +1,6 @@
 ## Summary
 
-<!-- What changed and why? For GitHub, include `Closes #N` for the completed issue. If another tracker uses this template, omit the keyword and use its native transition. Link the PRD and ADRs when applicable. -->
+<!-- What changed and why? If the change completes a pre-existing issue, reference it (on GitHub with `Closes #N`; another tracker: its native transition) — never create an issue just to have one to close. Link the PRD and ADRs when applicable. -->
 
 - PRD: `docs/prd/...` | N/A
 - ADR(s): `docs/adr/...` | N/A

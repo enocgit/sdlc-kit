@@ -179,7 +179,7 @@ How to judge the items that need interpretation:
   regardless of status, then require human approval before implementation resumes and re-freeze any
   affected contract. For contract changes, apply the exclusive deployed-consumer routing in Contract
   fidelity before this generic ADR rule. Every PRD requirement or scope amendment returns to human approval.
-  Ensure the tracker issue reflects reality. Check decision and delivery status separately: approval, acceptance,
+  When the change has a tracker issue, ensure it reflects reality. Check decision and delivery status separately: approval, acceptance,
   or freeze does not prove implementation.
   Current-behavior claims and security controls must reflect the task's evidence,
   with planned and partial behavior identified. Full epic reconciliation may wait for the final

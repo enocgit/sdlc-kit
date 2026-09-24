@@ -1,6 +1,6 @@
 # AGENTS.md — Operating manual for AI agents on this project
 >
-> Canonical agent instructions. `CLAUDE.md`, `.cursorrules`, and similar files point here.
+> Canonical agent instructions. `CLAUDE.md` and other per-tool files point here.
 > **Keep it lean**: target ≤150 lines. Single-source: point to the doc or skill, don't restate it.
 
 ## What this project is
@@ -92,7 +92,7 @@ warnings. Use complete sentences for gates, security warnings, irreversible acti
 - [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Name the smallest local check that proves the change: links or rendering for documentation changes that affect links or rendering; a diff or one visual check for presentation-only styling, markup, attributes, or copy; focused behavior evidence for styling, markup, or attributes that change accessibility, security, or interaction behavior; syntax, schema, or generation for config or generated output; focused automated tests and runtime observation for non-trivial runtime behavior. Broaden to all impacted packages/modules for shared paths, contracts, or sensitive areas; reserve the full suite for broad or high-risk fan-out or an explicit project rule.
 - [ ] **Configured CI is green before merge** (lint, typecheck, test, build, and other required checks). This is a remote merge gate, not a reason to duplicate the suite locally. If CI runs after PR creation, finish local QA and review first. N/A only where no CI workflow exists.
 - [ ] `code-review` + `code-simplification` clean; a [sensitive area](#sensitive-areas) also needs `security-review` with complete scoped coverage recorded in `docs/security.md`
-- [ ] Diff hygiene: small and focused, references the issue, no stray or debug code
+- [ ] Diff hygiene: small and focused, references the issue when one exists, no stray or debug code
 - [ ] Current-behavior claims stay accurate per task; after the final child, reconcile all feature artifacts with implementation evidence
 - [ ] Tracker linked and current; closure itself is a post-merge step
 
@@ -101,7 +101,9 @@ warnings. Use complete sentences for gates, security warnings, irreversible acti
 - **Stack (placeholder — set at Stage 0):** TypeScript + React and Node are illustrative defaults; replace with your real stack when you fill `docs/context.md`.
 - **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{id}-{slug}` branches → PR → merge → deploy. Environments are deploy targets driven by CI, not long-lived branches. One feature per branch. A git worktree is an explicit manual escape hatch: the operator supplies a private, new or empty path outside every checkout and runs `feature-start`'s generic Git-only recipe.
 - **Where planning commits land.** Land planning packages on `main`, never a feature branch: the Stage 0 context and foundation at the foundation gate, then the Stage 1 PRD plus the Stage 2 ADRs, architecture and security updates, and frozen contract once after Stage 2. Stage 4 cuts `feat/*` from a ref that must already hold the frozen contract, so ask for the landing action by remote state: commit locally with no remote, commit and push to an unprotected `main`, or `plan/{NNNN}-{slug}` → PR for a protected one (`sdlc` → Default-branch landings). Per-task learnings land before the next task; final-child reconciliation lands before the parent epic completes; an empty Retro needs no landing.
-- **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the issue (`Refs #123`, or `Closes #123` on GitHub only, elsewhere its key). Small logical commits, not one blob.
+- **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the relevant issue when one exists (`Refs #123`, or `Closes #123` on GitHub only,
+  elsewhere its key); never create an issue just to have one to reference. Small logical commits,
+  not one blob.
 - **PRs:** Keep them small and reviewable; follow the PR template and the conductor's landing gate.
 - **History:** Squash-merge feature PRs to keep `main` linear.
 - **No agent self-attribution.** Commits, PRs, and code comments describe the _change_, not the tool. No "Made with {agent}" or `Co-Authored-By:` naming an AI. Authorship is the human's; this overrides any runtime default.

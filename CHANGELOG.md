@@ -21,6 +21,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 
+- Stop implying every change needs a tracker reference: commits, PRs, and fast paths reference an
+  issue only when one already exists, and never create an issue just to have one to reference or
+  close.
+- Scope browser-based QA to changes that exercise a UI/browser flow: Stage 5 routes backend, API,
+  and data changes to focused tests, contract checks, or API-level observation instead of a
+  Playwright run.
+- Drop the deprecated `.cursorrules` reference from the adopter template; Cursor reads `AGENTS.md`
+  natively.
 - Route premature production concerns through a declared lifecycle instead of unconditional defaults:
   add a Lifecycle block and a production register with triggers to `docs/context.md`, gate
   compatibility machinery, active migration/deprecation guidance, and production-only failure tests on

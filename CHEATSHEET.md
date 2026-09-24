@@ -67,7 +67,8 @@ the human merges directly. With no remote, the human merges the local branch.
 
 - Keep `main` deployable. Use short-lived `feat/{id}-{slug}` branches.
 - Use imperative Conventional Commits: `type(scope): summary`, at most 72 characters.
-- Use `Refs #N` or `Closes #N` for GitHub. Use native keys for other trackers and no issue syntax for
+- Use `Refs #N` or `Closes #N` for GitHub when the change completes an existing issue; never create
+  an issue just to have one to reference. Use native keys for other trackers and no issue syntax for
   local-only IDs.
 - Land Stage 1–2 planning artifacts once after Stage 2, before branching; Stage 0 artifacts may land
   after their gate. With a remote, an unprotected `main` takes the commit and push under one

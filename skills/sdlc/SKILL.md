@@ -83,7 +83,8 @@ capability is available.
 2. **Right-size the path.** Classify the change before routing:
    - **Feature / user-facing / risky** → establish Stage 0 once if needed, then run Stages 1→8.
    - **Bug fix / small enhancement** → **Implement → QA → Review → Land → Retro** (Stages
-     4→5→6→7→8; reference an issue; no PRD/contract/ADR).
+     4→5→6→7→8; reference an issue when one exists — never create one just for the reference;
+    no PRD/contract/ADR).
    - **Chore / docs / dep bump** → **Implement → Review → Land → Retro** (Stages 4→6→7→8;
      trivial diff, CI green before merge).
    - The moment a "small" change touches a **contract**, a **security-sensitive area**, or makes
@@ -177,7 +178,7 @@ keep document structure and PRD/ADR introductions intact.
 | 2 Architecture + Contract | `documentation-and-adrs` + `grilling` | ADR(s) in `docs/adr/`, updated `docs/architecture.md`, `docs/security.md` (sensitive areas), **frozen** contract artifact in repo (OpenAPI/tRPC/schema) | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
 | 4 Implement | `feature-start` (direct feature branch by default; manual Git-only worktree escape hatch), `frontend-design` (UI work only), `ponytail` (backend/domain logic, parsers, transformations, state, tooling, and dependency choices) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
-| 5 QA | proportional local verification + runtime-equivalent checks (`webapp-testing` for UI/browser) | change-scope evidence; CI green now or after PR creation | proceed (disclose results) |
+| 5 QA | proportional local verification + runtime-equivalent checks (`webapp-testing` only when the change exercises a UI/browser flow; backend, API, and data changes verify with focused tests, contract checks, or API-level observation — no browser) | change-scope evidence; CI green now or after PR creation | proceed (disclose results) |
 | 6 Review | mandatory `code-review`, `code-simplification`, and local-readiness `definition-of-done-review` | clean diff, local DoD evidence, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
 | 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to _in review_ according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
 | 8 Retro | reflect + write (native) | curate **0–3** durable learnings after every task; after the final child, reconcile feature artifacts and the parent epic (see [Stage 8](#stage-8-what-a-learning-is-and-isnt)) | if repository files changed, offer to land them on `main`; otherwise continue without an empty landing action |
@@ -482,7 +483,7 @@ design or spike plan as a substitute for this pipeline's PRD path.
     wait for the human to confirm the package reached the default branch.
   Stage 4 branches from that clean ref; the branch carries the task implementation plus its
   required task-scoped tests and docs. (See `AGENTS.md` → Where planning commits land.)
-- One feature in flight per branch. Reference the tracker issue (its `#`/key) in commits/PRs.
+- One feature in flight per branch. Reference the tracker issue (its `#`/key) in commits/PRs when the task has one.
 - At Decompose, create issues with `gh issue create` and **shape their bodies to match**
   `.github/ISSUE_TEMPLATE/{epic,task}.md` — one `epic` per feature, a `task` per child. (`--body`
   bypasses the template, so follow its structure by hand: reference line → Scope/Tasks → DoD.)
@@ -513,6 +514,9 @@ design or spike plan as a substitute for this pipeline's PRD path.
   team-wide policy, not a pipeline dependency.
 - **Don't open a browser for a trivial UI change.** A presentation-only markup, copy, or styling
   tweak is proven by the diff or a single visual check, not by a Playwright run or MCP session.
+- **No browser for backend-only changes.** API, service, data-model, and tooling changes are proven
+  by focused tests, contract checks, or API-level runtime observation; a Playwright or MCP browser
+  session proves nothing about them.
 - Contract-first: never let implementation drift from the frozen contract. A shipped contract with a
   deployed consumer requires a versioning/deprecation ADR; if there is no deployed consumer, apply the
   ADR matrix and re-freeze the contract.
