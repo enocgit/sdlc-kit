@@ -32,12 +32,13 @@ feature can't start without. Let everything else emerge per-feature.
 ## First: orient
 
 **Resolve skills from the skill dirs.** Project-local bundled skills are authoritative inside a
-pipeline project. Use the project's local skill first; consult user-global directories
-(`~/.agents/skills`, `~/.claude/skills`) only when that local skill is absent, and disclose the
-fallback. If neither location has it, use your **runtime's equivalent** — several stage skills are
-named after Claude Code's commands (`code-review`, `simplify`, `security-review`) and other
-runtimes have their own equivalents (e.g. Codex `review` ≈ `code-review`). Only when no skill or runtime
-equivalent exists should you use the manual `fallback` in `required-skills.yml`.
+pipeline project; this includes the Stage 6 review skills (`code-review`, `code-simplification`,
+`security-review`), which ship with the kit and work on any agent runtime. Use the project's local
+skill first when it is present and invocable. If it is absent or cannot be invoked, consult user-global
+directories (`~/.agents/skills`, `~/.claude/skills`). If no invocable user-global skill is available,
+use your **runtime's equivalent** where one exists. Use the manual `fallback` in
+`required-skills.yml` only when no invocable project-local, user-global, or runtime-equivalent
+capability is available.
 
 1. Read `AGENTS.md`, `docs/context.md`, and `docs/test-strategy.md`. **Stage 0 is incomplete** if
    the operating manual or context is missing, `AGENTS.md` still contains `Stack (placeholder`, the
@@ -177,7 +178,7 @@ keep document structure and PRD/ADR introductions intact.
 | 3 Decompose | `writing-plans` + `project-status` | **tracker issues** (GitHub by default) shaped per `.github/ISSUE_TEMPLATE/{epic,task}.md` (the tracker is the record — no in-repo mirror; other trackers: their native issue types; local-only: feature + task rows in `docs/progress.md`) | disclose the breakdown, then continue |
 | 4 Implement | `feature-start` (direct feature branch by default; manual Git-only worktree escape hatch), `frontend-design` (UI work only), `ponytail` (backend/domain logic, parsers, transformations, state, tooling, and dependency choices) | code on a `feat/*` branch, one task at a time | **GATE — compact in-session plan per task** |
 | 5 QA | proportional local verification + runtime-equivalent checks (`webapp-testing` for UI/browser) | change-scope evidence; CI green now or after PR creation | proceed (disclose results) |
-| 6 Review | mandatory `code-review`, `simplify`, and local-readiness `definition-of-done-review` | clean diff, local DoD evidence, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
+| 6 Review | mandatory `code-review`, `code-simplification`, and local-readiness `definition-of-done-review` | clean diff, local DoD evidence, findings fixed | inline, no gate — but **`security-review` is mandatory if a sensitive area is touched** |
 | 7 Land | `project-status` | PR opened where hosting supports it. Without PR support, the branch is pushed if a remote exists, any available CI runs, and the human merges it directly; with no remote, the human merges the local branch ([Rules](#rules) → Tracker, remote, and PR/CI capabilities). **GitHub:** the PR carries `Closes #N` and the issue closes on merge — nothing to write. **Any other tracker or local-only:** no closing keyword; move the task to _in review_ according to [Task completion by tracker](#task-completion-by-tracker) | **GATE — the human merges** |
 | 8 Retro | reflect + write (native) | curate **0–3** durable learnings after every task; after the final child, reconcile feature artifacts and the parent epic (see [Stage 8](#stage-8-what-a-learning-is-and-isnt)) | if repository files changed, offer to land them on `main`; otherwise continue without an empty landing action |
 
@@ -222,7 +223,7 @@ always interrupt. This keeps the front half rigorous and the back half moving.
 says don't commit/push/PR unless asked. That is **one narrow stop at the commit/push boundary — not
 a reason to stop at the end of Stage 4.** After the Implement plan gate, keep going through
 everything that needs _no_ push: proportional local checks, runtime observation, and the whole Stage 6 pass
-(`code-review`, `simplify`, `security-review` if sensitive, diff hygiene). Only _then_ stop, at the
+(`code-review`, `code-simplification`, `security-review` if sensitive, diff hygiene). Only _then_ stop, at the
 push. For a PR workflow, report that tree-only local checks and review are done, then ask one combined
 question: _"Approve commit, push, and opening the PR?"_ With a remote but no PR workflow,
 ask _"Approve commit and push?"_ With no remote, ask only _"Approve commit?"_ After approval, create
@@ -515,7 +516,7 @@ design or spike plan as a substitute for this pipeline's PRD path.
 - Contract-first: never let implementation drift from the frozen contract. A shipped contract with a
   deployed consumer requires a versioning/deprecation ADR; if there is no deployed consumer, apply the
   ADR matrix and re-freeze the contract.
-- **Reviews run inline** during Implement/QA. Run `code-review`, `simplify`, and local readiness on a
+- **Reviews run inline** during Implement/QA. Run `code-review`, `code-simplification`, and local readiness on a
   clean materialization of the complete target-to-tree delta; bind evidence to its target, parent,
   and tree. After commit, require the tree to have the same reviewed content and its parent to match.
   At final confirmation, resolve authoritative target/head tips by PR, remote-only, or local-only

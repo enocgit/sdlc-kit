@@ -71,7 +71,7 @@ runs before Land when possible. If the project needs a PR to start CI, Land open
 
 ### 6. Review the diff
 
-`code-review` and `simplify` inspect the diff. Because the feature touches payments and PII, the
+`code-review` and `code-simplification` inspect the diff. Because the feature touches payments and PII, the
 agent also runs `security-review` and fixes its findings. `definition-of-done-review` confirms local
 readiness. Required CI is the only pending item before Land.
 

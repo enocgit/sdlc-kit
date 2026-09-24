@@ -41,7 +41,9 @@ trust boundary? What happens if each input is hostile? What if a dependency/webh
 ## Review record
 
 - **Scope / date:** {planning or implementation scope, intended file list} / YYYY-MM-DD
-- **Reviewed identity:** {base and revision or content identity, including uncommitted/new files}
+- **Reviewed identity:** {target and base identities plus the stable reviewed-subject identity;
+  when this file is in scope, exclude or normalize only the review-record metadata described by
+  `security-review`, never the threat model or baseline controls}
 - **Coverage:** {each intended file: tool-reviewed, manually reviewed, or excluded with reason;
   link a complete inventory if large. Resolve tool omissions manually; unknown coverage or
   inaccessible required files means incomplete review, not no findings.}

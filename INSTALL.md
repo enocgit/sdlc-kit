@@ -153,14 +153,22 @@ registry. Project-local installation remains the default recommendation.
 | `ponytail` | DietrichGebert/ponytail | Implement, backend/domain and dependency choices |
 | `webapp-testing` | anthropics/skills | QA, browser UI only |
 | `improve-codebase-architecture` | mattpocock/skills | Adopt an existing project |
+| `code-review` | sdlc kit (maintained adaptation) | Stage 6 Review |
+| `code-simplification` | sdlc kit (maintained adaptation of addyosmani/agent-skills) | Stage 6 Review |
+| `security-review` | sdlc kit (maintained adaptation) | Stages 0/0b/2 for sensitive planning/foundation/architecture; Stage 6 for sensitive implementation review |
 
 `vendor/skills/` contains exact upstream snapshots. The installer preserves them and adds
 `$SKILLS_DIR/{skill}/.sdlc-vendor/` with provenance and license files. The `to-spec` snapshot is pinned
 to a reviewed upstream revision. See [`vendor/skills.lock.json`](./vendor/skills.lock.json) for every
 pinned commit.
 
-Use the runtime's tools for runtime observation, code review, simplification, and security review.
-`required-skills.yml` provides manual fallbacks where available. The bundled `unslop` adaptation
+Stage 6 uses the bundled maintained adaptations `code-review`, `code-simplification`, and `security-review`.
+`security-review` is also mandatory for sensitive planning/foundation/architecture work at stages
+0/0b/2. Use a project-local bundled skill first when it is present and invocable. If it is absent or
+cannot be invoked, consult the user-global skill locations (`~/.agents/skills`, `~/.claude/skills`).
+If no invocable user-global skill is available, use an equivalent runtime capability where one
+exists. Use the manual fallback in `required-skills.yml` only when no invocable project-local,
+user-global, or runtime-equivalent capability is available. The bundled `unslop` adaptation
 automatically applies to human-facing replies and prose. It leaves code, commands, contracts, logs,
 and other excluded content unchanged.
 
@@ -168,8 +176,9 @@ Skills run with the agent's permissions. Keep the project-local copies committed
 CI environment uses the same instructions.
 
 `required-skills.yml` lists pipeline dependencies and standalone utilities, with manual fallbacks.
-To add a pipeline skill, update `AGENTS.md`, `required-skills.yml`, the snapshot and provenance when
-applicable, and the installed conductor at `$SKILLS_DIR/sdlc/SKILL.md`.
+To add a pipeline skill, update `AGENTS.md`, `required-skills.yml`, its skill and attribution files,
+and the installed conductor at `$SKILLS_DIR/sdlc/SKILL.md`; update a snapshot and provenance when
+applicable.
 
 ### Additional skills
 

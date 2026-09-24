@@ -8,6 +8,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Added
 
+- Stage 6 review skills now ship with the kit and work on any runtime: `code-review` and
+  `security-review` are maintained adaptations of Addy Osmani's `code-review-and-quality` skill and
+  the OWASP Secure Agent Playbook "Play: Security Code Review", and `code-simplification` is a
+  maintained adaptation of Addy Osmani's `code-simplification` skill. The `required-skills.yml`
+  entries for these capabilities no longer depend on Claude Code's native commands; their manual
+  fallbacks remain for runtimes where skill invocation is unavailable.
+
 - The release gate now verifies that every directory enumeration rewinds its descriptor first, and
   exercises a no-clobber publication on the kit's own filesystem instead of only the shared
   temporary directory.

@@ -5,12 +5,12 @@ description: >
   review by checking acceptance criteria, contract fidelity, proportional verification with test
   coverage where behavior warrants it, docs/ADR updates, and security for sensitive areas, then
   gives a pass/fail verdict with evidence appropriate to each item. Use at Stage 6 after code-review
-  and simplify, or when the user asks "is this ready to merge" or "run the DoD check".
+  and code-simplification, or when the user asks "is this ready to merge" or "run the DoD check".
 ---
 
 # definition-of-done-review
 
-Run this team-specific check after generic `code-review` and `simplify`. Those checks catch bugs and
+Run this team-specific check after generic `code-review` and `code-simplification`. Those checks catch bugs and
 cleanup issues; this one verifies readiness against the team's standard.
 
 ## Review modes
@@ -49,7 +49,7 @@ non-ignored untracked files staged by `git add -A`, and deletions. Record `forma
 resulting digest.
 
 Use a clean materialization of the recorded tree, not the mutable source worktree, for local QA,
-`code-review`, `simplify`, and `security-review`. For prospective review, create an unreferenced
+`code-review`, `code-simplification`, and `security-review`. For prospective review, create an unreferenced
 evidence commit with `git commit-tree`. Give it the recorded `tree`, `reviewBase` as its sole parent,
 and fixed identity, timestamps, and message; never update a ref. For Already-committed review, use
 `reviewedCommit` as the evidence commit. Create a mode-`0700` temporary parent for a detached private
@@ -61,6 +61,8 @@ at its recorded gitlink. Before and after each check, rebuild the tree identity 
 verify recursive submodule state. A mismatch discards the evidence and requires a fresh worktree and
 rerun. This prevents ignored, untracked, generated, and submodule residue from one check affecting the
 next. Reviews must cover the complete `reviewTarget`-to-tree delta, not only `reviewBase..HEAD`.
+
+For `security-review`, the recorded subject identity excludes or normalizes only the review-record metadata in `docs/security.md` as specified by that skill. Record-only updates to those fields do not invalidate the security subject review; substantive changes to its threat model, baseline controls, or reviewed scope require rematerialization and a fresh security review.
 
 After prospective review, require the new commit's sole direct parent to equal `reviewBase`, set
 `reviewedCommit` to that commit, obtain its tree, and require all three recorded identity values to
@@ -107,7 +109,7 @@ adds none.
 
 If reviewed content changed after local readiness, `targetBase` differs from `reviewTarget`, or the
 candidate tree differs from the locally reviewed tree, rerun applicable QA, `code-review`,
-`simplify`, `security-review`, and the full local-readiness review against a clean materialization
+`code-simplification`, `security-review`, and the full local-readiness review against a clean materialization
 of the complete target-to-candidate delta. A changed parent invalidates the same evidence even when
 the tree is identical.
 

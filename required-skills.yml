@@ -11,6 +11,10 @@
 # `sourcePath` is packaging metadata relative to this kit checkout. install.sh maps each bundled
 # skill name into `$SKILLS_DIR/{name}`. Pins and hashes live in vendor/skills.lock.json, per-skill
 # provenance in vendor/provenance/, and upstream license text in vendor/licenses/.
+# Runtime routing: use a project-local skill when present and invocable. If absent or unavailable,
+# consult user-global skill locations. If no invocable user-global skill is available, use a runtime
+# equivalent when available. Use the fallback only when no invocable project-local, user-global, or
+# runtime-equivalent capability is available.
 
 version: 1
 
@@ -136,22 +140,27 @@ skills:
               fallback: "prefer the smallest direct implementation, reuse existing code where it fits, and add the smallest sufficient verification",
         }
 
-      # --- claude-code (native CLI commands; not installable, not portable) ---
+      # --- stage 6 review skills, shippable on any runtime ---
+      # These are maintained adaptations of third-party skills; see each skill's NOTICE.md. The
+      # fallbacks remain for runtimes where skill invocation is unavailable.
       - {
               name: code-review,
-              kind: claude-code,
+              kind: local,
+              sourcePath: skills/code-review,
               stage: 6,
               fallback: "inspect the complete target-to-tree diff for correctness, contract fidelity, security, tests, and unrelated changes",
         }
       - {
-              name: simplify,
-              kind: claude-code,
+              name: code-simplification,
+              kind: local,
+              sourcePath: skills/code-simplification,
               stage: 6,
-              fallback: "remove unnecessary complexity from changed code without changing behavior, then rerun focused checks",
+              fallback: "inspect changed code for behavior-preserving simplification candidates, report each candidate with its equivalence checks, and leave edits to the parent or author; rerun affected reviews after rematerialization",
         }
       - {
               name: security-review,
-              kind: claude-code,
+              kind: local,
+              sourcePath: skills/security-review,
               stage: "0,0b,2,6",
               note: "mandatory before landing sensitive planning or implementation changes — not agent discretion",
               fallback: "perform a structured manual review of changed trust boundaries, authentication/authorization, data exposure, abuse cases, dependencies, and hostile inputs; reconcile intended file scope with actual coverage under sdlc, including docs/tests and new files; record reviewed identity, exclusions, limits, findings, and resolutions in docs/security.md; inaccessible required files block readiness",
