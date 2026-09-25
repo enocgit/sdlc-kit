@@ -14,9 +14,7 @@ commit/push/PR approval happens at the end of Stage 6 — `references/rules.md` 
 ## Tooling
 
 - Use the project's own test runner and lifecycle commands.
-- `webapp-testing`, when used: its Playwright method, but **not** its bundled `with_server.py`
-  (use the project's lifecycle runner or an already-running server so output is drained and the
-  process tree stays owned); wait for an app-specific readiness signal — locator, URL, or health
-  check — never mandatory `networkidle`.
+- `webapp-testing`: its SKILL already scopes itself to UI flows, the project's lifecycle runner,
+  and app-specific readiness signals; follow it as written.
 - When a browser is and isn't the right evidence, and the RED → GREEN requirement, see
   `references/rules.md` → Verification.

@@ -11,7 +11,7 @@ Definition of Done live in the operating manual this kit ships,
 
 | Layer | Tool | Required evidence |
 | --- | --- | --- |
-| Critical installer integration | `./scripts/validate-kit.sh` | Offline clean and dry-run installs, restrictive umask, no-clobber race, recovery and quarantine, containment, source-entry rejection, and installed-integrity checks |
+| Critical installer integration | `./scripts/validate-kit.sh` | Offline clean and dry-run installs, restrictive umask, no-clobber publication, interrupted-run cleanup, containment, source-entry rejection, and installed-integrity checks |
 | Provenance | `python3 scripts/vendor-skills.py verify` | Snapshot, license, provenance, and lock agreement |
 | Manifest schema | `python3 scripts/validate-required-skills.py required-skills.yml` | Strict YAML and kind-specific fields |
 | Syntax and static checks | `bash -n`, `python3 -m py_compile`, LSP, `git diff --check` | Changed Bash, Python, Markdown, and YAML are clean |
@@ -22,8 +22,9 @@ invariants only; prose, routing, and duplicated parser checks belong in review, 
 Documentation changes that affect links or rendering need the relevant validator check and link or
 rendering inspection; presentation-only docs copy, styling, markup, or attributes may use a diff or one
 visual check, while accessibility, security, or interaction changes need focused behavior evidence.
-Networked `sync` and `update` tests require an explicit maintenance
-run; normal validation and installation stay offline.
+The release gate tests `sync` and `update --track` offline against a local Git fixture; checks
+against upstream sources require an explicit maintenance run. Normal validation and installation
+stay offline.
 
 ## Release bar
 

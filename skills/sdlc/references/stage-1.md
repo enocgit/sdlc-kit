@@ -15,9 +15,9 @@ issues exist yet — tracker work begins at Stage 3.
 
 ## Skills, in order
 
-1. `brainstorming` (method only) — explore → **one question at a time** → approaches → design.
-   Discovery is exploratory — **no code.** Land the result as the optional Stage-1 brief and STOP;
-   do **not** write to `docs/superpowers/specs/` and do **not** auto-run `writing-plans`.
+1. `brainstorming` — explore → **one question at a time** → approaches → design. Discovery is
+   exploratory — **no code.** The fork lands the approved brief at `docs/briefs/NNNN-{slug}.md`
+   and stops; it owns no handoff to planning.
 2. `to-spec` — turn the approved direction into the PRD using the kit's PRD template; write to
    `docs/prd/NNNN-{slug}.md`; do not publish or label a tracker issue.
 3. `grilling` — stress-test the PRD until no open questions remain; the Definition of Ready
@@ -25,11 +25,6 @@ issues exist yet — tracker work begins at Stage 3.
 
 **Skill overrides:**
 
-- `brainstorming`: use its discovery method; the conductor owns the artifact and the approval gate.
-  If the user approves its visual companion, set `SUPERPOWERS_DISABLE_TELEMETRY=1` to block its
-  branding request; keep it on loopback (SSH tunnel, never plaintext non-loopback); use its default
-  temporary session directory; do not pass `--project-dir`; ignore its instruction to commit or
-  write under `docs/superpowers/`.
 - `to-spec`: use its synthesis method with the kit's PRD template; override its tracker publishing.
 - `grilling`: point it at the decision, not the document.
 

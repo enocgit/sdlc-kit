@@ -1,4 +1,7 @@
 skills/address-review/SKILL.md
+skills/brainstorming/LICENSE
+skills/brainstorming/SKILL.md
+skills/brainstorming/spec-document-reviewer-prompt.md
 skills/code-review/LICENSE.txt
 skills/code-review/NOTICE.md
 skills/code-review/SKILL.md
@@ -7,6 +10,8 @@ skills/code-simplification/NOTICE.md
 skills/code-simplification/SKILL.md
 skills/definition-of-done-review/SKILL.md
 skills/feature-start/SKILL.md
+skills/improve-codebase-architecture/LICENSE
+skills/improve-codebase-architecture/SKILL.md
 skills/project-status/SKILL.md
 skills/sdlc/SKILL.md
 skills/sdlc/references/rules.md
@@ -25,6 +30,8 @@ skills/security-review/SKILL.md
 skills/unslop/LICENSE.txt
 skills/unslop/NOTICE.md
 skills/unslop/SKILL.md
+skills/webapp-testing/LICENSE.txt
+skills/webapp-testing/SKILL.md
 templates/AGENTS.md
 templates/CLAUDE.md
 templates/docs/adr/0001-record-architecture-decisions.md

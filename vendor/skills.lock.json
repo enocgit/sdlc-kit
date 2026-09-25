@@ -1,15 +1,6 @@
 {
   "version": 2,
   "skills": {
-    "brainstorming": {
-      "source": "https://github.com/obra/superpowers.git",
-      "track": "refs/heads/main",
-      "commit": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
-      "upstreamPath": "skills/brainstorming",
-      "contentSha256": "d6ec8dae24bff1fdddc321d087d51e5636a8dddec73a18b6ad8a707896c68705",
-      "licenseSource": "LICENSE",
-      "licenseSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400"
-    },
     "to-spec": {
       "source": "https://github.com/mattpocock/skills.git",
       "track": "refs/heads/main",
@@ -39,7 +30,7 @@
     },
     "writing-plans": {
       "source": "https://github.com/obra/superpowers.git",
-      "track": "refs/heads/main",
+      "track": "refs/tags/v6.3.0",
       "commit": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
       "upstreamPath": "skills/writing-plans",
       "contentSha256": "ae810d901e75e409c701ccb659b40875ae5ba2e5daae2d119e582d222d818208",
@@ -54,24 +45,6 @@
       "contentSha256": "315a8f632f79fb9d42863044513f2998022a58d16c7ef4b5e314bedb91698d51",
       "licenseSource": "skills/frontend-design/LICENSE.txt",
       "licenseSha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
-    },
-    "webapp-testing": {
-      "source": "https://github.com/anthropics/skills.git",
-      "track": "refs/heads/main",
-      "commit": "3b3fad96af16a10759d930941b4520ba0c40edae",
-      "upstreamPath": "skills/webapp-testing",
-      "contentSha256": "2a6fc822d75c875c127b9344d44e68aa65f0cb431892cc9467d2a931068db670",
-      "licenseSource": "skills/webapp-testing/LICENSE.txt",
-      "licenseSha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362"
-    },
-    "improve-codebase-architecture": {
-      "source": "https://github.com/mattpocock/skills.git",
-      "track": "refs/heads/main",
-      "commit": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
-      "upstreamPath": "skills/engineering/improve-codebase-architecture",
-      "contentSha256": "2889222c35b133361e87aa71863cf2e679fb62b5f6cefce365f1c681de52f315",
-      "licenseSource": "LICENSE",
-      "licenseSha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5"
     },
     "ponytail": {
       "source": "https://github.com/DietrichGebert/ponytail.git",

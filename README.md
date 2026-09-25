@@ -9,7 +9,8 @@ The kit installs:
 - a conductor skill that routes work through the workflow;
 - a project operating manual from `templates/AGENTS.md`, installed as `AGENTS.md`;
 - templates for product, architecture, security, contract, test, and progress docs; and
-- pinned stage skills installed project-locally by default for reproducible runs.
+- stage skills installed project-locally by default for reproducible runs — maintained adaptations
+  the kit owns, plus exact third-party snapshots pinned under `vendor/skills/`.
 
 It works with web and API products, SaaS, backends, CLIs, libraries, and cross-platform mobile
 apps. The defaults assume contracts, continuous integration (CI), database migrations, and
@@ -119,8 +120,8 @@ behavior. After foundation approval, the next feature follows the normal workflo
   code, identifiers, schemas, contracts, commands, logs, quoted text, machine-readable output, fixed
   formats, vendor snapshots, and neutral technical records unchanged.
 - Skills are portable Markdown. Each stage has a manual fallback in `required-skills.yml`.
-- Stage-bound third-party skills are pinned under `vendor/skills/` and installed project-locally by
-  default.
+- Stage-bound third-party techniques arrive two ways: exact snapshots pinned under `vendor/skills/`, and
+  maintained adaptations under `skills/` that carry an adaptation header and the upstream license.
 - `required-skills.yml` records pipeline dependencies, standalone utilities, and their fallbacks.
   Adding another skill does not make it a pipeline stage.
 - GitHub is the default tracker and PR host, not a runtime requirement.
@@ -141,8 +142,8 @@ The installer records provenance and license metadata for vendored skills. Sourc
 | `templates/CLAUDE.md` | one-line pointer to the operating manual |
 | `docs/context.md` | repository context for maintainers and agents |
 | `install.sh` | merge-aware installer with `--dry-run` |
-| `skills/` | conductor, kit-owned workflow skills, and utilities |
-| `vendor/skills/` | pinned, unmodified third-party pipeline skills |
+| `skills/` | conductor, kit-owned workflow skills, and maintained adaptations |
+| `vendor/skills/` | pinned, unmodified third-party snapshots |
 | `vendor/skills.lock.json` | upstream revisions, paths, content hashes, and license hashes |
 | `scripts/vendor-skills.py` | verifies, restores, refreshes, and removes vendored snapshots |
 | `templates/docs/` | project documentation templates |

@@ -3,18 +3,18 @@
 # capabilities used by the pipeline.
 #
 # kind:
-#   local       - maintained by this kit in skills/ and installed project-locally
-#                 by install.sh
+#   local       - maintained by this kit in skills/ and installed
+#                 project-locally by install.sh
 #   vendored    - exact third-party snapshot in vendor/skills, pinned by the
 #                 provenance lock, and installed project-locally by install.sh
 #   claude-code - a capability named after Claude Code's native command (not a
 #                 file, not installable). On another runtime, use that runtime's
 #                 equivalent or the manual fallback.
 #
-# `sourcePath` is packaging metadata relative to this kit checkout. install.sh
-# maps each bundled skill name into `$SKILLS_DIR/{name}`. Pins and hashes live in
-# vendor/skills.lock.json, per-skill provenance in vendor/provenance/, and
-# upstream license text in vendor/licenses/.
+# `sourcePath` is packaging metadata relative to this kit checkout.
+# install.sh maps each bundled skill name into `$SKILLS_DIR/{name}`. Pins and
+# hashes live in vendor/skills.lock.json, per-skill provenance in
+# vendor/provenance/, and upstream license text in vendor/licenses/.
 #
 # Runtime routing: use a project-local skill when present and invocable. If
 # absent or unavailable, consult user-global skill locations. If no invocable
@@ -70,15 +70,12 @@ skills:
   # paths and transitions. See skills/sdlc/SKILL.md "Borrow the technique, not
   # the workflow".
   - name: brainstorming
-    kind: vendored
-    sourcePath: vendor/skills/brainstorming
-    source: obra/superpowers
+    kind: local
+    sourcePath: skills/brainstorming
     stage: 1
     note: >-
-      method only — land a Stage-1 brief in docs/briefs/; ignore its commit and
-      docs/superpowers instructions; keep the visual companion loopback-only,
-      use its default temporary session directory, and use an SSH tunnel for
-      remote access
+      maintained adaptation of obra/superpowers (MIT); the fork lands the
+      approved brief at docs/briefs/NNNN-{slug}.md and stops
     fallback: ask clarifying questions and draft the brief by hand
   - name: documentation-and-adrs
     kind: vendored
@@ -101,26 +98,21 @@ skills:
       create ordered tracker issues manually with scope, acceptance criteria,
       dependencies, verification, and touched paths
   - name: webapp-testing
-    kind: vendored
-    sourcePath: vendor/skills/webapp-testing
-    source: anthropics/skills
+    kind: local
+    sourcePath: skills/webapp-testing
     stage: 5
     note: >-
-      UI/browser checks only — skip for backend; do not use the bundled
-      with_server.py or mandatory networkidle waits; use the project's lifecycle
-      runner and an app-specific readiness signal, or a platform runner such as
-      Maestro or Detox for mobile
+      maintained adaptation of anthropics/skills (Apache-2.0); already scoped to
+      UI checks, the project's lifecycle runner, and app-specific readiness
     fallback: >-
       drive the app with its platform runner (Playwright, Maestro, Detox, etc.)
   - name: improve-codebase-architecture
-    kind: vendored
-    sourcePath: vendor/skills/improve-codebase-architecture
-    source: mattpocock/skills
+    kind: local
+    sourcePath: skills/improve-codebase-architecture
     stage: 0
     note: >-
-      method only — CONTEXT.md means docs/context.md; do not invoke unavailable
-      codebase-design/domain-modeling dependencies or generate the CDN-backed
-      HTML report
+      maintained adaptation of mattpocock/skills (MIT); ranked candidates in
+      chat, CONTEXT.md means docs/context.md
     fallback: >-
       read context, ADRs, recent-change hotspots, and current modules; record
       ranked structure risks and one smallest useful improvement

@@ -4,6 +4,44 @@ All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); this project aims to follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Three pipeline skills move from exact snapshots to maintained adaptations the kit owns, following
+  the `code-review` pattern — adaptation header naming the upstream and re-scoping, upstream license
+  shipped in the skill directory: `brainstorming` (obra/superpowers),
+  `improve-codebase-architecture` (mattpocock/skills), and `webapp-testing` (anthropics/skills).
+  Each bakes in the conductor overrides that previously lived in `required-skills.yml` notes:
+  brainstorming lands its brief at `docs/briefs/` and stops (no upstream hand-off to planning, no
+  visual companion — its browser mockup server stays upstream), improve-codebase-architecture
+  presents ranked candidates in chat against `docs/context.md` (no CDN HTML report, no
+  runtime-specific files), and webapp-testing uses the project's lifecycle runner and app-specific
+  readiness signals (no bundled server script).
+- `vendor-skills.py update` gains `--track`, so pin moves go through the tool instead of by
+  hand-editing the lock. `writing-plans` now pins the `v6.3.0` release tag (same commit as before);
+  the other five snapshots keep their reviewed `main` pins because no upstream tag points at their
+  pinned commits — moving them would have changed content.
+
+### Changed
+
+- `vendor-skills.py` shrinks from 1,371 to 887 lines: the staging-intent, quarantine, transaction
+  marker, and inherited-lock recovery machinery are replaced by a plain `flock`, an atomic
+  no-replace rename publication, and next-run cleanup that restores or discards a crashed
+  publication. The offline validator covers snapshot verification, sync/restore, update/`--track`,
+  removal, interrupted-staging cleanup, and installer wrapping; copy-time hash re-verification is
+  preserved.
+
+### Migration (0.8.0 → 0.9.0)
+
+- Projects referencing the forked skills at their vendor paths now find them under `skills/`:
+  update any local routing or `required-skills.yml` copies; the skills' names are unchanged.
+- The three forked skills no longer carry the brainstorming visual companion or the webapp-testing
+  bundled server script; keep using upstream `obra/superpowers` and `anthropics/skills` directly if
+  you relied on those.
+- In existing `AGENTS.md` files, remove the brainstorming visual-companion reference and its
+  `SUPERPOWERS_DISABLE_TELEMETRY` setting; installation preserves an adopter's existing file.
+
 ## [0.8.0] - 2026-09-24
 
 ### Added
