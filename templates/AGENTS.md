@@ -128,7 +128,7 @@ PII/KYC, file uploads, and admin/privileged surfaces.** A change touching these 
 
 ## Vendored skill overrides
 
-Third-party snapshots supply techniques; this file and the `sdlc` conductor own paths, transitions, and safety. Run stage-bound snapshots only when `sdlc` routes to them. Per-skill overrides (what to use, what to skip, where artifacts land) live in the conductor's stage references (`$SKILLS_DIR/sdlc/references/`), which are canonical — this section records only what a reader must know without them: run borrowed skills' methods, never their workflow opinions; `AGENTS.md` conventions win over any borrowed default; no snapshot writes under `docs/superpowers/`; the `brainstorming` visual companion stays loopback-only with `SUPERPOWERS_DISABLE_TELEMETRY=1`.
+Third-party snapshots supply techniques; this file and the `sdlc` conductor own paths, transitions, and safety. Run stage-bound snapshots only when `sdlc` routes to them. Per-skill overrides (what to use, what to skip, where artifacts land) live in the conductor's stage references (`$SKILLS_DIR/sdlc/references/`), which are canonical — this section records only what a reader must know without them: run borrowed skills' methods, never their workflow opinions; `AGENTS.md` conventions win over any borrowed default; no snapshot writes under `docs/superpowers/`.
 
 ## Guardrails
 

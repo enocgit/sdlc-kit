@@ -161,27 +161,30 @@ registry. Project-local installation remains the default recommendation.
 
 | Skill | Upstream | Stage |
 | --- | --- | --- |
-| `brainstorming` | obra/superpowers | Spec |
+| `brainstorming` | sdlc kit (maintained adaptation of obra/superpowers) | Spec |
 | `to-spec` | mattpocock/skills | Spec |
 | `grilling` | mattpocock/skills | Spec, Architecture |
 | `documentation-and-adrs` | addyosmani/agent-skills | Foundation, Architecture |
 | `writing-plans` | obra/superpowers | Decompose |
 | `frontend-design` | anthropics/skills | Implement, UI only |
 | `ponytail` | DietrichGebert/ponytail | Implement, backend/domain and dependency choices |
-| `webapp-testing` | anthropics/skills | QA, browser UI only |
-| `improve-codebase-architecture` | mattpocock/skills | Adopt an existing project |
+| `webapp-testing` | sdlc kit (maintained adaptation of anthropics/skills) | QA, browser UI only |
+| `improve-codebase-architecture` | sdlc kit (maintained adaptation of mattpocock/skills) | Adopt an existing project |
 | `code-review` | sdlc kit (maintained adaptation) | Stage 6 Review |
 | `code-simplification` | sdlc kit (maintained adaptation of addyosmani/agent-skills) | Stage 6 Review |
 | `security-review` | sdlc kit (maintained adaptation) | Stages 0/0b/2 for sensitive planning/foundation/architecture; Stage 6 for sensitive implementation review |
 
 `vendor/skills/` contains exact upstream snapshots. The installer preserves them and adds
-`$SKILLS_DIR/{skill}/.sdlc-vendor/` with provenance and license files. The `to-spec` snapshot is pinned
-to a reviewed upstream revision. See [`vendor/skills.lock.json`](./vendor/skills.lock.json) for every
-pinned commit.
+`$SKILLS_DIR/{skill}/.sdlc-vendor/` with provenance and license files. `writing-plans` is pinned to
+an upstream release tag; the other snapshots pin reviewed upstream revisions. See
+[`vendor/skills.lock.json`](./vendor/skills.lock.json) for every pin.
 
-Stage 6 uses the bundled maintained adaptations `code-review`, `code-simplification`, and `security-review`.
-`security-review` is also mandatory for sensitive planning/foundation/architecture work at stages
-0/0b/2. Use a project-local bundled skill first when it is present and invocable. If it is absent or
+The kit's maintained adaptations (`brainstorming`, `improve-codebase-architecture`, `webapp-testing`,
+`code-review`, `code-simplification`, `security-review`) are owned here: each names its upstream and
+re-scoping in an adaptation header, and ships the upstream license. `webapp-testing` scopes itself to
+UI flows, the project's lifecycle runner, and app-specific readiness signals. `security-review` is
+also mandatory for sensitive planning/foundation/architecture work at stages 0/0b/2. Use a
+project-local bundled skill first when it is present and invocable. If it is absent or
 cannot be invoked, consult the user-global skill locations (`~/.agents/skills`, `~/.claude/skills`).
 If no invocable user-global skill is available, use an equivalent runtime capability where one
 exists. Use the manual fallback in `required-skills.yml` only when no invocable project-local,

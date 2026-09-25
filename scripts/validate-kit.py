@@ -212,6 +212,20 @@ class Validator:
         }
         if manifest != actual:
             raise CheckError(f"kit inventory mismatch: missing={sorted(actual - manifest)} extra={sorted(manifest - actual)}")
+        adaptations = {
+            path.relative_to(self.kit / "skills").parts[0]
+            for path in (self.kit / "skills").glob("*/SKILL.md")
+            if "maintained adaptation" in path.read_text(encoding="utf-8")
+        }
+        missing_licenses = sorted(
+            name
+            for name in adaptations
+            if not any((self.kit / "skills" / name).glob("LICENSE*"))
+        )
+        if missing_licenses:
+            raise CheckError(
+                f"maintained adaptations missing bundled upstream license: {', '.join(missing_licenses)}"
+            )
         manifest_module = importlib.util.spec_from_file_location(
             "validate_required_skills", self.kit / "scripts/validate-required-skills.py"
         )
@@ -269,6 +283,61 @@ class Validator:
                 raise CheckError(f"installed kit version marker is wrong: {marker.read_text()!r}")
             if (target / "docs/runbook.md").exists():
                 raise CheckError("runbook template was installed but is no longer in the payload")
+
+    def installer_rejects_caller_handoff(self) -> None:
+        with Fixture(self.kit) as fx:
+            kit = fx.kit_copy()
+            vendor_script = kit / "scripts/vendor-skills.py"
+            module_spec = importlib.util.spec_from_file_location("vendor_skills_handoff", vendor_script)
+            if module_spec is None or module_spec.loader is None:
+                raise CheckError("could not load vendor script for installer handoff test")
+            vendor_module = importlib.util.module_from_spec(module_spec)
+            module_spec.loader.exec_module(vendor_module)
+
+            vendor = kit / "vendor"
+            data = json.loads((vendor / "skills.lock.json").read_text())
+            hashes = vendor_module.install_hash_environment(data)
+            dry_target = fx.root / "direct-dry-run"
+            dry_result = fx.install(
+                dry_target, dry_run=True, kit=kit,
+                env={"SDLC_VENDOR_LOCKED": "1", **hashes},
+            )
+            expect_ok(dry_result, "direct dry run with caller-supplied vendor handoff")
+            if dry_target.exists():
+                raise CheckError("direct dry run created its target")
+
+            skill = "writing-plans"
+            skill_file = vendor / "skills" / skill / "SKILL.md"
+            skill_file.write_text(skill_file.read_text() + "caller-controlled change\n")
+            content_hashes = json.loads(hashes["SDLC_VENDOR_CONTENT_HASHES"])
+            content_hashes[skill] = vendor_module.snapshot_hash(vendor / "skills" / skill)
+            hashes["SDLC_VENDOR_CONTENT_HASHES"] = json.dumps(content_hashes, sort_keys=True, separators=(",", ":"))
+            env = {"SDLC_VENDOR_LOCKED": "1", **hashes}
+
+            holder_script = (
+                "import fcntl, os, sys, time; "
+                "fd = os.open(sys.argv[1], os.O_RDONLY | getattr(os, 'O_DIRECTORY', 0)); "
+                "fcntl.flock(fd, fcntl.LOCK_EX); print('locked', flush=True); time.sleep(60)"
+            )
+            holder = subprocess.Popen(
+                [sys.executable, "-c", holder_script, str(kit)],
+                cwd=kit, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            )
+            try:
+                if holder.stdout is None or holder.stdout.readline() != "locked\n":
+                    raise CheckError("unrelated process failed to acquire the kit lock")
+                target = fx.target()
+                result = fx.install(target, kit=kit, env=env)
+                expect_fail(result, "direct install with forged hashes and unrelated lock holder")
+                if (target / "AGENTS.md").exists():
+                    raise CheckError("install wrote files before rejecting the invalid vendor handoff")
+            finally:
+                holder.terminate()
+                try:
+                    holder.communicate(timeout=5)
+                except subprocess.TimeoutExpired:
+                    holder.kill()
+                    holder.communicate()
 
     def dry_run(self) -> None:
         with Fixture(self.kit) as fx:
@@ -417,7 +486,7 @@ class Validator:
             changelog.write_text("\n".join(lines[:unreleased_heading + 1] + lines[next_release:]) + "\n")
             old_target = fx.target("empty-unreleased-target")
             expect_ok(fx.install(old_target, kit=empty_unreleased_kit), "install with empty Unreleased section")
-            if (old_target / ".sdlc-kit-version").read_text() != "0.7.0\n":
+            if (old_target / ".sdlc-kit-version").read_text() != kit_version(empty_unreleased_kit) + "\n":
                 raise CheckError("empty Unreleased section did not select the released version")
 
     def containment(self) -> None:
@@ -464,6 +533,108 @@ class Validator:
             os.mkfifo(special)
             expect_fail(fx.install(fx.target("special-target"), kit=kit), "source special file")
 
+    def vendor_staging_cleanup(self) -> None:
+        with Fixture(self.kit) as fx:
+            kit = fx.kit_copy()
+            vendor_script = kit / "scripts/vendor-skills.py"
+            module_spec = importlib.util.spec_from_file_location("vendor_skills_staging", vendor_script)
+            if module_spec is None or module_spec.loader is None:
+                raise CheckError("could not load vendor script for staging cleanup test")
+            vendor_module = importlib.util.module_from_spec(module_spec)
+            module_spec.loader.exec_module(vendor_module)
+
+            empty_staging = kit / (vendor_module.STAGING_PREFIX + "a" * 24)
+            empty_staging.mkdir()
+            nonempty_staging = kit / (vendor_module.STAGING_PREFIX + "b" * 24)
+            nonempty_staging.mkdir()
+            (nonempty_staging / "partial").write_text("adopter data\\n")
+            unrecognized_staging = kit / (vendor_module.STAGING_PREFIX + "c" * 24)
+            unrecognized_staging.mkdir()
+            (unrecognized_staging / vendor_module.VENDOR_STAGING_MARKER).write_text("unknown marker\\n")
+
+            expect_ok(
+                run([sys.executable, "scripts/vendor-skills.py", "verify"], cwd=kit),
+                "verify after interrupted vendor staging",
+            )
+            if os.path.lexists(empty_staging):
+                raise CheckError("next vendor operation left an empty interrupted staging directory")
+            for preserved in (nonempty_staging, unrecognized_staging):
+                if not os.path.lexists(preserved):
+                    raise CheckError(f"cleanup removed ambiguous staging data: {preserved.name}")
+            if (nonempty_staging / "partial").read_text() != "adopter data\\n":
+                raise CheckError("cleanup changed an unmarked staging directory")
+
+    def vendor_sync_and_update_track(self) -> None:
+        with Fixture(self.kit) as fx:
+            kit = fx.kit_copy()
+            vendor_script = kit / "scripts/vendor-skills.py"
+            module_spec = importlib.util.spec_from_file_location("vendor_skills_update", vendor_script)
+            if module_spec is None or module_spec.loader is None:
+                raise CheckError("could not load vendor script for sync/update test")
+            vendor_module = importlib.util.module_from_spec(module_spec)
+            module_spec.loader.exec_module(vendor_module)
+
+            name = "writing-plans"
+            vendor = kit / "vendor"
+            data = json.loads((vendor / "skills.lock.json").read_text())
+            entry = data["skills"][name]
+            source = "https://github.com/validator-fixture/vendor-skills.git"
+            entry["source"] = source
+            (vendor / "skills.lock.json").write_text(vendor_module.lock_text(data))
+            (vendor / "provenance" / f"{name}.json").write_text(vendor_module.provenance_text(name, entry))
+
+            repository = fx.root / "upstream-fixture"
+            upstream_skill = repository / entry["upstreamPath"]
+            shutil.copytree(vendor / "skills" / name, upstream_skill)
+            skill_file = upstream_skill / "SKILL.md"
+            skill_file.write_text(skill_file.read_text() + "\\nfixture update marker\\n")
+            upstream_license = repository / entry["licenseSource"]
+            upstream_license.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(vendor / "licenses" / f"{name}.txt", upstream_license)
+            run(["git", "init", "--quiet"], cwd=repository)
+            run(["git", "add", "-A"], cwd=repository)
+            run(
+                ["git", "-c", "user.name=validator", "-c", "user.email=validator@example.test",
+                 "commit", "--quiet", "-m", "fixture update"],
+                cwd=repository,
+            )
+            commit = run(["git", "rev-parse", "HEAD"], cwd=repository).stdout.strip()
+            run(["git", "tag", "v-test"], cwd=repository)
+
+            git_config = fx.root / "empty.gitconfig"
+            git_config.write_text("")
+            git_env = {
+                "GIT_CONFIG_GLOBAL": str(git_config),
+                "GIT_CONFIG_NOSYSTEM": "1",
+                "GIT_CONFIG_COUNT": "1",
+                "GIT_CONFIG_KEY_0": f"url.{repository.as_uri()}.insteadOf",
+                "GIT_CONFIG_VALUE_0": source,
+            }
+            expect_ok(
+                run(
+                    [sys.executable, "scripts/vendor-skills.py", "update", name, "--track", "refs/tags/v-test"],
+                    cwd=kit, env=git_env,
+                ),
+                "offline update with track",
+            )
+            updated = json.loads((vendor / "skills.lock.json").read_text())["skills"][name]
+            if updated["track"] != "refs/tags/v-test" or updated["commit"] != commit:
+                raise CheckError("update did not record the selected tag and resolved commit")
+            expected_content = skill_file.read_text()
+            if (vendor / "skills" / name / "SKILL.md").read_text() != expected_content:
+                raise CheckError("update did not publish the tagged snapshot")
+            expect_ok(run([sys.executable, "scripts/vendor-skills.py", "verify"], cwd=kit), "post-update verify")
+
+            installed_snapshot = vendor / "skills" / name / "SKILL.md"
+            installed_snapshot.write_text("damaged local snapshot\\n")
+            expect_ok(
+                run([sys.executable, "scripts/vendor-skills.py", "sync", name], cwd=kit, env=git_env),
+                "offline sync restore",
+            )
+            if installed_snapshot.read_text() != expected_content:
+                raise CheckError("sync did not restore the snapshot at the locked commit")
+            expect_ok(run([sys.executable, "scripts/vendor-skills.py", "verify"], cwd=kit), "post-sync verify")
+
     def vendor_removal(self) -> None:
         with Fixture(self.kit) as fx:
             kit = fx.kit_copy()
@@ -478,13 +649,9 @@ class Validator:
 
             def assert_no_removal_residue(label: str) -> None:
                 residue = [
-                    kit / vendor_module.VENDOR_STAGING_INTENT_NAME,
-                    kit / vendor_module.VENDOR_BACKUP_NAME,
-                    kit / vendor_module.VENDOR_TRANSACTION_NAME,
-                    *kit.glob(f"{vendor_module.VENDOR_STAGING_INTENT_NAME}.tmp-*"),
-                    *kit.glob(f"{vendor_module.VENDOR_TRANSACTION_NAME}.tmp-*"),
-                    *kit.glob(".vendor-staging-*[0-9a-f]"),
-                    *kit.glob(".vendor-preserved-*"),
+                    kit / vendor_module.VENDOR_OLD_NAME,
+                    *kit.glob(f"{vendor_module.STAGING_PREFIX}*"),
+                    *kit.glob(f"{vendor_module.VENDOR_OLD_NAME}.tmp-*"),
                 ]
                 residue = [path for path in residue if os.path.lexists(path)]
                 if residue:
@@ -534,12 +701,20 @@ class Validator:
                 for path in directory.iterdir()
                 if path.stem != removed_name
             }
+            offline_git_env = {
+                "GIT_CONFIG_GLOBAL": os.devnull,
+                "GIT_CONFIG_NOSYSTEM": "1",
+                "GIT_CONFIG_COUNT": "1",
+                "GIT_CONFIG_KEY_0": "http.proxy",
+                "GIT_CONFIG_VALUE_0": "http://127.0.0.1:1",
+                "GIT_TERMINAL_PROMPT": "0",
+            }
             expect_ok(
                 run(
                     [sys.executable, "scripts/vendor-skills.py", "remove", removed_name, removed_name],
-                    cwd=kit,
+                    cwd=kit, env=offline_git_env,
                 ),
-                "vendor removal",
+                "offline vendor removal",
             )
             assert_no_removal_residue("successful vendor removal")
             if (vendor / "skills" / removed_name).exists():
@@ -560,7 +735,7 @@ class Validator:
         with Fixture(self.kit) as fx:
             target = fx.target()
             expect_ok(fx.install(target), "install for tamper check")
-            payload = target / ".agents/skills/brainstorming/SKILL.md"
+            payload = target / ".agents/skills/to-spec/SKILL.md"
             payload.write_text(payload.read_text() + "tampered\n")
             expect_fail(run([sys.executable, "scripts/vendor-skills.py", "verify-installed", str(target / ".agents/skills")], cwd=self.kit), "tampered payload")
 
@@ -608,6 +783,7 @@ class Validator:
 
     def run(self) -> int:
         checks = (("syntax, schemas, and provenance", self.static), ("clean install", self.smoke),
+                  ("installer rejects caller-controlled vendor handoff", self.installer_rejects_caller_handoff),
                   ("dry-run immutability", self.dry_run), ("restrictive umask", self.umask),
                   ("no-clobber publication", self.no_clobber),
                   ("interrupted-run cleanup", self.interrupted_cleanup),
@@ -615,6 +791,8 @@ class Validator:
                   ("process-group timeout", self.timeout_kills_process_group),
                   ("kit version marker", self.version_marker),
                   ("target containment", self.containment), ("source entry rejection", self.source_rejection),
+                  ("vendor staging cleanup", self.vendor_staging_cleanup),
+                  ("offline vendor sync and update track", self.vendor_sync_and_update_track),
                   ("vendored removal", self.vendor_removal), ("installed tamper detection", self.tamper),
                   ("directory enumeration rewind", self.enumeration_rewind))
         for name, function in checks:

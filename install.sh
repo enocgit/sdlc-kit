@@ -46,15 +46,47 @@ for a in "$@"; do
   esac
 done
 
-if [ -n "${SDLC_VENDOR_LOCK_FD:-}" ]; then
-  VENDOR_CONTINUATION=continue-locked
-  [ "$DRY" -eq 1 ] && VENDOR_CONTINUATION=continue-preview-locked
-  python3 "$VENDOR_TOOL" "$VENDOR_CONTINUATION" "$SDLC_VENDOR_LOCK_FD" >/dev/null
-else
+vendor_lock_is_held() {
+  python3 - "$KIT" <<'PY'
+import fcntl
+import os
+import sys
+
+try:
+    descriptor = os.open(sys.argv[1], os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+except OSError:
+    raise SystemExit(1)
+try:
+    try:
+        fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        raise SystemExit(0)
+    raise SystemExit(1)
+finally:
+    os.close(descriptor)
+PY
+}
+
+# The environment flag is only a wrapper handoff hint; require its repository lock to be held.
+if [ -z "${SDLC_VENDOR_LOCKED:-}" ] || ! vendor_lock_is_held; then
   VENDOR_WRAPPER=install-locked
   [ "$DRY" -eq 1 ] && VENDOR_WRAPPER=preview-locked
   exec python3 "$VENDOR_TOOL" "$VENDOR_WRAPPER" bash "$0" "$@"
 fi
+
+# Never trust caller-controlled handoff hashes. Derive copy-time expectations from the lock
+# while the vendor-operation lock is held, using the same function as the wrapper.
+VENDOR_HASHES="$(python3 "$VENDOR_TOOL" install-hashes)" || {
+  echo "Could not derive vendor integrity hashes from the lock" >&2
+  exit 1
+}
+vendor_hash_value() {
+  python3 -c 'import json, sys; print(json.loads(sys.argv[1])[sys.argv[2]])' "$VENDOR_HASHES" "$1"
+}
+SDLC_VENDOR_CONTENT_HASHES="$(vendor_hash_value SDLC_VENDOR_CONTENT_HASHES)"
+SDLC_VENDOR_PROVENANCE_HASHES="$(vendor_hash_value SDLC_VENDOR_PROVENANCE_HASHES)"
+SDLC_VENDOR_LICENSE_HASHES="$(vendor_hash_value SDLC_VENDOR_LICENSE_HASHES)"
+export SDLC_VENDOR_CONTENT_HASHES SDLC_VENDOR_PROVENANCE_HASHES SDLC_VENDOR_LICENSE_HASHES
 
 [ "$DRY" -eq 1 ] && {
   echo "DRY RUN — no files will be written"

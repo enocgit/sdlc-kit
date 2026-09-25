@@ -67,7 +67,7 @@ On-ramp sub-stages keep their letter (`0a`/`0b`/`0adopt`).
 | 0a Context (new) | installer templates (fill) | `AGENTS.md`, filled `docs/context.md` | **GATE — context filled** |
 | 0b Foundation (new) | `documentation-and-adrs` | product PRD, foundational ADRs, architecture skeleton, core contract scaffold, threat model, configured `docs/test-strategy.md` | **GATE — approve foundation** |
 | 0 adopt (existing) | `improve-codebase-architecture` + read-only analysis | reconstructed foundation (see `references/stage-0.md`) | **GATE — approve** |
-| 1 Spec | `brainstorming` (method only) → `to-spec` → `grilling` | optional brief, then hardened PRD `docs/prd/NNNN-{slug}.md` | **GATE — approve PRD** |
+| 1 Spec | `brainstorming` → `to-spec` → `grilling` | optional brief, then hardened PRD `docs/prd/NNNN-{slug}.md` | **GATE — approve PRD** |
 | 2 Architecture + Contract | `documentation-and-adrs` + `grilling` | ADR(s), `docs/architecture.md`, `docs/security.md`, **frozen** contract | **GATE — approve approach + freeze interface** |
 | 3 Decompose | `writing-plans` + `project-status` | tracker issues (or `docs/progress.md` rows) | disclose the breakdown, then continue |
 | 4 Implement | `feature-start`; `frontend-design` (UI only), `ponytail` (backend/domain) | code on a `feat/*` branch, one task at a time | disclose the compact plan, then continue; **GATE only for a sensitive area or scope deviation** |

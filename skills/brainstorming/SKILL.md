@@ -5,6 +5,17 @@ description: "You MUST use this before any creative work - creating features, bu
 
 # Brainstorming Ideas Into Designs
 
+A maintained adaptation of Jesse Vincent's `brainstorming` skill from
+[obra/superpowers](https://github.com/obra/superpowers) (MIT — see `LICENSE` in this directory).
+This fork keeps the discovery method (paths, hard gate, one-question-at-a-time, approaches,
+sectioned design) and re-scopes the outputs: the approved design lands as the kit's optional
+Stage-1 brief at `docs/briefs/NNNN-{slug}.md` — never `docs/superpowers/specs/` or an automatic
+hand-off to `writing-plans`: Stage 1 owns the PRD, and the conductor routes later tracker
+decomposition through Stage 3. Nothing is committed to Git unless the user asks. The upstream
+browser-based visual companion is not included in this fork; visual questions stay in the terminal
+or chat. Spec review uses
+`spec-document-reviewer-prompt.md`.
+
 Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
 
 Start by classifying how much process the request needs, then work
@@ -41,11 +52,15 @@ override it:
   sentences to a few short paragraphs), and STOP. Implementation
   starts only after your human partner says yes to that design — a
   bounded task's approval is as hard a gate as an architectural
-  one. No spec file, no implementation plan document.
+  one. No spec file, no implementation plan document. When the
+  conductor routes this skill in Stage 1, discovery is no-code: if the
+  conductor asks for an optional brief, land it at
+  `docs/briefs/NNNN-{slug}.md`; otherwise stop after the design. In either
+  case, return control to the conductor for the PRD gate.
 - **Architectural** — new projects, new subsystems, changes that
   restructure how components fit together or alter interfaces others
   depend on. Follow the full process: questions, approaches, sectioned
-  design, written spec, then the writing-plans skill.
+  design, written brief, then the conductor's planning stage.
 
 When in doubt between two paths, take the heavier one. The ratchet is
 one-way: hidden complexity discovered mid-task upgrades the path —
@@ -89,18 +104,21 @@ your path and complete them in order.
 2. **Ask clarifying questions** — one at a time, the ones that matter
 3. **Present short design in chat** — approach, files touched, testing
 4. **Get approval** — STOP and wait for an explicit yes; presenting the design and starting in the same breath is skipping the gate
-5. **Implement** — proceed with the normal development workflow (TDD applies); no plan document
+5. **Implement (standalone only)** — outside the conductor, proceed with the normal development
+   workflow after approval (TDD applies); no plan document. When routed by Stage 1, land an
+   approved brief at `docs/briefs/NNNN-{slug}.md` only if the conductor asks for one; otherwise
+   stop after the design. Return control to the conductor for `to-spec` and the PRD approval gate.
 
 **Architectural:**
 1. **Explore project context** — check files, docs, recent commits
-2. **Offer the visual companion just-in-time** — NOT upfront. The first time a question would genuinely be clearer shown than described, offer it then (its own message); on approval its browser tab opens for you. If no visual question ever arises, never offer it. See the Visual Companion section below.
-3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-4. **Propose 2-3 approaches** — with trade-offs and your recommendation
-5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
-7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+3. **Propose 2-3 approaches** — with trade-offs and your recommendation
+4. **Present design** — in sections scaled to their complexity, get user approval after each section
+5. **Write design doc** — save to `docs/briefs/NNNN-<slug>.md` (the kit's Stage-1 brief)
+6. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+7. **User reviews written spec** — ask user to review the spec file before proceeding
+8. **Return to the conductor** — hand the approved brief to Stage 1, which owns the PRD; the
+   conductor routes later tracker decomposition through Stage 3
 
 ## Process Flow
 
@@ -111,6 +129,7 @@ digraph brainstorming {
     "Ask clarifying questions (bounded)" [shape=box];
     "Present short design in chat" [shape=box];
     "Human approves?" [shape=diamond];
+    "Conductor Stage 1?" [shape=diamond];
     "Investigate; report recommendation" [shape=doublecircle];
     "Implement via normal workflow (no plan doc)" [shape=doublecircle];
     "Explore project context" [shape=box];
@@ -121,7 +140,7 @@ digraph brainstorming {
     "Write design doc" [shape=box];
     "Spec self-review\n(fix inline)" [shape=box];
     "User reviews spec?" [shape=diamond];
-    "Invoke writing-plans skill" [shape=doublecircle];
+    "Land approved brief; return to conductor" [shape=doublecircle];
     "Hidden complexity? Upgrade path" [shape=box];
 
     "Classify: spike / bounded / architectural" -> "Present question + probe (2-3 sentences)" [label="spike"];
@@ -131,27 +150,30 @@ digraph brainstorming {
     "Ask clarifying questions (bounded)" -> "Present short design in chat";
     "Present short design in chat" -> "Human approves?";
     "Human approves?" -> "Investigate; report recommendation" [label="spike: yes"];
-    "Human approves?" -> "Implement via normal workflow (no plan doc)" [label="bounded: yes"];
+    "Human approves?" -> "Conductor Stage 1?" [label="bounded: yes"];
+    "Conductor Stage 1?" -> "Land approved brief; return to conductor" [label="yes"];
+    "Conductor Stage 1?" -> "Implement via normal workflow (no plan doc)" [label="no"];
     "Hidden complexity? Upgrade path" -> "Classify: spike / bounded / architectural";
     "Explore project context" -> "Ask clarifying questions";
     "Ask clarifying questions" -> "Propose 2-3 approaches";
     "Propose 2-3 approaches" -> "Present design sections";
+    "Present design sections" -> "Present design sections" [label="no, revise"];
     "Present design sections" -> "User approves design?";
-    "User approves design?" -> "Present design sections" [label="no, revise"];
     "User approves design?" -> "Write design doc" [label="yes"];
     "Write design doc" -> "Spec self-review\n(fix inline)";
     "Spec self-review\n(fix inline)" -> "User reviews spec?";
     "User reviews spec?" -> "Write design doc" [label="changes requested"];
-    "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
+    "User reviews spec?" -> "Land approved brief; return to conductor" [label="approved"];
 }
 ```
 
-**Terminal states are path-bound.** Architectural: the ONLY skill you
-invoke after brainstorming is writing-plans — never frontend-design,
-mcp-builder, or any other implementation skill. Bounded: after
-approval, implementation proceeds directly through the normal
-development workflow; no plan document. Spike: the terminal state is a
-reported recommendation.
+**Terminal states are path-bound.** Architectural: after the brief is
+approved, stop and return it to the conductor's Stage 1 for the PRD;
+later tracker decomposition belongs to Stage 3. Bounded: outside the
+conductor, implementation proceeds after approval through the normal
+development workflow; no plan document. When routed in Stage 1, land
+the approved brief and stop so the conductor can continue. Spike: the
+terminal state is a reported recommendation.
 
 ## The Process
 
@@ -203,10 +225,8 @@ is the whole process.
 
 **Documentation:**
 
-- Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
-  - (User preferences for spec location override this default)
-- Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
+- Write the validated design as the Stage-1 brief to `docs/briefs/NNNN-<slug>.md`
+- Use the `writing-clearly-and-concisely` skill if available
 
 **Spec Self-Review:**
 After writing the spec document, look at it with fresh eyes:
@@ -221,30 +241,12 @@ Fix any issues inline. No need to re-review — just fix and move on.
 **User Review Gate:**
 After the spec review loop passes, ask the user to review the written spec before proceeding:
 
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
+> "Brief written to `<path>`. Please review it and let me know if you want to make any changes before we move on."
 
 Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
 
-**Implementation:**
+**Transition:**
 
-- Invoke the writing-plans skill to create a detailed implementation plan
-- Do NOT invoke any other skill. writing-plans is the next step.
-
-## Visual Companion
-
-A browser-based companion for showing mockups, diagrams, and visual options during brainstorming. Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
-
-**Offering the companion (just-in-time):** Do NOT offer it upfront. Wait until a question would genuinely be clearer shown than told — a real mockup / layout / diagram question, not merely a UI *topic*. The first time that happens, offer it then, as its own message:
-> "This next part might be easier if I show you — I can put together mockups, diagrams, and comparisons in a browser tab as we go. It's still new and can be token-intensive. Want me to? I'll open it for you."
-
-**This offer MUST be its own message.** Only the offer — no clarifying question, summary, or other content. Wait for the user's response. If they accept, start the server with `--open` so their browser opens to the first screen automatically. If they decline, continue text-only and don't offer again unless they raise it.
-
-**Per-question decision:** Even after the user accepts, decide FOR EACH QUESTION whether to use the browser or the terminal. The test: **would the user understand this better by seeing it than reading it?**
-
-- **Use the browser** for content that IS visual — mockups, wireframes, layout comparisons, architecture diagrams, side-by-side visual designs
-- **Use the terminal** for content that is text — requirements questions, conceptual choices, tradeoff lists, A/B/C/D text options, scope decisions
-
-A question about a UI topic is not automatically a visual question. "What does personality mean in this context?" is a conceptual question — use the terminal. "Which wizard layout works better?" is a visual question — use the browser.
-
-If they agree to the companion, read the detailed guide before proceeding:
-`skills/brainstorming/visual-companion.md`
+- Stop after the approved brief lands. Do not invoke `writing-plans` or any other skill: Stage 1
+  turns the brief into the PRD; the conductor routes later tracker decomposition through Stage 3.
+  Nothing here commits to Git unless the user asks.
