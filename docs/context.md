@@ -50,3 +50,12 @@ The kit aims to make agent-led feature work reproducible without changing user-g
 
 - Hosting a skill registry or agent runtime.
 - Replacing a target project's tracker, CI provider, or deployment platform.
+
+## Learnings
+
+- **2026-09-24:** This repository does not self-host the sdlc pipeline: governance lives in
+  `AGENTS.md`, `docs/context.md`, and `CHANGELOG.md`; planning artifacts are feature-branch PRDs
+  (see `docs/prd/`). Do not scaffold adopter docs (ADR/, architecture, security) here.
+- **2026-09-24:** `required-skills.yml` is deliberately yamllint-default-clean: block style,
+  wrapped ≤80 columns. Keep new entries in that style instead of reintroducing flow mappings or
+  long comment lines.
