@@ -3,7 +3,8 @@ name: feature-start
 description: >
   Starts implementation of one decomposed task: isolates a workspace (a feature branch by default;
   a git worktree only when isolation is critical), loads the relevant PRD, ADR, and frozen contract,
-  then proposes a compact in-session plan for approval before any code is written.
+  then discloses a compact in-session plan; approval before code is required only for sensitive work
+  or a plan that deviates from the approved decomposition.
   Use at the start of Stage 4 (Implement) once scope is approved, or when the user says
   "start working on issue #N",
   "begin this task", or "let's implement {feature}".
@@ -11,8 +12,9 @@ description: >
 
 # feature-start
 
-Prepare a clean starting point with the context needed to implement one task, then stop for a plan
-approval gate.
+Prepare a clean starting point with the context needed to implement one task, then disclose its plan.
+Pause for approval before code only when the task is sensitive or the plan deviates from the approved
+decomposition.
 
 ## Steps
 
@@ -90,31 +92,29 @@ approval gate.
      this kit performs; the operator owns any parent-directory cleanup.
 
    - **Green baseline:** In the selected workspace, install dependencies and run the project's
-     setup and build commands as needed, then establish only a change-appropriate baseline: use a
-     focused test or runtime observation for behavior or interaction, a targeted render/browser or
-     manual visual check for visual UI behavior, focused behavior evidence or runtime observation for
-     accessibility or security changes in styling, markup, or attributes, and a source or context baseline for presentation-only markup,
-     copy, or styling. After the change, use a diff or one visual check for presentation-only work.
-     Use a link or rendering check for documentation that affects links or rendering, or a schema or
-     syntax check for configuration. Do not run the full suite by default; for shared paths, broaden
-     verification to
-     all impacted packages/modules. Reserve the full suite for broad or high-risk dependency
-     fan-out or an explicit project rule. If the selected baseline is red, stop and report; do not
-     start work on a broken baseline. For non-trivial executable behavior, name a failing automated
-     test in the task plan and create or run it after approval; an observational check alone is not
-     sufficient. For other bug fixes, an existing focused check or observation that intentionally
-     reproduces the known bug is an expected RED signal, not a broken baseline; record that observed
-     failure in the task plan. If no such check exists, name the planned RED check and its expected
-     failure before approval, then create or run it after approval. Unrelated setup, build, or baseline
-     failures still block.
+     setup and build commands as needed, then establish only a change-appropriate baseline — apply
+     the verification standard in `AGENTS.md` (proportional evidence, no full suite by default) at
+     pre-change scope: a focused test or runtime observation for behavior or interaction, a
+     targeted render/browser or manual visual check for visual UI behavior, focused behavior
+     evidence for accessibility or security changes in styling, markup, or attributes, and a source
+     or context baseline for presentation-only markup, copy, or styling. If the selected baseline
+     is red, stop and report; do not start work on a broken baseline. For non-trivial executable
+     behavior, name a failing automated test in the task plan and create or run it after disclosure (and approval when required);
+     an observational check alone is not sufficient. For other bug fixes, an existing focused check
+     or observation that intentionally reproduces the known bug is an expected RED signal, not a
+     broken baseline; record that observed failure in the task plan. If no such check exists, name
+     the planned RED check and its expected failure in the task plan, then create or run it after
+     disclosure (and approval when required). Unrelated setup, build, or baseline failures still block.
 3. **Load context.** Read into context:
    - `docs/context.md` (domain, glossary, hard constraints — incl. retro learnings from prior cycles)
    - The feature's PRD in `docs/prd/`
    - Any ADR(s) it depends on in `docs/adr/`
    - The frozen contract artifact (OpenAPI/tRPC/schema) the task implements against
    - `docs/test-strategy.md` (Definition of Done + which layer to test at)
-4. **Plan.** Present a compact in-session plan. If the runtime provides a structured plan artifact,
-   use it; otherwise present the same plan in the response. The plan is a transient gate artifact,
+4. **Plan.** Present a compact in-session plan. Human approval is required only for a sensitive task
+   or a plan that deviates from the approved decomposition; otherwise disclose the plan and proceed.
+   If the runtime provides a structured plan artifact, use it; otherwise present the same plan in the
+   response. The plan is a transient gate artifact,
    not repository documentation. Do not create `docs/superpowers/plans/` or another plan file unless
    the human asks for a durable plan.
 
@@ -131,7 +131,7 @@ approval gate.
      executable behavior, name the planned failing
      automated test. For other bug fixes, name a planned failing automated test or observable reproducer
      appropriate to the risk; if an existing check or observation already fails, record its result,
-     otherwise record the expected failure and create or run the check after approval.
+     otherwise record the expected failure and create or run the check after disclosure (and approval when required).
    - **Risks and case against:** record four separate facts:
      - **Rejected approach** — what you rejected and why.
      - **Likely failure** — the failure most likely to occur.
@@ -142,13 +142,15 @@ approval gate.
      observation.
 
    Omit implementation code, repeated PRD/ADR/contract content, speculative work, mechanical
-   microsteps, and commit instructions. After approval, create or run the recorded planned RED check
-   for a bug fix; for non-trivial executable behavior, create or run the failing automated test, then
-   make it pass and refactor. Otherwise collect the
+   microsteps, and commit instructions. After the plan is disclosed (and approved when required),
+   create or run the recorded planned RED check for a bug fix; for non-trivial executable behavior,
+   create or run the failing automated test, then make it pass and refactor. Otherwise collect the
    planned proportional verification; presentation-only styling, markup, attributes, copy, or layout
    can use a diff or one visual check, while styling, markup, or attributes that change accessibility,
    security, or interaction behavior need focused behavior evidence.
-5. **GATE.** Present the plan. Ask for approval before writing any code.
+5. **Conditional gate.** Present the plan. If the task touches a sensitive area or the plan deviates
+   from the approved decomposition, stop and ask for approval before writing code. Otherwise disclose
+   the plan and proceed; the human can interrupt at any time.
 
 ## Rules
 

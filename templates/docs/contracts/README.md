@@ -21,6 +21,9 @@
 - **Validation:** Zod schemas in `packages/contracts/*` — single source for runtime + types.
 - **Database:** `prisma/schema.prisma` + `prisma/migrations/*`.
 - **Events/messages:** `contracts/events/*.json` (JSON Schema / Avro).
+- **Boundary documents:** when an interface needs prose beyond schemas (auth wire protocols,
+  callback flows), a contract document may live in this folder next to the pointers — keep it
+  scan-first and link it from the list above.
 
 ## The contract-first rule
 

@@ -12,16 +12,18 @@ The `sdlc` skill routes the work.
 | 1 | Spec | optional brief and feature PRD | approve PRD |
 | 2 | Architecture + Contract | ADRs, architecture/security updates, and frozen contract | approve and freeze |
 | 3 | Decompose | tracker tasks | disclose |
-| 4 | Implement | one task on a `feat/*` branch | approve compact task plan |
+| 4 | Implement | one task on a `feat/*` branch | disclose the task plan; gate only for a sensitive area or scope deviation |
 | 5 | Quality assurance (QA) | tests, runtime or relevant non-runtime evidence, continuous integration (CI) | none |
 | 6 | Review | clean diff and security review when required | inline; no separate gate |
 | 7 | Land | pull request (PR) or direct-merge path | human merges |
-| 8 | Retro | per-task learnings; after all feature tasks, reconcile feature artifacts, frozen contract, contract index, and parent-epic status | none |
+| 8 | Retro | 0–3 durable learnings per merge; final-child epic closure: delivery record, reconciliation, parent-epic status | offer to land repository edits |
 
 A feature's parent tracker record, often called an epic, groups its child tasks. A fresh project has
-six **hard pipeline gates** for a one-task feature: context, foundation, PRD,
-architecture and contract, the task plan, and merge. Adoption combines the first two into one Stage 0
-approval, so a one-task feature has five. Each additional task adds a task-plan approval and a merge
+five **hard pipeline gates** for a one-task feature: context, foundation, PRD,
+architecture and contract, and merge. Adoption combines the first two into one Stage 0
+approval, so a one-task feature has four. Task plans are disclosure, not gates — a hard gate only
+when a task touches a sensitive area or deviates from the approved decomposition. Each additional
+task adds a merge
 approval. Repository-action approvals and external-tracker write approvals are separate safety stops,
 not extra pipeline gates. At other stages, work continues after decisions are disclosed. One approval
 may cover commit, push, and PR creation when the request names all three. Merge always stays separate.

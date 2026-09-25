@@ -28,8 +28,9 @@ exact third-party snapshots, installation-safe scripts, and project-document tem
   `scripts/vendor-skills.py` for refreshes or approved removals and review the resulting diff.
 - Keep installation project-local by default, offline, reproducible, and non-destructive. An explicitly
   selected `SKILLS_DIR` may be external.
-- Preserve no-clobber publication, containment, recovery, quarantine, integrity, and restrictive-
-  umask guarantees when changing installer code.
+- Preserve no-clobber publication, containment, integrity, and restrictive-umask guarantees when
+  changing installer code; recovery and quarantine machinery is removed by PRD 0001, so an
+  interrupted install may leave one temp directory for the next run to clean.
 - Apply the maintained `skills/unslop` policy automatically to human-facing replies and prose where
   applicable; preserve its exclusions for code, contracts, commands, logs, quoted text, fixed formats,
   vendor snapshots, and neutral technical records.
@@ -85,7 +86,7 @@ change ready:
 python3 scripts/vendor-skills.py verify
 python3 scripts/validate-required-skills.py required-skills.yml
 bash -n install.sh scripts/*.sh
-python3 -m py_compile scripts/*.py scripts/validation/*.py
+python3 -m py_compile scripts/*.py
 git diff --check
 ```
 

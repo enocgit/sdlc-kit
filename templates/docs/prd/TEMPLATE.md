@@ -1,13 +1,19 @@
 # PRD NNNN: {title}
 
-> Follow the documentation writing standard in AGENTS.md. Keep this scan-first: status, scope,
+> Follow the documentation writing standard in AGENTS.md. Keep this scan-first: approval, scope,
 > decisions, constraints, links, and open questions before detail. Delete unused sections in the
-> filled PRD.
+> filled PRD. State nothing about implementation progress — the tracker owns live state; this
+> document's delivery record is written once, when the feature is true.
+>
+> **Amending an approved PRD:** write a new amendment PRD that states the changed requirements and
+> supersedes the superseded ones; link both directions. Do not rewrite approved requirements in
+> place.
 
 ## Summary
 
 - **Approval:** Draft | Approved
-- **Delivery:** Not implemented | Partially implemented | Implemented — {summary and evidence links}
+- **Delivery:** {write once, at final reconciliation only: what shipped, with evidence links —
+  delete this line until then; the tracker owns intermediate state}
 - **Outcome:** {one sentence describing the intended result}
 - **Scope:** In — {short list}; Out — {short list}
 - **Key decisions:** {decision summary or links}

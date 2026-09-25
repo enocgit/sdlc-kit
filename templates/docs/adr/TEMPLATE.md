@@ -12,6 +12,7 @@
 
 - **Status:** Proposed | Accepted | Superseded by ADR-NNNN
 - **Date:** YYYY-MM-DD
+- **Scope:** {what this decision covers — feature, surface, or contract; omit when obvious}
 - **Relates to:** {PRD / issue / ADR links}
 
 ## Context

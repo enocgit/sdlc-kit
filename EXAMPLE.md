@@ -59,10 +59,10 @@ discloses it and continues without waiting for another approval.
 
 ### 4. Implement a task
 
-`feature-start` creates `feat/3-payment-intent` and loads the relevant PRD, ADR, and contract.
-
-**Gate:** approve the compact in-session task plan. The agent creates no plan file unless the human
-asks for one. After approval, it implements against the frozen contract.
+`feature-start` creates `feat/3-payment-intent` and loads the relevant PRD, ADR, and contract. Because
+payments and PII are sensitive, the agent discloses its compact in-session plan and stops for approval
+before implementation. After approval, it implements against the frozen contract. It creates no plan
+file unless the human asks for one.
 
 ### 5. Verify the change
 
@@ -95,10 +95,11 @@ branch before editing, then asks to land that change before the next task. If no
 changed, there is no extra landing action.
 
 After the final task, the agent checks out and syncs the updated default branch before reconciling
-feature artifacts, including the frozen contract and contract index, and updating statuses. It asks
-for approval to land those edits. After they land, it verifies the epic Definition of Done and asks
-for approval to update and close the parent GitHub issue. After that approval and verified closure,
-it offers the optional `improve` audit, `improve next`, or the next `sdlc {feature}` run.
+feature artifacts: it writes the delivery record into the PRD once — what shipped, with evidence
+links — moves planned-changes facts into current-state sections, and updates stale summaries against
+evidence. It asks for approval to land those edits. After they land, it verifies the epic Definition
+of Done and asks for approval to update and close the parent GitHub issue. After that approval and
+verified closure, it offers the optional `improve` audit, `improve next`, or the next `sdlc {feature}` run.
 
 ## Existing project
 

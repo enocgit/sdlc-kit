@@ -9,6 +9,16 @@ skills/definition-of-done-review/SKILL.md
 skills/feature-start/SKILL.md
 skills/project-status/SKILL.md
 skills/sdlc/SKILL.md
+skills/sdlc/references/rules.md
+skills/sdlc/references/stage-0.md
+skills/sdlc/references/stage-1.md
+skills/sdlc/references/stage-2.md
+skills/sdlc/references/stage-3.md
+skills/sdlc/references/stage-4.md
+skills/sdlc/references/stage-5.md
+skills/sdlc/references/stage-6.md
+skills/sdlc/references/stage-7.md
+skills/sdlc/references/stage-8.md
 skills/security-review/LICENSE.txt
 skills/security-review/NOTICE.md
 skills/security-review/SKILL.md
@@ -26,7 +36,6 @@ templates/docs/contracts/README.md
 templates/docs/prd/0000-product.md
 templates/docs/prd/TEMPLATE.md
 templates/docs/progress.md
-templates/docs/runbook.md
 templates/docs/security.md
 templates/docs/test-strategy.md
 templates/github/ISSUE_TEMPLATE/epic.md

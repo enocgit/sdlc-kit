@@ -156,22 +156,16 @@ How to judge the items that need interpretation:
   an interface change; only when there is no deployed consumer may the ADR matrix route apply, with
   applicable approval, a re-freeze, and a production-register deferral. For fast-path work with no
   integration contract, accept N/A only with a concrete rationale.
-- **Verification / observed working.** Evidence must match the risk. Require the proportional local
-  checks described in `AGENTS.md`; do not require a full local suite merely because CI defines lint,
-  typecheck, test, and build checks. Runtime-affecting work must be exercised and observed with the
-  available runtime tools. Non-runtime work that affects links or rendering needs a relevant concrete
-  check such as link or rendering inspection; presentation-only styling, static markup, attributes,
-  copy, or layout may use a diff or one visual check. Non-trivial executable behavior, including
-  validation, authorization or security denial, error, retry, timeout, and partial-failure branches,
-  needs automated coverage. Styling, markup, or attributes that change accessibility, security, or
-  interaction behavior need focused behavior evidence. Do not fail a change merely because its best
-  proof is not a new test, and do not accept an assertion that only restates a presentation rule as
-  proof. A browser run is evidence only when the change can break the flow it exercises; a run that
-  could not have failed proves nothing. Configured
-  CI checks remain required from their trusted producer before merge. While the Lifecycle block in
-  `docs/context.md` shows no deployed consumer, real data, or traffic, defer only failures whose
-  required deployed consumer, real data, deployment, load, traffic, or multi-version condition is
-  unavailable; record the deferral in the production register.
+- **Verification / observed working.** Evidence must match the risk: apply the verification
+  standard in `AGENTS.md` (proportional local checks, no full suite merely because CI defines
+  lint/typecheck/test/build, browser evidence only when the change can break the flow it
+  exercises — a run that could not have failed proves nothing). Runtime-affecting work must be
+  exercised and observed with the available runtime tools. Do not fail a change merely because its
+  best proof is not a new test, and do not accept an assertion that only restates a presentation
+  rule as proof. Configured CI checks remain required from their trusted producer before merge.
+  While the Lifecycle block in `docs/context.md` shows no deployed consumer, real data, or traffic,
+  defer only failures whose required deployed consumer, real data, deployment, load, traffic, or
+  multi-version condition is unavailable; record the deferral in the production register.
 - **Docs.** Update `docs/architecture.md` if the system's shape changed. Edit a Proposed or Accepted
   ADR in place only while it is unimplemented and dependency-free; after amending an accepted ADR,
   require renewed human approval and re-freeze any affected contract before implementation resumes.
@@ -179,11 +173,19 @@ How to judge the items that need interpretation:
   regardless of status, then require human approval before implementation resumes and re-freeze any
   affected contract. For contract changes, apply the exclusive deployed-consumer routing in Contract
   fidelity before this generic ADR rule. Every PRD requirement or scope amendment returns to human approval.
-  When the change has a tracker issue, ensure it reflects reality. Check decision and delivery status separately: approval, acceptance,
-  or freeze does not prove implementation.
+  When the change has a tracker issue, ensure it reflects reality. Decision states (approval,
+  acceptance, freeze) are stated by their artifacts; live delivery state is stated only by the
+  tracker — no doc may carry intermediate status prose.
   Current-behavior claims and security controls must reflect the task's evidence,
   with planned and partial behavior identified. Full epic reconciliation may wait for the final
   child; inaccurate claims about enforced behavior may not. Link evidence, not duplicate task lists.
+- **Stale-claim scan (mechanical).** In the changed docs, search for intermediate status tokens
+  (`PENDING`, `TODO`, `In progress`, `Partially implemented`, `Planned`), template markers, and
+  statements of delivery state outside the tracker and ADRs. For each hit: if it is live state, it
+  moves to the tracker or is deleted; if it is a decision record, it moves to the ADR; if it is a
+  current-behavior claim, require evidence from this change or a dated link to its source. Record
+  the scan (patterns, files, hits, resolutions) as local-readiness evidence — a claimed-clean scan
+  without the recorded patterns and hits is not evidence.
 - **Readability.** Review changed docs, issue criteria, and proposed PR text against `AGENTS.md`'s
   one-point writing rule; identify overloaded points rather than enforcing word or sentence quotas.
   Split independent obligations while preserving exact conditions, requirement IDs, document
