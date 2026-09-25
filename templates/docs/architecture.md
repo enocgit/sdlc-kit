@@ -34,15 +34,15 @@
 ## Planned changes
 
 <!-- Approved future changes only. Link the decision and contract; keep current behavior in the
-     sections above. Separate decision status from delivery: Not implemented, Partially implemented,
-     or Implemented. Link partial-delivery evidence rather than copying tracker checklists. Update
-     affected current-behavior claims with each task. Remove this section when no plans remain. -->
+     sections above. Never mark delivery progress here — the tracker owns live state, and a claim
+     is written only when it is true. When implementation lands, move the change's facts into the
+     current-state sections and drop the planned entry. Remove this section when no plans remain. -->
 
 ## Cross-cutting concerns
 
 - **Auth:** {approach}
 - **Errors:** {approach}
-- **Observability:** {logs/metrics/traces — see docs/runbook.md}
+- **Observability:** {logs/metrics/traces — document a project-created runbook when operational needs require one}
 - **Config/secrets:** {approach}
 
 ## Decisions affecting this architecture

@@ -4,6 +4,65 @@ All notable changes to this project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/); this project aims to follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- The installer records its release in `.sdlc-kit-version` at the target root — the one destination
+  it updates when the version changes — and records `unreleased` when this checkout has a non-empty
+  `[Unreleased]` section. Upgrade guidance covers both that marker and pre-marker 0.7.0 installs;
+  review the changelog since the marker, merge template changes by hand, and refresh only named skills.
+- PRD amendments follow a stated pattern: a new amendment PRD with bidirectional links, never
+  rewriting approved requirements in place.
+- ADRs may record an optional Scope line; contract boundary documents may live in `docs/contracts/`
+  next to the artifact pointers.
+
+### Changed
+
+- Reader-first documentation model: one bounded narrative per feature (the PRD, plus a delivery
+  record written once at final reconciliation), status prose removed from every other doc — live
+  state lives only in the tracker, decision states only in their ADRs. The Definition of Done
+  review gains a mechanical stale-claim scan (tokens, routing per hit, recorded as readiness
+  evidence).
+- The conductor splits into a ~110-line router plus `references/stage-{0..8}.md` and
+  `references/rules.md`: per-stage procedure is read at stage start instead of held in one 560-line
+  file, and doctrine is single-sourced — AGENTS.md owns reader-facing standards, conductor
+  references own pipeline mechanics, and skills point instead of restating.
+- The pipeline has five hard gates (context, foundation, PRD, approach+freeze, merge). The per-task
+  plan is proceed-with-disclosure and a hard gate only for a sensitive area or scope deviation.
+- Retro is the learning pass only (0–3 curated bullets, prune before append, cap confirmed at epic
+  closure); tracker closure is Land's tail; epic closure runs once, on the final child.
+- The security template restructures into current truth (threat model, baseline controls, records
+  index) plus per-feature dated records in `docs/security/records/`, with design-not-status and
+  reference-shared-actors writing rules; the test-strategy template shrinks to its test-specific
+  bar and points at AGENTS.md for the standard.
+- Installer simplification: publication is temp-dir plus atomic no-replace rename; the
+  staging-intent, quarantine, and lock-recovery machinery is replaced by a next-run cleanup pass
+  that removes only entries matching generated staging shapes from the target, template-file, and
+  configured skill publication parents, preserving ambiguous lookalikes; legacy `.sdlc-file-<24hex>`
+  directories from the old 0.7.x publisher remain for manual inspection. Containment, no-clobber,
+  restrictive umask, dry-run, and symlink validation are unchanged and still behaviorally tested.
+  The validator shrinks to invariant-mapped checks and `scripts/validation/` is removed.
+- Prerequisites state the POSIX-only requirement and the atomic-rename requirement up front; the
+  wrong same-directory-hard-links prerequisite is corrected.
+- The runbook template is removed from the installer payload; projects create one organically when
+  operations need it.
+- Vendored skill overrides move from this manual into the conductor's stage references; the
+  operating manual keeps a reader-level summary.
+- README renders the stage table from the conductor's single source and points adopters at the
+  issue tracker for feedback; CHEATSHEET and EXAMPLE follow the new gate and status model.
+- Updated kit-owned skill directories `skills/feature-start/`, `skills/definition-of-done-review/`,
+  `skills/sdlc/`, and `skills/security-review/` to align the conditional task-plan gate, CI sequence,
+  and dated security-record workflow.
+
+### Migration (0.7.0 → 0.8.0)
+
+- Finish in-flight features under 0.7.0 rules before upgrading, or accept the new gate model
+  mid-feature deliberately: approved PRDs and frozen contracts carry over unchanged.
+- If `docs/security.md` holds dated review records, move them to `docs/security/records/` (one
+  file per feature) and add the records index to `docs/security.md` from the new template.
+- Read `.sdlc-kit-version` after upgrading to confirm the release marker.
+
 ## [0.7.0] - 2026-09-24
 
 ### Added

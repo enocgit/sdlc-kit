@@ -7,8 +7,11 @@ project-local skills directory by default. It does not use a registry.
 
 You need:
 
-- Bash and Python 3.10+ on a POSIX system.
-- Filesystems that support descriptor-relative operations and same-directory hard links.
+- A POSIX system (Linux or macOS, including WSL). Windows is unsupported: the installer relies on
+  POSIX file semantics and atomic no-replace renames.
+- Bash and Python 3.10+.
+- Filesystems that support descriptor-relative operations and atomic no-replace renames
+  (`renameat2` on Linux, `renameatx_np` on macOS).
 - Git 2.25 or newer. Before the first review, run `git rev-parse --show-object-format` in the target
   repository. Upgrade Git if that command fails.
 - An agent that loads `SKILL.md` files and can run shell commands.
@@ -65,6 +68,7 @@ The table lists the files and directories the installer publishes.
 | `required-skills.yml` | `required-skills.yml` |
 | `templates/docs/` | `docs/` |
 | `templates/github/` | `.github/` |
+| — | `.sdlc-kit-version` (release marker, updated on upgrade) |
 | `skills/`, `vendor/skills/` | `.agents/skills/` by default |
 
 Set `SKILLS_DIR` when the runtime reads another skills directory:
@@ -88,18 +92,28 @@ ln -s ../.agents/skills .claude/skills
 The link points `.claude/skills` to `.agents/skills`. Committed links can fail on Windows without
 developer mode, in some CI checkouts, or across Docker bind mounts.
 
-If an install stops partway through, the next install locks the parent directory and moves marked
-stale state to `.sdlc-preserved-*`. Inspect that directory before removing it. The installer ignores
-unmarked lookalikes. An interruption while writing recovery intent may also leave
-`.sdlc-staging-intent.tmp-*`; inspect and remove it manually.
+The installer stages each publication in a temp file or directory and renames it into place. If an
+install stops partway through, the next real install checks the target root, template-file parents,
+and configured skills root under their publication locks. It removes only regular files named
+`.sdlc-file-` plus 24 lowercase hexadecimal characters, and directories named `.sdlc-skill-`, a
+sanitized skill label, and a 24-character lowercase hexadecimal token. Ambiguous lookalikes and the
+legacy `.sdlc-staging-intent` marker are left untouched; `.sdlc-preserved-*` directories from older
+releases remain for manual inspection. Legacy `.sdlc-file-<24hex>` directories from the old 0.7.x
+publisher are also skipped; inspect their contents and remove them manually if they are leftovers.
+The installer records the release in `.sdlc-kit-version` at
+the target root, or `unreleased` when this checkout has a non-empty `[Unreleased]` changelog section;
+this marker is the one destination it updates when the value changes.
 
 ### Upgrade an existing installation
 
-Run steps 1–6 from the `sdlc-kit` checkout. The target paths can point to another directory.
+Re-running the installer adds new files but never replaces existing files or skills, so an upgrade
+is: see what changed since your installed release, merge template changes by hand, refresh the
+skills you want updated, and verify.
 
-Re-running the installer adds new files but does not replace existing files or skills.
-
-1. Commit or back up the target. Update this kit checkout and review its `CHANGELOG.md` and diff.
+1. Check for `.sdlc-kit-version` in the target and read it if present. If it is absent, treat the
+   installation as a pre-marker 0.7.0 install and review all `CHANGELOG.md` changes since `[0.7.0]`.
+   Back up the target, then compare from a version marker; for `unreleased`, review the
+   `[Unreleased]` section.
 2. Stop agents that use the target.
 3. Record absolute paths. Use a stable skills directory for the project:
 
@@ -116,16 +130,19 @@ Re-running the installer adds new files but does not replace existing files or s
    SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh --dry-run "$TARGET"
    ```
 
-5. Move each bundled skill directory to a backup outside `SKILLS_DIR_ABS`, then install:
+5. Refresh bundled skills: the changelog names the skills a release touched, so only those need
+   attention — move each skill directory you want updated to a backup outside `SKILLS_DIR_ABS`,
+   then install. Unmoved skills stay at their installed version.
 
    ```bash
    SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh "$TARGET"
    ```
 
-6. Review the target diff and verify the installed snapshots:
+6. Verify the installed snapshots and the marker:
 
    ```bash
    python3 scripts/vendor-skills.py verify-installed "$SKILLS_DIR_ABS"
+   cat "$TARGET/.sdlc-kit-version"
    ```
 
 If the runtime does not read `AGENTS.md`, point its instruction file to it:
@@ -204,9 +221,9 @@ without changing the surrounding workflow:
 
 | Responsibility | GitHub default | Replacement |
 | --- | --- | --- |
-| Create tasks | `gh issue create` in `$SKILLS_DIR/sdlc/SKILL.md` | Tracker API or CLI |
+| Create tasks | `gh issue create` in `$SKILLS_DIR/sdlc/references/stage-3.md` | Tracker API or CLI |
 | Report status | `gh issue list` or `gh project item-list` in `$SKILLS_DIR/project-status/SKILL.md` | Tracker query |
-| Complete tasks | `Closes #N` in `$SKILLS_DIR/sdlc/SKILL.md` | Native Git integration or post-merge update |
+| Complete tasks | `Closes #N` in `$SKILLS_DIR/sdlc/references/rules.md` | Native Git integration or post-merge update |
 | Name branches | Issue number in `$SKILLS_DIR/feature-start/SKILL.md` | Tracker key such as `ENG-123` |
 
 ### CI and end-to-end tests

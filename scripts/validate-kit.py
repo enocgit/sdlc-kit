@@ -1,34 +1,177 @@
 #!/usr/bin/env python3
-"""Offline release gate for critical sdlc kit invariants."""
+"""Offline release gate for critical sdlc kit invariants.
+
+Checks map to the installer guarantees that survive PRD 0001: containment,
+no-clobber publication, restrictive umask, dry-run immutability, interrupted-run
+cleanup, source rejection, inventory integrity, vendored-snapshot identity, and
+directory-enumeration rewinding. See docs/prd/0001-reader-first-restructure.md.
+"""
 from __future__ import annotations
 
 import ast
-import concurrent.futures
+import contextlib
+import hashlib
 import importlib.util
 import json
 import os
 import shutil
+import signal
+import stat
 import subprocess
 import sys
 import tempfile
-import threading
 import time
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
 
-from importlib import import_module
 
-_helpers = import_module("validation.helpers")
-CheckError = _helpers.CheckError
-Fixture = _helpers.Fixture
-assert_mode = _helpers.assert_mode
-assert_no_changes = _helpers.assert_no_changes
-assert_same_tree = _helpers.assert_same_tree
-copy_tree = _helpers.copy_tree
-expect_fail = _helpers.expect_fail
-expect_ok = _helpers.expect_ok
-run = _helpers.run
-snapshot = _helpers.snapshot
+class CheckError(RuntimeError):
+    """A validation assertion failed."""
+
+
+def run(
+    command: Sequence[str],
+    *,
+    cwd: Path,
+    env: dict[str, str] | None = None,
+    timeout: int = 300,
+    umask: int | None = None,
+) -> subprocess.CompletedProcess[str]:
+    merged = os.environ.copy()
+    if env:
+        merged.update(env)
+    if umask is not None:
+        command = ("bash", "-c", f"umask {umask:o}; exec \"$@\"", "validate", *command)
+    process = subprocess.Popen(
+        command,
+        cwd=cwd,
+        env=merged,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        start_new_session=True,
+    )
+    try:
+        stdout, stderr = process.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired as timed_out:
+        with contextlib.suppress(ProcessLookupError):
+            os.killpg(process.pid, signal.SIGTERM)
+        try:
+            stdout, stderr = process.communicate(timeout=1)
+        except subprocess.TimeoutExpired:
+            with contextlib.suppress(ProcessLookupError):
+                os.killpg(process.pid, signal.SIGKILL)
+            stdout, stderr = process.communicate()
+        raise subprocess.TimeoutExpired(
+            command, timeout, output=stdout, stderr=stderr
+        ) from timed_out
+    return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+
+
+def expect_ok(result: subprocess.CompletedProcess[str], label: str) -> None:
+    if result.returncode:
+        raise CheckError(
+            f"{label} failed ({result.returncode})\n{result.stdout[-2000:]}{result.stderr[-2000:]}"
+        )
+
+
+def expect_fail(result: subprocess.CompletedProcess[str], label: str) -> None:
+    if result.returncode == 0:
+        raise CheckError(f"{label} unexpectedly succeeded")
+
+
+def snapshot(root: Path) -> dict[str, tuple[str, int, int]]:
+    result: dict[str, tuple[str, int, int]] = {
+        ".": ("directory", stat.S_IMODE(root.stat().st_mode), 0)
+    }
+    for path in sorted(root.rglob("*")):
+        rel = path.relative_to(root).as_posix()
+        entry = path.lstat()
+        mode = stat.S_IMODE(entry.st_mode)
+        if path.is_symlink():
+            result[rel] = ("link:" + os.readlink(path), mode, 0)
+        elif path.is_dir():
+            result[rel] = ("directory", mode, 0)
+        elif path.is_file():
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            result[rel] = (digest, mode, entry.st_size)
+        else:
+            result[rel] = (f"special:{stat.S_IFMT(entry.st_mode):o}", mode, 0)
+    return result
+
+
+def assert_same_tree(left: Path, right: Path) -> None:
+    if snapshot(left) != snapshot(right):
+        raise CheckError(f"tree mismatch: {left} != {right}")
+
+
+def assert_mode(path: Path, expected: int) -> None:
+    actual = stat.S_IMODE(path.stat().st_mode)
+    if actual != expected:
+        raise CheckError(f"{path} has mode {actual:o}, expected {expected:o}")
+
+
+def assert_no_changes(root: Path, before: dict[str, tuple[str, int, int]]) -> None:
+    if snapshot(root) != before:
+        raise CheckError("dry run changed the target tree")
+
+
+def kit_version(kit: Path) -> str:
+    lines = (kit / "CHANGELOG.md").read_text().splitlines()
+    in_unreleased = False
+    for line in lines:
+        if line == "## [Unreleased]":
+            in_unreleased = True
+            continue
+        if in_unreleased and line.startswith("## ["):
+            break
+        if in_unreleased and line.strip() and not line.startswith("### "):
+            return "unreleased"
+    for line in lines:
+        if line.startswith("## [") and "] - " in line:
+            return line[4 : line.index("]")]
+    raise CheckError("CHANGELOG.md has no released version section")
+
+
+class Fixture:
+    def __init__(self, kit: Path):
+        self.kit = kit
+        self._tmp = tempfile.TemporaryDirectory(prefix="sdlc-validate-")
+        self.root = Path(self._tmp.name)
+
+    def close(self) -> None:
+        self._tmp.cleanup()
+
+    def __enter__(self) -> Fixture:
+        return self
+
+    def __exit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
+        self.close()
+
+    def target(self, name: str = "target") -> Path:
+        path = self.root / name
+        path.mkdir(parents=True)
+        return path
+
+    def kit_copy(self) -> Path:
+        destination = self.root / "kit"
+        shutil.copytree(
+            self.kit,
+            destination,
+            symlinks=True,
+            ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc"),
+        )
+        return destination
+
+    def install(self, target: Path, *, dry_run: bool = False,
+                env: dict[str, str] | None = None, umask: int | None = None,
+                kit: Path | None = None) -> subprocess.CompletedProcess[str]:
+        source_kit = kit or self.kit
+        args = ["bash", str(source_kit / "install.sh")]
+        if dry_run:
+            args.append("--dry-run")
+        args.append(str(target))
+        return run(args, cwd=source_kit, env=env, umask=umask, timeout=300)
 
 
 class Validator:
@@ -99,8 +242,7 @@ class Validator:
     def smoke(self) -> None:
         with Fixture(self.kit) as fx:
             target = fx.target()
-            result = fx.install(target)
-            expect_ok(result, "install")
+            expect_ok(fx.install(target), "install")
             for source, destination in (
                 (self.kit / "templates/AGENTS.md", target / "AGENTS.md"),
                 (self.kit / "templates/CLAUDE.md", target / "CLAUDE.md"),
@@ -122,6 +264,11 @@ class Validator:
                     assert_same_tree(source, target / ".agents/skills" / source.name)
             expect_ok(run([sys.executable, "scripts/vendor-skills.py", "verify-installed", str(target / ".agents/skills")], cwd=self.kit), "installed integrity")
             assert_mode(target / ".agents/skills/brainstorming/SKILL.md", 0o644)
+            marker = target / ".sdlc-kit-version"
+            if marker.read_text() != kit_version(self.kit) + "\n":
+                raise CheckError(f"installed kit version marker is wrong: {marker.read_text()!r}")
+            if (target / "docs/runbook.md").exists():
+                raise CheckError("runbook template was installed but is no longer in the payload")
 
     def dry_run(self) -> None:
         with Fixture(self.kit) as fx:
@@ -164,118 +311,114 @@ class Validator:
             if existing_skill.read_text() != "keep this skill\n":
                 raise CheckError("existing local skill was overwritten")
 
-    def _publish_command(self, target: Path, source: Path, destination: Path,
-                         kind: str = "file") -> list[str]:
-        return [sys.executable, "scripts/install-safe.py", kind, str(target), str(source), str(destination)]
-
-    def _tree_publisher(self, target: Path, source: Path, destination: Path) -> Any:
-        module_spec = importlib.util.spec_from_file_location("install_safe", self.kit / "scripts/install-safe.py")
-        if module_spec is None or module_spec.loader is None:
-            raise CheckError("could not load install-safe module")
-        module = importlib.util.module_from_spec(module_spec)
-        module_spec.loader.exec_module(module)
-        return module
-
-    def publication_race(self) -> None:
+    def interrupted_cleanup(self) -> None:
+        """Remove generated staging names but preserve ambiguous lookalikes."""
         with Fixture(self.kit) as fx:
             target = fx.target()
-            sources = (fx.root / "first", fx.root / "second")
-            for source, text in zip(sources, ("first\n", "second\n")):
-                source.mkdir(mode=0o755)
-                source.chmod(0o755)
-                (source / "SKILL.md").write_text(text)
-                (source / "SKILL.md").chmod(0o644)
-            destination = target / "published"
-            module = self._tree_publisher(target, sources[0], destination)
-            barrier = threading.Barrier(2)
-            original_rename = module.atomic_rename_noreplace
+            stale_dir = target / (".sdlc-skill-interrupted-" + "4" * 24)
+            stale_dir.mkdir()
+            (stale_dir / "partial").write_text("partial\n")
+            stale_file = target / (".sdlc-file-" + "5" * 24)
+            stale_file.write_text("partial file\n")
+            lookalike_file = target / ".sdlc-file-deadbeef"
+            lookalike_file.write_text("adopter data\n")
+            lookalike_dir = target / ".sdlc-skill-not-ours"
+            lookalike_dir.mkdir()
+            (lookalike_dir / "keep.txt").write_text("adopter data\n")
+            legacy_name = target / ".sdlc-staging-intent"
+            legacy_name.write_text("adopter data\n")
+            expect_ok(fx.install(target), "install after interruption")
+            for stale in (stale_dir, stale_file):
+                if os.path.lexists(stale):
+                    raise CheckError(f"generated interrupted-run staging survived: {stale.name}")
+            for preserved in (lookalike_file, lookalike_dir, legacy_name):
+                if not os.path.lexists(preserved):
+                    raise CheckError(f"ambiguous adopter entry was deleted: {preserved.name}")
+            if (lookalike_file.read_text() != "adopter data\n"
+                    or (lookalike_dir / "keep.txt").read_text() != "adopter data\n"
+                    or legacy_name.read_text() != "adopter data\n"):
+                raise CheckError("cleanup changed ambiguous adopter data")
+            if not (target / "AGENTS.md").is_file():
+                raise CheckError("cleanup pass broke the install itself")
 
-            def synchronized_rename(*args):
-                barrier.wait(timeout=30)
-                return original_rename(*args)
-
-            setattr(module, "lock_and_recover_parent", lambda _parent_fd: None)
-            setattr(module, "atomic_rename_noreplace", synchronized_rename)
-            setattr(module, "write_staging_intent", lambda _parent_fd, _name: None)
-            setattr(module, "clear_staging_intent", lambda _parent_fd, _missing_ok=False: None)
-            publishers = [
-                lambda source=source: module.publish_tree(target, source, destination)
-                for source in sources
-            ]
-            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-                results = list(executor.map(lambda fn: fn(), publishers))
-            if sorted(results) != [False, True]:
-                raise CheckError(f"publication race violated no-clobber semantics: {results}")
-            winner = sources[0] if (destination / "SKILL.md").read_text() == "first\n" else sources[1]
-            assert_same_tree(winner, destination)
-
-    def recovery(self) -> None:
+    def cleanup_on_no_clobber_rerun(self) -> None:
+        """A complete install rerun cleans stale names even when payloads are skipped."""
         with Fixture(self.kit) as fx:
             target = fx.target()
-            source = fx.root / "source"
-            source.write_text("payload\n")
-            staging = target / (".sdlc-skill-recovery-" + "1" * 24)
-            staging.mkdir()
-            (staging / ".sdlc-installing").write_bytes(b"sdlc-install-v1\n")
-            (target / ".sdlc-staging-intent").write_text(staging.name + "\n")
-            destination = target / "published"
-            expect_ok(run(self._publish_command(target, source, destination), cwd=self.kit), "recovery publish")
-            preserved = list(target.glob(".sdlc-preserved-*"))
-            if len(preserved) != 1 or (target / ".sdlc-staging-intent").exists() or staging.exists():
-                raise CheckError("interrupted publication was not recovered and quarantined")
-            if destination.read_text() != "payload\n":
-                raise CheckError("recovery did not publish the requested payload")
+            expect_ok(fx.install(target), "initial install before cleanup rerun")
+            stale_root = target / (".sdlc-file-" + "6" * 24)
+            stale_nested = target / "docs" / (".sdlc-file-" + "7" * 24)
+            skills_root = target / ".agents/skills"
+            stale_skill = skills_root / (".sdlc-skill-interrupted-" + "8" * 24)
+            stale_root.write_text("partial\n")
+            stale_nested.write_text("partial\n")
+            stale_skill.mkdir()
+            (stale_skill / "partial").write_text("partial\n")
+            expect_ok(fx.install(target), "no-clobber install rerun")
+            leftovers = [path for path in (stale_root, stale_nested, stale_skill) if os.path.lexists(path)]
+            if leftovers:
+                raise CheckError(f"no-clobber rerun left stale staging behind: {leftovers}")
+            if (target / "AGENTS.md").read_text() != (self.kit / "templates/AGENTS.md").read_text():
+                raise CheckError("cleanup-on-rerun changed the installed payload")
 
-    def quarantine(self) -> None:
-        with Fixture(self.kit) as fx:
-            target = fx.target()
-            source = fx.root / "source"
-            source.write_text("payload\n")
-            staging = target / (".sdlc-skill-quarantine-" + "2" * 24)
-            staging.mkdir()
-            (staging / ".sdlc-installing").write_bytes(b"sdlc-install-v1\n")
-            (staging / "late-entry").write_text("preserve me\n")
-            expect_ok(run(self._publish_command(target, source, target / "published"), cwd=self.kit), "quarantine publish")
-            preserved = list(target.glob(".sdlc-preserved-*"))
-            if len(preserved) != 1 or (preserved[0] / "late-entry").read_text() != "preserve me\n":
-                raise CheckError("uncertain staging state was not preserved whole")
-            if (target / "published").read_text() != "payload\n":
-                raise CheckError("quarantine recovery did not publish the requested payload")
-
-    def timeout_cleanup(self) -> None:
-        with Fixture(self.kit) as fx:
-            pid_file = fx.root / "descendant.pid"
-            command = ["bash", "-c", f"sleep 30 & echo $! > {pid_file}; wait"]
-            timed_out = False
+    def timeout_kills_process_group(self) -> None:
+        """A timeout sends SIGTERM to descendants before escalating to SIGKILL."""
+        child = (
+            "import pathlib,signal,sys,time; "
+            "term_marker=pathlib.Path(sys.argv[1]); "
+            "survived_marker=pathlib.Path(sys.argv[2]); "
+            "ready_marker=pathlib.Path(sys.argv[3]); "
+            "signal.signal(signal.SIGTERM, lambda *_: (term_marker.write_text('SIGTERM'), sys.exit(0))); "
+            "ready_marker.write_text('ready'); time.sleep(10); survived_marker.write_text('survived')"
+        )
+        parent = (
+            "import pathlib,subprocess,sys,time\n"
+            "subprocess.Popen([sys.executable, '-c', " + repr(child) + ", sys.argv[1], sys.argv[2], sys.argv[3]])\n"
+            "ready=pathlib.Path(sys.argv[3]); deadline=time.monotonic()+30\n"
+            "while not ready.exists() and time.monotonic()<deadline:\n"
+            "    time.sleep(0.01)\n"
+            "time.sleep(30)\n"
+        )
+        with tempfile.TemporaryDirectory(prefix="sdlc-timeout-") as temporary:
+            term_marker = Path(temporary) / "child-received-sigterm"
+            child_marker = Path(temporary) / "child-survived"
+            ready_marker = Path(temporary) / "child-ready"
             try:
-                run(command, cwd=self.kit, timeout=1)
+                run([sys.executable, "-c", parent, str(term_marker), str(child_marker), str(ready_marker)],
+                    cwd=self.kit, timeout=5)
             except subprocess.TimeoutExpired:
-                timed_out = True
-            if not timed_out:
-                raise CheckError("timeout fixture unexpectedly completed")
-            try:
-                pid = int(pid_file.read_text())
-            except (OSError, ValueError) as exc:
-                raise CheckError(f"timeout fixture did not record its descendant: {exc}") from exc
-            for _ in range(20):
-                try:
-                    os.kill(pid, 0)
-                except ProcessLookupError:
-                    return
+                pass
+            else:
+                raise CheckError("timed-out command unexpectedly completed")
+            if not term_marker.exists():
+                raise CheckError("timeout did not deliver SIGTERM to the child process group")
+            deadline = time.monotonic() + 1.5
+            while time.monotonic() < deadline and not child_marker.exists():
                 time.sleep(0.05)
-            raise CheckError(f"timed-out descendant survived: {pid}")
+            if child_marker.exists():
+                raise CheckError("timeout left a child process running")
 
-    def timeout_exit_race(self) -> None:
-        original_killpg = _helpers.os.killpg
-        setattr(_helpers.os, "killpg", lambda _pid, _signal: (_ for _ in ()).throw(ProcessLookupError()))
-        try:
-            try:
-                run(["bash", "-c", "sleep 0.2"], cwd=self.kit, timeout=0.05)
-            except subprocess.TimeoutExpired:
-                return
-            raise CheckError("timeout exit race unexpectedly completed")
-        finally:
-            setattr(_helpers.os, "killpg", original_killpg)
+    def version_marker(self) -> None:
+        with Fixture(self.kit) as fx:
+            target = fx.target()
+            stale_marker = target / ".sdlc-kit-version"
+            stale_marker.write_text("0.0.1\n")
+            expect_ok(fx.install(target), "install for marker check")
+            if stale_marker.read_text() != kit_version(self.kit) + "\n":
+                raise CheckError("install did not update the kit version marker")
+            assert_mode(stale_marker, 0o644)
+
+            empty_unreleased_kit = fx.kit_copy()
+            changelog = empty_unreleased_kit / "CHANGELOG.md"
+            lines = changelog.read_text().splitlines()
+            unreleased_heading = lines.index("## [Unreleased]")
+            next_release = next(index for index in range(unreleased_heading + 1, len(lines))
+                                if lines[index].startswith("## ["))
+            changelog.write_text("\n".join(lines[:unreleased_heading + 1] + lines[next_release:]) + "\n")
+            old_target = fx.target("empty-unreleased-target")
+            expect_ok(fx.install(old_target, kit=empty_unreleased_kit), "install with empty Unreleased section")
+            if (old_target / ".sdlc-kit-version").read_text() != "0.7.0\n":
+                raise CheckError("empty Unreleased section did not select the released version")
 
     def containment(self) -> None:
         with Fixture(self.kit) as fx:
@@ -332,11 +475,10 @@ class Validator:
             module_spec.loader.exec_module(vendor_module)
 
             vendor = kit / "vendor"
-            staging_intent = kit / vendor_module.VENDOR_STAGING_INTENT_NAME
 
             def assert_no_removal_residue(label: str) -> None:
                 residue = [
-                    staging_intent,
+                    kit / vendor_module.VENDOR_STAGING_INTENT_NAME,
                     kit / vendor_module.VENDOR_BACKUP_NAME,
                     kit / vendor_module.VENDOR_TRANSACTION_NAME,
                     *kit.glob(f"{vendor_module.VENDOR_STAGING_INTENT_NAME}.tmp-*"),
@@ -350,7 +492,7 @@ class Validator:
 
             removed_name = "using-git-worktrees"
             source_name = "writing-plans"
-            copy_tree(vendor / "skills" / source_name, vendor / "skills" / removed_name)
+            shutil.copytree(vendor / "skills" / source_name, vendor / "skills" / removed_name, symlinks=True)
             (vendor / "licenses" / f"{removed_name}.txt").write_bytes(
                 (vendor / "licenses" / f"{source_name}.txt").read_bytes()
             )
@@ -467,11 +609,11 @@ class Validator:
     def run(self) -> int:
         checks = (("syntax, schemas, and provenance", self.static), ("clean install", self.smoke),
                   ("dry-run immutability", self.dry_run), ("restrictive umask", self.umask),
-                  ("no-clobber publication", self.no_clobber), ("publication race", self.publication_race),
-                  ("interrupted publication recovery", self.recovery),
-                  ("uncertain recovery quarantine", self.quarantine),
-                  ("timeout process-group cleanup", self.timeout_cleanup),
-                  ("timeout exit race cleanup", self.timeout_exit_race),
+                  ("no-clobber publication", self.no_clobber),
+                  ("interrupted-run cleanup", self.interrupted_cleanup),
+                  ("cleanup on no-clobber rerun", self.cleanup_on_no_clobber_rerun),
+                  ("process-group timeout", self.timeout_kills_process_group),
+                  ("kit version marker", self.version_marker),
                   ("target containment", self.containment), ("source entry rejection", self.source_rejection),
                   ("vendored removal", self.vendor_removal), ("installed tamper detection", self.tamper),
                   ("directory enumeration rewind", self.enumeration_rewind))

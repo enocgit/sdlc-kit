@@ -20,7 +20,9 @@ at every gate (✅) for explicit human approval; at non-gate stages do the work,
 worth overriding, then continue.
 
 - **Stages:** 0 Context + Foundation · 1 Spec · 2 Architecture + Contract · 3 Decompose · 4 Implement · 5 QA · 6 Review · 7 Land · 8 Retro
-- **Gates (✅):** context filled, foundation, PRD, approach + freeze, per-task plan, human merge. Decompose, QA, and Review are proceed-with-disclosure.
+- **Gates (✅):** context filled, foundation, PRD, approach + freeze, human merge. Decompose, QA,
+  Review, and the per-task plan are proceed-with-disclosure; a task plan is a hard gate only when it
+  touches a sensitive area or deviates from the approved decomposition.
 - **Fast paths:** bug fix → 4→5→6→7→8; chore → 4→6→7→8. Stage 0 runs once, then features run 1→8. A contract change, a sensitive area, or a new decision takes the full feature path.
 
 Open every pipeline response with `SDLC ▸ Stage {N}/8 {Name} · {next gate or action}`.
@@ -99,8 +101,8 @@ warnings. Use complete sentences for gates, security warnings, irreversible acti
 ## Conventions
 
 - **Stack (placeholder — set at Stage 0):** TypeScript + React and Node are illustrative defaults; replace with your real stack when you fill `docs/context.md`.
-- **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{id}-{slug}` branches → PR → merge → deploy. Environments are deploy targets driven by CI, not long-lived branches. One feature per branch. A git worktree is an explicit manual escape hatch: the operator supplies a private, new or empty path outside every checkout and runs `feature-start`'s generic Git-only recipe.
-- **Where planning commits land.** Land planning packages on `main`, never a feature branch: the Stage 0 context and foundation at the foundation gate, then the Stage 1 PRD plus the Stage 2 ADRs, architecture and security updates, and frozen contract once after Stage 2. Stage 4 cuts `feat/*` from a ref that must already hold the frozen contract, so ask for the landing action by remote state: commit locally with no remote, commit and push to an unprotected `main`, or `plan/{NNNN}-{slug}` → PR for a protected one (`sdlc` → Default-branch landings). Per-task learnings land before the next task; final-child reconciliation lands before the parent epic completes; an empty Retro needs no landing.
+- **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{id}-{slug}` branches → PR → merge → deploy. Environments are deploy targets driven by CI, not long-lived branches. One feature per branch. A git worktree is an explicit manual escape hatch: the operator supplies a private, new or empty path outside every checkout and runs `feature-start`'s generic Git-only recipe, owning path selection, privacy, and containment checks.
+- **Where planning commits land.** Planning packages land on `main`, never a feature branch, and Stage 4 branches from a ref that already holds the frozen contract. The conductor's landing rules (`$SKILLS_DIR/sdlc/references/rules.md` → Default-branch landings) are canonical for the by-remote-state action; per-task learnings land before the next task; final-child reconciliation lands before the parent epic completes; an empty Retro needs no landing.
 - **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the relevant issue when one exists (`Refs #123`, or `Closes #123` on GitHub only,
   elsewhere its key); never create an issue just to have one to reference. Small logical commits,
   not one blob.
@@ -126,12 +128,7 @@ PII/KYC, file uploads, and admin/privileged surfaces.** A change touching these 
 
 ## Vendored skill overrides
 
-Third-party snapshots supply techniques; this file and the `sdlc` conductor own paths, transitions, and safety. Run stage-bound snapshots only when `sdlc` routes to them, and apply these overrides:
-
-- Before using the `brainstorming` visual companion, set `SUPERPOWERS_DISABLE_TELEMETRY=1` to block its branding request. Keep it on loopback with an SSH tunnel, never plaintext non-loopback mode; use its default temporary session directory and do not pass `--project-dir`. Ignore its instruction to commit or write under `docs/superpowers/`.
-- For `improve-codebase-architecture`, treat `CONTEXT.md` as `docs/context.md`; do not invoke its unavailable `codebase-design` or `domain-modeling` dependencies, and skip its CDN-backed report.
-- For an opt-in worktree, use the generic Git-only `git worktree add` and non-forced `git worktree remove` commands in `feature-start`; the operator owns platform-specific path selection, privacy, and containment checks.
-- Do not use `webapp-testing`'s bundled `with_server.py`; use the project's lifecycle runner or an already-running server. Wait for an app-specific readiness signal, not mandatory `networkidle`.
+Third-party snapshots supply techniques; this file and the `sdlc` conductor own paths, transitions, and safety. Run stage-bound snapshots only when `sdlc` routes to them. Per-skill overrides (what to use, what to skip, where artifacts land) live in the conductor's stage references (`$SKILLS_DIR/sdlc/references/`), which are canonical — this section records only what a reader must know without them: run borrowed skills' methods, never their workflow opinions; `AGENTS.md` conventions win over any borrowed default; no snapshot writes under `docs/superpowers/`; the `brainstorming` visual companion stays loopback-only with `SUPERPOWERS_DISABLE_TELEMETRY=1`.
 
 ## Guardrails
 

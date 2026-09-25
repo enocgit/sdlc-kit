@@ -363,6 +363,20 @@ copy_skill() { # srcdir dstdir [vendored-skill-name] — descriptor-relative no-
   fi
 }
 
+clean_template_parents() { # source tree destination tree — clean only parents that receive files
+  local srcdir="${1%/}" dstdir="${2%/}" source_file rel parent_rel destination_dir
+  while IFS= read -r -d '' source_file; do
+    rel="${source_file#"$srcdir"/}"
+    if [[ "$rel" == */* ]]; then
+      parent_rel="${rel%/*}"
+      destination_dir="$dstdir/$parent_rel"
+    else
+      destination_dir="$dstdir"
+    fi
+    python3 "$SAFE_INSTALL" clean "$TARGET" "$destination_dir" >/dev/null
+  done < <(find "$srcdir" -type f -print0)
+}
+
 # Validate every destination parent before publishing anything, so dry-run and real installs reject
 # the same path conflicts and a late conflict cannot leave a partial install.
 ensure_safe_parent "$TARGET" "$TARGET/AGENTS.md"
@@ -376,6 +390,14 @@ done
 for d in "$KIT"/vendor/skills/*/; do
   ensure_safe_parent "$SKILL_WRITE_ROOT" "$SKILLS_DIR/$(basename "$d")"
 done
+
+# Clean interrupted-run staging in every publication parent, even when all destinations already
+# exist and the file/skill copy helpers will skip them. The marker separately cleans TARGET's root.
+if [ "$DRY" -eq 0 ]; then
+  clean_template_parents "$KIT/templates/docs" "$TARGET/docs"
+  clean_template_parents "$KIT/templates/github" "$TARGET/.github"
+  python3 "$SAFE_INSTALL" clean "$SKILL_WRITE_ROOT" "$SKILLS_DIR" >/dev/null
+fi
 
 # Operating manual + one-line CLAUDE.md pointer
 copy_file "$KIT/templates/AGENTS.md" "$TARGET/AGENTS.md"
@@ -395,6 +417,26 @@ for d in "$KIT"/vendor/skills/*/; do
   name="$(basename "$d")"
   copy_skill "$d" "$SKILLS_DIR/$name" "$name"
 done
+
+# Kit version marker — the one managed exception to no-clobber: an existing marker for a
+# different release is replaced, so re-running after an upgrade reports the new version.
+if awk '
+  /^## \[Unreleased\]$/ { in_unreleased = 1; next }
+  /^## \[/ { if (in_unreleased) exit }
+  in_unreleased && $0 !~ /^[[:space:]]*$/ && $0 !~ /^### / { found = 1; exit }
+  END { exit(found ? 0 : 1) }
+' "$KIT/CHANGELOG.md"; then
+  KIT_VERSION="unreleased"
+else
+  KIT_VERSION="$(sed -n 's/^## \[\([0-9][0-9A-Za-z.]*\)\] - .*/\1/p' "$KIT/CHANGELOG.md" | head -1)"
+  KIT_VERSION="${KIT_VERSION:-unreleased}"
+fi
+if [ "$DRY" -eq 1 ]; then
+  echo "  ~ .sdlc-kit-version -> $KIT_VERSION (dry run)"
+else
+  MARKER_RESULT="$(python3 "$SAFE_INSTALL" version "$TARGET" "$KIT_VERSION")"
+  echo "  marker: .sdlc-kit-version $KIT_VERSION ($MARKER_RESULT)"
+fi
 
 # Summary / conflict report
 echo

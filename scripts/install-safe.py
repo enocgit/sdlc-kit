@@ -12,7 +12,6 @@ import os
 import re
 import secrets
 import stat
-import sys
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, BinaryIO
@@ -21,16 +20,15 @@ if not hasattr(os, "O_DIRECTORY") or not hasattr(os, "O_NOFOLLOW"):
     raise RuntimeError("safe installation requires O_DIRECTORY and O_NOFOLLOW support")
 OPEN_DIRECTORY = os.O_RDONLY | os.O_DIRECTORY | getattr(os, "O_CLOEXEC", 0)
 OPEN_NOFOLLOW = os.O_NOFOLLOW
-INSTALLING_MARKER = ".sdlc-installing"
-INSTALLING_MARKER_CONTENT = b"sdlc-install-v1\n"
-INSTALLING_INTENT = ".sdlc-staging-intent"
+STAGING_FILE_RE = re.compile(r"\.sdlc-file-[0-9a-f]{24}\Z")
+STAGING_SKILL_RE = re.compile(
+    r"\.sdlc-skill-[a-z0-9](?:[a-z0-9._-]{0,38}[a-z0-9])?-[0-9a-f]{24}\Z"
+)
+KIT_VERSION_MARKER = ".sdlc-kit-version"
 INSTALLED_DIRECTORY_MODE = 0o755
 INSTALLED_REGULAR_MODE = 0o644
 INSTALLED_EXECUTABLE_MODE = 0o755
 NORMALIZED_TIMESTAMP_NS = 0
-STAGING_NAME_RE = re.compile(
-    r"^(?:\.sdlc-file-[0-9a-f]{24}|\.sdlc-skill-[a-z0-9](?:[a-z0-9._-]{0,38}[a-z0-9])?-[0-9a-f]{24})$"
-)
 
 
 def contained_parts(allowed_root: Path, destination: Path) -> tuple[list[str], str]:
@@ -211,10 +209,6 @@ def copy_source_to_new_file(
         os.close(source_fd)
 
 
-def valid_staging_name(name: str) -> bool:
-    return STAGING_NAME_RE.fullmatch(name) is not None
-
-
 def skill_staging_prefix(name: str) -> str:
     label = re.sub(r"[^a-z0-9._-]", "-", name.lower())[:40].strip("._-")
     if not label:
@@ -222,225 +216,63 @@ def skill_staging_prefix(name: str) -> str:
     return f".sdlc-skill-{label}-"
 
 
-def write_staging_intent(parent_fd: int, staging_name: str) -> None:
-    if not valid_staging_name(staging_name):
-        raise ValueError(f"invalid staging name for intent: {staging_name}")
-    temporary_name = f"{INSTALLING_INTENT}.tmp-{secrets.token_hex(12)}"
-    descriptor = os.open(
-        temporary_name,
-        os.O_WRONLY | os.O_CREAT | os.O_EXCL | OPEN_NOFOLLOW,
-        0o600,
-        dir_fd=parent_fd,
-    )
-    try:
-        try:
-            write_all(descriptor, staging_name.encode() + b"\n")
-            os.fsync(descriptor)
-        finally:
-            os.close(descriptor)
-        if not atomic_rename_noreplace(
-            parent_fd,
-            temporary_name,
-            parent_fd,
-            INSTALLING_INTENT,
-        ):
-            raise RuntimeError("staging intent already exists")
-        os.fsync(parent_fd)
-    except BaseException:
-        try:
-            os.unlink(temporary_name, dir_fd=parent_fd)
-            os.fsync(parent_fd)
-        except FileNotFoundError:
-            pass
-        raise
-
-
-def clear_staging_intent(parent_fd: int, missing_ok: bool = False) -> None:
-    try:
-        os.unlink(INSTALLING_INTENT, dir_fd=parent_fd)
-    except FileNotFoundError:
-        if missing_ok:
-            return
-        raise RuntimeError("staging intent disappeared")
-    except OSError as error:
-        raise RuntimeError("could not remove staging intent") from error
-    os.fsync(parent_fd)
-
-
-def validate_intent_recovery_state(staging_fd: int) -> tuple[int, int] | None:
-    names = list_entries(staging_fd)
-    if not names:
-        return None
-    if names != [INSTALLING_MARKER]:
-        raise RuntimeError("staging intent target contains unexpected entries")
-    try:
-        marker_fd = os.open(INSTALLING_MARKER, os.O_RDONLY | OPEN_NOFOLLOW, dir_fd=staging_fd)
-    except OSError as error:
-        raise RuntimeError("staging intent marker is unreadable") from error
-    try:
-        marker_stat = os.fstat(marker_fd)
-        marker_content = read_bounded(marker_fd, len(INSTALLING_MARKER_CONTENT) + 1)
-    finally:
-        os.close(marker_fd)
-    if not stat.S_ISREG(marker_stat.st_mode) or marker_content != INSTALLING_MARKER_CONTENT:
-        raise RuntimeError("staging intent marker is invalid")
-    return marker_stat.st_dev, marker_stat.st_ino
-
-
-def quarantine_intended_staging(
-    parent_fd: int,
-    staging_name: str,
-    staging_fd: int,
-) -> None:
-    preserve_stale_staging(parent_fd, staging_name, staging_fd)
-
-
-def recover_staging_intent(parent_fd: int) -> None:
-    try:
-        descriptor = os.open(INSTALLING_INTENT, os.O_RDONLY | OPEN_NOFOLLOW, dir_fd=parent_fd)
-    except FileNotFoundError:
-        return
-    try:
-        marker_stat = os.fstat(descriptor)
-        content = read_bounded(descriptor, 256)
-    finally:
-        os.close(descriptor)
-    try:
-        staging_name = content.decode("ascii").removesuffix("\n")
-    except UnicodeError as error:
-        raise RuntimeError("invalid staging intent encoding") from error
-    if not stat.S_ISREG(marker_stat.st_mode) or content != staging_name.encode() + b"\n" or not valid_staging_name(staging_name):
-        raise RuntimeError("invalid staging intent")
-    try:
-        staging_fd = open_child_directory(parent_fd, staging_name, create=False)
-    except FileNotFoundError:
-        clear_staging_intent(parent_fd)
-        return
-    try:
-        validate_intent_recovery_state(staging_fd)
-        quarantine_intended_staging(parent_fd, staging_name, staging_fd)
-    finally:
-        os.close(staging_fd)
-    clear_staging_intent(parent_fd)
-
-
-def create_staging_wrapper(parent_fd: int, prefix: str) -> tuple[str, int]:
-    staging_name = f"{prefix}{secrets.token_hex(12)}"
-    write_staging_intent(parent_fd, staging_name)
-    try:
-        os.mkdir(staging_name, mode=0o700, dir_fd=parent_fd)
-    except OSError as error:
-        clear_staging_intent(parent_fd)
-        raise RuntimeError(f"could not create private staging directory: {staging_name}") from error
-    try:
-        staging_fd = open_child_directory(parent_fd, staging_name, create=False)
-    except BaseException:
-        cleanup_succeeded = False
-        try:
-            os.rmdir(staging_name, dir_fd=parent_fd)
-            os.fsync(parent_fd)
-            cleanup_succeeded = True
-        except BaseException:
-            pass
-        finally:
-            if cleanup_succeeded:
-                clear_staging_intent(parent_fd, missing_ok=True)
-        raise
-    try:
-        marker_fd = os.open(
-            INSTALLING_MARKER,
-            os.O_WRONLY | os.O_CREAT | os.O_EXCL | OPEN_NOFOLLOW,
-            0o600,
-            dir_fd=staging_fd,
-        )
-        try:
-            write_all(marker_fd, INSTALLING_MARKER_CONTENT)
-            os.fsync(marker_fd)
-        finally:
-            os.close(marker_fd)
-        os.fsync(staging_fd)
-        os.fsync(parent_fd)
-        clear_staging_intent(parent_fd)
-        return staging_name, staging_fd
-    except BaseException:
-        cleanup_succeeded = False
-        try:
-            remove_staging_directory(parent_fd, staging_name, staging_fd)
-            os.fsync(parent_fd)
-            cleanup_succeeded = True
-        except BaseException:
-            pass
-        finally:
-            os.close(staging_fd)
-            if cleanup_succeeded:
-                clear_staging_intent(parent_fd, missing_ok=True)
-        raise
-
-
-def recover_stale_staging(parent_fd: int) -> None:
-    recover_staging_intent(parent_fd)
-    for name in list_entries(parent_fd):
-        if not name.startswith((".sdlc-file-", ".sdlc-skill-")):
-            continue
-        try:
-            staging_fd = open_child_directory(parent_fd, name, create=False)
-        except (FileNotFoundError, NotADirectoryError, OSError):
-            continue
-        owned = False
-        try:
-            try:
-                marker_fd = os.open(INSTALLING_MARKER, os.O_RDONLY | OPEN_NOFOLLOW, dir_fd=staging_fd)
-            except (FileNotFoundError, OSError):
-                continue
-            try:
-                marker_stat = os.fstat(marker_fd)
-                owned = (
-                    stat.S_ISREG(marker_stat.st_mode)
-                    and read_bounded(marker_fd, len(INSTALLING_MARKER_CONTENT) + 1)
-                    == INSTALLING_MARKER_CONTENT
-                )
-            finally:
-                os.close(marker_fd)
-            if owned:
-                preserve_stale_staging(parent_fd, name, staging_fd)
-        finally:
-            os.close(staging_fd)
-
-
-def lock_and_recover_parent(parent_fd: int) -> None:
+def lock_parent(parent_fd: int) -> None:
+    """Serialize installers publishing into the same directory so cleanup
+    never removes another live process's staging entry."""
     fcntl.flock(parent_fd, fcntl.LOCK_EX)
-    recover_stale_staging(parent_fd)
+
+
+def clean_stale_staging(parent_fd: int) -> None:
+    """Remove only entries matching the installer's generated staging shapes.
+
+    The parent lock excludes a live publication. Names with a partial or ambiguous
+    shape, legacy intent markers, and entries of the wrong type are left untouched.
+    """
+    changed = False
+    for name in list_entries(parent_fd):
+        if STAGING_FILE_RE.fullmatch(name):
+            if not stat.S_ISREG(entry_stat(parent_fd, name).st_mode):
+                continue
+            unlink_entry(parent_fd, name)
+            changed = True
+        elif STAGING_SKILL_RE.fullmatch(name):
+            if not stat.S_ISDIR(entry_stat(parent_fd, name).st_mode):
+                continue
+            staging_fd = open_child_directory(parent_fd, name, create=False)
+            try:
+                remove_tree_contents(staging_fd)
+                remove_open_directory_entry(parent_fd, name, staging_fd)
+            finally:
+                os.close(staging_fd)
+            changed = True
+    if changed:
+        os.fsync(parent_fd)
 
 
 def publish_file(allowed_root: Path, source: Path, destination: Path) -> bool:
     parent_fd, name = open_parent_directory(allowed_root, destination)
     try:
-        lock_and_recover_parent(parent_fd)
-        staging_name, staging_fd = create_staging_wrapper(parent_fd, ".sdlc-file-")
-    except BaseException:
-        os.close(parent_fd)
-        raise
-    try:
-        copy_source_to_new_file(source, staging_fd, "payload")
+        lock_parent(parent_fd)
+        clean_stale_staging(parent_fd)
+        temp_name = f".sdlc-file-{secrets.token_hex(12)}"
         try:
-            os.link(
-                "payload",
-                name,
-                src_dir_fd=staging_fd,
-                dst_dir_fd=parent_fd,
-                follow_symlinks=False,
-            )
-        except FileExistsError:
-            return False
-        os.fsync(parent_fd)
-        return True
-    finally:
-        try:
-            remove_staging_directory(parent_fd, staging_name, staging_fd)
+            copy_source_to_new_file(source, parent_fd, temp_name)
+            published = atomic_rename_noreplace(parent_fd, temp_name, parent_fd, name)
+        except BaseException:
+            try:
+                os.unlink(temp_name, dir_fd=parent_fd)
+                os.fsync(parent_fd)
+            except FileNotFoundError:
+                pass
+            raise
+        if published:
             os.fsync(parent_fd)
-        finally:
-            os.close(staging_fd)
-            os.close(parent_fd)
+        else:
+            os.unlink(temp_name, dir_fd=parent_fd)
+            os.fsync(parent_fd)
+        return published
+    finally:
+        os.close(parent_fd)
 
 
 def copy_regular_entry(source_fd: int, destination_fd: int, name: str) -> None:
@@ -815,31 +647,6 @@ def remove_open_directory_entry(parent_fd: int, name: str, opened_fd: int) -> No
     remove_directory_entry(parent_fd, name)
 
 
-def preserve_stale_staging(parent_fd: int, name: str, staging_fd: int) -> str:
-    expected = os.fstat(staging_fd)
-    for _attempt in range(8):
-        preserved = f".sdlc-preserved-{secrets.token_hex(12)}"
-        if atomic_rename_noreplace(parent_fd, name, parent_fd, preserved):
-            break
-    else:
-        raise RuntimeError(f"could not quarantine stale staging directory: {name}")
-    try:
-        moved = os.stat(preserved, dir_fd=parent_fd, follow_symlinks=False)
-    except OSError as error:
-        raise RuntimeError(f"could not inspect quarantined stale staging: {preserved}") from error
-    if not stat.S_ISDIR(moved.st_mode) or (moved.st_dev, moved.st_ino) != (
-        expected.st_dev,
-        expected.st_ino,
-    ):
-        raise RuntimeError(f"stale staging changed while quarantining: {name}; preserved as {preserved}")
-    os.fsync(parent_fd)
-    print(
-        f"warning: preserved interrupted installer staging as {preserved}; inspect and remove it manually",
-        file=sys.stderr,
-    )
-    return preserved
-
-
 def remove_tree_contents(directory_fd: int) -> None:
     for name in list_entries(directory_fd):
         staged_stat = entry_stat(directory_fd, name)
@@ -950,19 +757,6 @@ def normalize_tree_timestamps(directory_fd: int) -> None:
     os.fsync(directory_fd)
 
 
-def validate_tree_payload_identity(control_fd: int, payload_fd: int) -> None:
-    expected = os.fstat(payload_fd)
-    try:
-        actual = os.stat("payload", dir_fd=control_fd, follow_symlinks=False)
-    except OSError as error:
-        raise RuntimeError("private tree payload disappeared before publication") from error
-    if not stat.S_ISDIR(actual.st_mode) or (actual.st_dev, actual.st_ino) != (
-        expected.st_dev,
-        expected.st_ino,
-    ):
-        raise RuntimeError("private tree payload changed before publication")
-
-
 def publish_tree(
     allowed_root: Path,
     source: Path,
@@ -975,61 +769,119 @@ def publish_tree(
 ) -> bool:
     parent_fd, name = open_parent_directory(allowed_root, destination)
     try:
-        lock_and_recover_parent(parent_fd)
-        control_name, control_fd = create_staging_wrapper(
-            parent_fd,
-            skill_staging_prefix(name),
-        )
+        lock_parent(parent_fd)
+        clean_stale_staging(parent_fd)
+        staging_name = skill_staging_prefix(name) + secrets.token_hex(12)
+        os.mkdir(staging_name, mode=0o700, dir_fd=parent_fd)
     except BaseException:
         os.close(parent_fd)
         raise
+    staging_fd = open_child_directory(parent_fd, staging_name, create=False)
     published = False
-    payload_fd: int | None = None
-    final_mode = INSTALLED_DIRECTORY_MODE
     try:
-        os.mkdir("payload", mode=0o700, dir_fd=control_fd)
-        os.fsync(control_fd)
-        payload_fd = open_child_directory(control_fd, "payload", create=False)
-        copy_tree_entries(source, payload_fd)
-        validate_staged_symlink_graph(payload_fd)
+        copy_tree_entries(source, staging_fd)
+        validate_staged_symlink_graph(staging_fd)
         if expected_content_sha256 is None:
-            reject_staged_symlinks(payload_fd)
+            reject_staged_symlinks(staging_fd)
         else:
-            actual_content_sha256 = snapshot_hash_fd(payload_fd)
+            actual_content_sha256 = snapshot_hash_fd(staging_fd)
             if actual_content_sha256 != expected_content_sha256:
                 raise RuntimeError("staged skill differs from its locked content hash")
         add_vendor_metadata(
-            payload_fd,
+            staging_fd,
             provenance,
             license_file,
             expected_provenance_sha256,
             expected_license_sha256,
         )
-        os.fchmod(payload_fd, final_mode)
-        normalize_tree_timestamps(payload_fd)
-        validate_tree_payload_identity(control_fd, payload_fd)
-        if not atomic_rename_noreplace(control_fd, "payload", parent_fd, name):
-            return False
-        published = True
-        os.fsync(payload_fd)
-        os.fsync(control_fd)
-        os.fsync(parent_fd)
-        return True
+        os.fchmod(staging_fd, INSTALLED_DIRECTORY_MODE)
+        normalize_tree_timestamps(staging_fd)
+        expected_identity = os.fstat(staging_fd)
+        actual_identity = os.stat(staging_name, dir_fd=parent_fd, follow_symlinks=False)
+        if (actual_identity.st_dev, actual_identity.st_ino) != (
+            expected_identity.st_dev,
+            expected_identity.st_ino,
+        ):
+            raise RuntimeError("staged skill directory changed before publication")
+        published = atomic_rename_noreplace(parent_fd, staging_name, parent_fd, name)
+        if published:
+            os.fsync(parent_fd)
+        return published
     finally:
-        try:
-            if payload_fd is not None:
-                try:
-                    if not published:
-                        os.fchmod(payload_fd, 0o700)
-                finally:
-                    os.close(payload_fd)
-        finally:
+        os.close(staging_fd)
+        if not published:
             try:
-                remove_staging_directory(parent_fd, control_name, control_fd)
-                os.fsync(parent_fd)
+                cleanup_fd = open_child_directory(parent_fd, staging_name, create=False)
+            except FileNotFoundError:
+                pass
+            else:
+                try:
+                    os.fchmod(cleanup_fd, 0o700)
+                    remove_tree_contents(cleanup_fd)
+                    os.rmdir(staging_name, dir_fd=parent_fd)
+                finally:
+                    os.close(cleanup_fd)
+            os.fsync(parent_fd)
+        os.close(parent_fd)
+
+
+def clean_staging_directory(allowed_root: Path, directory: Path) -> None:
+    """Clean one publication parent while holding its publication lock."""
+    parent_fd, _ = open_parent_directory(allowed_root, directory / ".sdlc-clean-staging")
+    try:
+        lock_parent(parent_fd)
+        clean_stale_staging(parent_fd)
+    finally:
+        os.close(parent_fd)
+
+
+def publish_version_marker(allowed_root: Path, version: str) -> str:
+    """Write the kit version marker, the one managed exception to no-clobber:
+    an existing marker for a different version is replaced atomically."""
+    if not version or any(character in version for character in "/\n\r\0"):
+        raise ValueError(f"invalid kit version: {version!r}")
+    parent_fd, name = open_parent_directory(allowed_root, allowed_root / KIT_VERSION_MARKER)
+    try:
+        lock_parent(parent_fd)
+        clean_stale_staging(parent_fd)
+        content = (version + "\n").encode()
+        try:
+            descriptor = os.open(name, os.O_RDONLY | OPEN_NOFOLLOW, dir_fd=parent_fd)
+        except FileNotFoundError:
+            pass
+        else:
+            try:
+                if read_bounded(descriptor, len(content) + 1) == content:
+                    return "current"
             finally:
-                os.close(control_fd)
-                os.close(parent_fd)
+                os.close(descriptor)
+        temp_name = f".sdlc-file-{secrets.token_hex(12)}"
+        try:
+            temp_fd = os.open(
+                temp_name,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL | OPEN_NOFOLLOW,
+                INSTALLED_REGULAR_MODE,
+                dir_fd=parent_fd,
+            )
+            try:
+                write_all(temp_fd, content)
+                os.fchmod(temp_fd, INSTALLED_REGULAR_MODE)
+                os.utime(temp_fd, ns=(NORMALIZED_TIMESTAMP_NS, NORMALIZED_TIMESTAMP_NS))
+                os.fsync(temp_fd)
+            finally:
+                os.close(temp_fd)
+            os.rename(temp_name, name, src_dir_fd=parent_fd, dst_dir_fd=parent_fd)
+            os.fsync(parent_fd)
+            return "updated"
+        except BaseException:
+            try:
+                os.unlink(temp_name, dir_fd=parent_fd)
+                os.fsync(parent_fd)
+            except FileNotFoundError:
+                pass
+            raise
+    finally:
+        os.close(parent_fd)
 
 
 def parse_args() -> argparse.Namespace:
@@ -1047,6 +899,12 @@ def parse_args() -> argparse.Namespace:
     check_parser = subparsers.add_parser("check")
     check_parser.add_argument("path", type=Path)
     check_parser.add_argument("--write-probe", action="store_true")
+    version_parser = subparsers.add_parser("version")
+    version_parser.add_argument("allowed_root", type=Path)
+    version_parser.add_argument("version")
+    clean_parser = subparsers.add_parser("clean")
+    clean_parser.add_argument("allowed_root", type=Path)
+    clean_parser.add_argument("directory", type=Path)
     tree_parser = subparsers.add_parser("tree")
     tree_parser.add_argument("allowed_root", type=Path)
     tree_parser.add_argument("source", type=Path)
@@ -1072,6 +930,13 @@ def main() -> None:
     if args.command == "check":
         check_atomic_rename_support(args.path, args.write_probe)
         print("supported")
+        return
+    if args.command == "version":
+        print(publish_version_marker(args.allowed_root, args.version))
+        return
+    if args.command == "clean":
+        clean_staging_directory(args.allowed_root, args.directory)
+        print("cleaned")
         return
     if args.command == "file":
         added = publish_file(args.allowed_root, args.source, args.destination)

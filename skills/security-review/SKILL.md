@@ -4,7 +4,8 @@ description: >
   Performs a structured security review of the complete target-to-tree diff: walks the changed
   trust boundaries and attack surface by OWASP weakness class, traces data flows, verifies that
   intended file scope matches actual coverage, and records findings, exclusions, and resolutions in
-  docs/security.md. Mandatory before landing any sensitive-area change; use at Stage 0/0b/2 for
+  a dated file under docs/security/records/ with a matching index entry in docs/security.md. Mandatory
+  before landing any sensitive-area change; use at Stage 0/0b/2 for
   sensitive planning packages and at Stage 6 for the implementation diff.
 ---
 
@@ -25,8 +26,9 @@ context to judge them, plus every file the change adds, removes, or retypes.
 Reconcile intended file scope with actual coverage before starting: list the files the change
 should touch per the task, plan, or contract, then compare against the diff. The reviewed scope
 must include docs, tests, and new files affected by the change. Any inaccessible required file
-blocks readiness rather than being skipped. Record reviewed identity, exclusions, and limits in
-`docs/security.md` — an exclusion needs a stated rationale, not silence.
+blocks readiness rather than being skipped. Record reviewed identity, exclusions, and limits in the
+dated review record, and index it in `docs/security.md` — an exclusion needs a stated rationale, not
+silence.
 
 Establish context first. For every applicable sensitive-area review (Stage 0/0b/2/6), read the
 adopter project's current `docs/security.md` before analyzing the changed files. Treat that threat
@@ -98,10 +100,12 @@ heuristic. Re-verify each finding before reporting: confirm the path is reachabl
 framework, middleware, or upstream control already neutralizes it; discard what isn't genuine.
 State positive observations too — the controls that are present and correct.
 
-## Record the review in docs/security.md
+## Record the review in docs/security/records/
 
-For sensitive-area changes, the review is not complete until recorded. The record uses a stable
-review-subject identity captured from the clean materialization before the record is updated:
+For sensitive-area changes, the review is not complete until a dated record is written under
+`docs/security/records/` and its current entry is indexed in `docs/security.md`. Use one file per
+feature or an append-only log; never edit a prior record. The record uses a stable review-subject
+identity captured from the clean materialization before the record is updated:
 
 - Reviewed identity: target and base identities plus the reviewed subject identity (tree or content
   identity) for the materialized files.
@@ -129,4 +133,5 @@ An unresolved Critical or HIGH finding blocks landing. Inaccessible required fil
 - [ ] All applicable weakness classes walked against the changed code
 - [ ] Removed or weakened controls checked as deliberately as added flaws
 - [ ] Each finding re-verified and confidence-rated
-- [ ] `docs/security.md` updated with identity, scope, exclusions, findings, resolutions, limits
+- [ ] A dated record under `docs/security/records/` contains identity, scope, exclusions, findings,
+      resolutions, and limits; `docs/security.md` indexes the current record

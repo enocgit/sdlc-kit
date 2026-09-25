@@ -8,7 +8,7 @@ The kit installs:
 
 - a conductor skill that routes work through the workflow;
 - a project operating manual from `templates/AGENTS.md`, installed as `AGENTS.md`;
-- templates for product, architecture, security, contract, test, runbook, and progress docs; and
+- templates for product, architecture, security, contract, test, and progress docs; and
 - pinned stage skills installed project-locally by default for reproducible runs.
 
 It works with web and API products, SaaS, backends, CLIs, libraries, and cross-platform mobile
@@ -54,7 +54,8 @@ The installer adds missing files, never overwrites existing destinations, and wr
 target project and any explicitly selected `SKILLS_DIR`. For a worked example,
 read [`EXAMPLE.md`](./EXAMPLE.md). Once the workflow is familiar, keep
 [`CHEATSHEET.md`](./CHEATSHEET.md) nearby. Maintainers should read
-[`CONTRIBUTING.md`](./CONTRIBUTING.md).
+[`CONTRIBUTING.md`](./CONTRIBUTING.md). Questions, friction, or adoption feedback: open an issue at
+<https://github.com/enocgit/sdlc-kit>.
 
 ## How the workflow works
 
@@ -70,15 +71,16 @@ instructions](./INSTALL.md#tracker). Local-only projects use `docs/progress.md`.
 | 1 | Spec | optional brief and feature PRD | approve the PRD |
 | 2 | Architecture + Contract | ADRs, architecture/security updates, and frozen contract | approve and freeze the contract |
 | 3 | Decompose | tracker tasks | disclose the breakdown |
-| 4 | Implement | code on a `feat/*` branch | approve each task plan |
+| 4 | Implement | code on a `feat/*` branch | disclose the task plan; gate only for a sensitive area or scope deviation |
 | 5 | Quality assurance (QA) | tests, runtime or relevant non-runtime evidence, and CI | none |
 | 6 | Review | clean diff and, when required, security review | inline; no separate gate |
 | 7 | Land | pull request (PR) when supported, otherwise direct merge path | human merges |
-| 8 | Retro | per-task learnings; after all feature tasks, reconcile feature artifacts, frozen contract, contract index, and parent-epic status | none |
+| 8 | Retro | 0–3 durable learnings after every merge; once after the final task, epic closure: delivery record, artifact reconciliation, parent-epic status | offer to land repository edits |
 
 The feature's parent tracker record, often called an epic, groups its child tasks. The workflow pauses
-for human approval at the foundation, specification, architecture and contract, task-plan, and merge
-points. Repository actions and external-tracker writes require separate approval; one approval may
+for human approval at the foundation, specification, architecture and contract, and merge
+points; a task plan needs approval only when it touches a sensitive area or deviates from the
+approved decomposition. Repository actions and external-tracker writes require separate approval; one approval may
 cover commit, push, and PR creation when the request names all three. Merge always stays separate.
 
 At Land, if hosting has no PR workflow, the agent pushes when a remote exists and runs available CI;
