@@ -59,3 +59,9 @@ The kit aims to make agent-led feature work reproducible without changing user-g
 - **2026-09-24:** `required-skills.yml` is deliberately yamllint-default-clean: block style,
   wrapped ≤80 columns. Keep new entries in that style instead of reintroducing flow mappings or
   long comment lines.
+- **2026-09-24:** Measure per-file line counts before writing a size target into a PRD. The 0.9.0
+  metric miscomputed 0.8.0's scripts baseline (3,591 actual, not 3,006) and guessed a vendor-tool
+  size the guarantees can't reach.
+- **2026-09-24:** `vendor-skills.py` at ~887 lines is the floor for its guarantees — verify,
+  copy-time hash re-verification, atomic no-replace publication, and next-run crash recovery. A
+  smaller tool means dropping a guarantee, not finding fat.
