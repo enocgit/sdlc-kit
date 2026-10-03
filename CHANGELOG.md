@@ -6,6 +6,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ## [Unreleased]
 
+### Added
+
+- `install.sh --upgrade --adopt FILE`: mark a kit payload path adopter-owned — never written, merged, or re-added by later upgrades.
+
 ## [0.1.0] - 2026-10-03
 
 Initial release.

@@ -167,13 +167,16 @@ class Fixture:
 
     def install(self, target: Path, *, dry_run: bool = False,
                 env: dict[str, str] | None = None, umask: int | None = None,
-                kit: Path | None = None, upgrade: bool = False) -> subprocess.CompletedProcess[str]:
+                kit: Path | None = None, upgrade: bool = False,
+                adopt: Sequence[str] = ()) -> subprocess.CompletedProcess[str]:
         source_kit = kit or self.kit
         args = ["bash", str(source_kit / "install.sh")]
         if dry_run:
             args.append("--dry-run")
         if upgrade:
             args.append("--upgrade")
+        for rel in adopt:
+            args.extend(["--adopt", rel])
         args.append(str(target))
         return run(args, cwd=source_kit, env=env, umask=umask, timeout=300)
 
@@ -835,6 +838,64 @@ class Validator:
                 if needle not in after:
                     raise CheckError(f"consecutive upgrade lost content: {needle}")
 
+    def upgrade_adopted_files(self) -> None:
+        """--adopt transfers ownership: no writes, merges, siblings, or re-adds.
+
+        RED→GREEN for the adopter-ownership contract: an adopted file stays
+        byte-for-byte through template changes without a conflict sibling,
+        and an adopted deleted file is never re-added.
+        """
+        with Fixture(self.kit) as fx:
+            target = fx.target()
+            expect_ok(fx.install(target), "install before adopt")
+            agents = target / "AGENTS.md"
+            agents.write_text(agents.read_text() + "\nAdopter owns this line.\n")
+            kit = fx.kit_copy()
+            kit_agents = kit / "templates/AGENTS.md"
+            kit_agents.write_text(kit_agents.read_text() + "\nKit rewrites the closing line.\n")
+            before = agents.read_bytes()
+            result = fx.install(target, upgrade=True, kit=kit, adopt=("AGENTS.md",))
+            expect_ok(result, "adopt a modified file")
+            if agents.read_bytes() != before:
+                raise CheckError("the upgrade modified an adopted file")
+            if (target / "AGENTS.md.sdlc-conflict").exists():
+                raise CheckError("an adopted file produced a conflict sibling")
+            if "adopted" not in result.stdout or "AGENTS.md" not in result.stdout:
+                raise CheckError("upgrade report did not record the adoption")
+            try:
+                manifest = json.loads((target / ".sdlc-kit-manifest.json").read_text())
+            except (OSError, json.JSONDecodeError) as exc:
+                raise CheckError(f"upgrade did not write a readable manifest: {exc}") from exc
+            entry = manifest["target"]["AGENTS.md"]
+            if not (isinstance(entry, dict) and entry.get("adopted")):
+                raise CheckError("manifest did not record the adopted flag")
+            before = agents.read_bytes()
+            expect_ok(fx.install(target, upgrade=True, kit=kit), "upgrade after adoption")
+            if agents.read_bytes() != before:
+                raise CheckError("a later upgrade modified an adopted file")
+            progress = target / "docs/progress.md"
+            progress.unlink()
+            result = fx.install(target, upgrade=True, kit=kit, adopt=("docs/progress.md",))
+            expect_ok(result, "adopt an absent file")
+            if progress.exists():
+                raise CheckError("adopting an absent file re-added it")
+            try:
+                manifest = json.loads((target / ".sdlc-kit-manifest.json").read_text())
+            except (OSError, json.JSONDecodeError) as exc:
+                raise CheckError(f"upgrade did not write a readable manifest: {exc}") from exc
+            if not (isinstance(manifest["target"].get("docs/progress.md"), dict)
+                    and manifest["target"]["docs/progress.md"].get("adopted")):
+                raise CheckError("manifest did not record the absent adopted file")
+            expect_ok(fx.install(target, upgrade=True, kit=kit),
+                      "upgrade with an absent adopted file")
+            if progress.exists():
+                raise CheckError("a later upgrade re-added an adopted absent file")
+            result = fx.install(target, upgrade=True, kit=kit, adopt=("no/such/file.md",))
+            if result.returncode == 0:
+                raise CheckError("an unknown --adopt target was accepted")
+            if "not part of the kit payload" not in result.stdout + result.stderr:
+                raise CheckError("an unknown --adopt target failed without explanation")
+
     def identical_tracking(self) -> None:
         """Existing files identical to kit content are tracked for upgrades.
 
@@ -877,6 +938,7 @@ class Validator:
                   ("upgrade conflicts preserve the adopter file", self.upgrade_conflict_preserves_adopter),
                   ("upgrade routes instance and pinned classes without merging", self.upgrade_class_routing),
                   ("consecutive upgrades preserve adopter content", self.upgrade_second_run_preserves_adopter),
+                  ("adopted files are never written, merged, or re-added", self.upgrade_adopted_files),
                   ("identical existing files are tracked", self.identical_tracking))
         for name, function in checks:
             self.check(name, function)

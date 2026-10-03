@@ -21,6 +21,7 @@ import shutil
 import stat
 import subprocess
 import sys
+from collections.abc import Sequence
 from pathlib import Path
 from typing import TextIO
 
@@ -567,7 +568,7 @@ def kit_skill_source(kit: Path, rel: str) -> Path:
 
 
 def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
-                dry_run: bool, stream: TextIO) -> int:
+                dry_run: bool, stream: TextIO, adopt: Sequence[str] = ()) -> int:
     """Content-anchored upgrade against the recorded install manifest.
 
     Each manifest entry carries the base content the kit last laid down. A
@@ -577,6 +578,10 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
     files re-anchor on the new kit version so the next upgrade merges again
     instead of replacing. Legacy manifest versions degrade conservatively:
     nothing adopter-modified is written without an anchor.
+
+    Adopted paths (--adopt) transfer ownership to the adopter: the kit never
+    writes, merges, or re-adds them. A present adopted file is reported only
+    when the kit template changed upstream; an absent one is silent.
     """
     manifest_path = target / KIT_MANIFEST_MARKER
     if not manifest_path.exists():
@@ -594,7 +599,9 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
         old_by_kind["skills"] = dict(manifest.get("skills", {}).get("files", {}))
 
     actions: dict[str, list[str]] = {"add": [], "update": [], "current": [], "merged": [],
-                                     "conflict": [], "modified": [], "removed": []}
+                                     "conflict": [], "modified": [], "removed": [],
+                                     "adopted": []}
+    adopt_set = {item.strip() for item in adopt if item.strip()}
     kept_detail: dict[str, str] = {}
     plan: list[tuple[str, Path, Path]] = []
     merge_writes: list[tuple[str, Path, bytes]] = []
@@ -615,6 +622,19 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
         installed_bytes: bytes | None = None
         if destination.is_file() and not destination.is_symlink():
             installed_bytes = destination.read_bytes()
+        if rel in adopt_set or (isinstance(entry, dict) and entry.get("adopted")):
+            newly_adopted = rel in adopt_set
+            if installed_bytes is None:
+                new_entries[kind][rel] = {"class": klass, "base": None, "adopted": True}
+            else:
+                old_base = entry.get("base") if isinstance(entry, dict) else None
+                new_entries[kind][rel] = {"class": klass, "base": new_text, "adopted": True}
+                if not newly_adopted and old_base != new_text:
+                    kept_detail[rel] = " (adopted; kit template changed upstream)"
+                    actions["adopted"].append(rel)
+            if newly_adopted:
+                actions["adopted"].append(rel)
+            continue
         if installed_bytes is None:
             actions["add"].append(rel)
             plan.append((kind, destination, source))
@@ -691,11 +711,20 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
         for rel in sorted(set(old_by_kind[kind]) - seen[kind]):
             actions["removed"].append(rel + (" (skills)" if kind == "skills" else ""))
 
+    unknown = sorted(adopt_set - (seen["target"] | seen["skills"]))
+    if unknown:
+        raise InstallError(
+            "--adopt target is not part of the kit payload: " + ", ".join(unknown))
+
     label = "DRY RUN — no files will be written" if dry_run else "Upgrade"
     print(f"{label}: {len(actions['update'])} updated, {len(actions['add'])} added, "
           f"{len(actions['current'])} current, {len(actions['merged'])} merged, "
           f"{len(actions['conflict'])} conflicts, {len(actions['modified'])} kept "
-          f"(adopter-modified), {len(actions['removed'])} removed upstream", file=stream)
+          f"(adopter-modified), {len(actions['adopted'])} adopted, "
+          f"{len(actions['removed'])} removed upstream", file=stream)
+    for rel in actions["adopted"]:
+        print(f"  A {rel}{kept_detail.get(rel, ' (adopted — kit will not write this path)')}",
+              file=stream)
     for rel in actions["add"]:
         print(f"  + {rel}", file=stream)
     for rel in actions["update"]:
@@ -914,7 +943,9 @@ def command_upgrade(arguments: argparse.Namespace) -> None:
     target = open_verified_root(Path(arguments.target), create=False)
     skills_dir = open_verified_root(Path(arguments.skills_dir), create=True)
     version = arguments.kit_version or kit_version_of(kit)
-    raise SystemExit(run_upgrade(kit, target, skills_dir, version, arguments.dry_run, sys.stdout))
+    adopt = tuple(arguments.adopt or ())
+    raise SystemExit(run_upgrade(kit, target, skills_dir, version, arguments.dry_run,
+                                 sys.stdout, adopt=adopt))
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -965,6 +996,10 @@ def build_parser() -> argparse.ArgumentParser:
     upgrade_parser.add_argument("--skills-dir", required=True)
     upgrade_parser.add_argument("--kit-version", default=None)
     upgrade_parser.add_argument("--dry-run", action="store_true")
+    upgrade_parser.add_argument("--adopt", action="append", default=[],
+                                metavar="FILE",
+                                help="mark a kit payload path adopter-owned: never "
+                                     "written, merged, or re-added by later upgrades")
     upgrade_parser.set_defaults(handler=command_upgrade)
     return parser
 

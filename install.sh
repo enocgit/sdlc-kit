@@ -31,12 +31,24 @@ DRY=0
 UPGRADE=0
 TARGET_ARG="."
 TARGET_SET=0
-for a in "$@"; do
+ADOPT_ARGS=()
+args=("$@")
+i=0
+while [ "$i" -lt "${#args[@]}" ]; do
+  a="${args[$i]}"
   case "$a" in
   --dry-run) DRY=1 ;;
   --upgrade) UPGRADE=1 ;;
+  --adopt)
+    i=$((i + 1))
+    if [ "$i" -ge "${#args[@]}" ]; then
+      echo "--adopt requires a file path relative to the install root" >&2
+      exit 2
+    fi
+    ADOPT_ARGS+=("${args[$i]}")
+    ;;
   -h | --help)
-    echo "Usage: ./install.sh [--dry-run] [--upgrade] [TARGET_DIR]"
+    echo "Usage: ./install.sh [--dry-run] [--upgrade [--adopt FILE]]... [TARGET_DIR]"
     exit 0
     ;;
   -*)
@@ -52,7 +64,13 @@ for a in "$@"; do
     TARGET_SET=1
     ;;
   esac
+  i=$((i + 1))
 done
+
+if [ "${#ADOPT_ARGS[@]}" -gt 0 ] && [ "$UPGRADE" -eq 0 ]; then
+  echo "--adopt requires --upgrade" >&2
+  exit 2
+fi
 
 [ "$DRY" -eq 1 ] && {
   echo "DRY RUN — no files will be written"
@@ -419,6 +437,9 @@ fi
 if [ "$UPGRADE" -eq 1 ]; then
   UPGRADE_ARGS=(upgrade --kit "$KIT" --target "$TARGET" --skills-dir "$SKILLS_DIR" --kit-version "$KIT_VERSION")
   [ "$DRY" -eq 1 ] && UPGRADE_ARGS+=(--dry-run)
+  for adopted in "${ADOPT_ARGS[@]}"; do
+    UPGRADE_ARGS+=(--adopt "$adopted")
+  done
   exec python3 "$SAFE_INSTALL" "${UPGRADE_ARGS[@]}"
 fi
 

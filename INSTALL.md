@@ -106,7 +106,7 @@ this marker is the one destination it updates when the value changes.
 
 ### Upgrade an existing installation
 
-Installs made with 0.10.0 or later record what they published in `.sdlc-kit-manifest.json`.
+Installs record what they published in `.sdlc-kit-manifest.json`.
 Upgrading is then one command — the installer replaces files it published that the adopter never
 edited, keeps adopter-modified files and reports them, and leaves files the new release removed:
 
@@ -158,6 +158,20 @@ automatically.
 
 Always stop agents that use the target before upgrading, and read `CHANGELOG.md` for what the
 release touched.
+
+#### Adopting a file (`--adopt`)
+
+Some files can never track the kit template: a filled doc whose template evolves (`docs/context.md`),
+a CI workflow you rewrote for your stack, a template you deleted on purpose. Each upgrade would
+otherwise re-attempt a merge it cannot complete, regenerating a `.sdlc-conflict` file or re-adding
+the deleted file every run. Adopt the path once to stop that:
+
+```bash
+SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh --upgrade --adopt docs/context.md --adopt .github/workflows/ci.yml "$TARGET"
+```
+
+An adopted path is never written, merged, or re-added again (`A` lines; present files report when
+the kit template changed upstream). A plain install re-adds missing adopted files.
 
 If the runtime does not read `AGENTS.md`, point its instruction file to it:
 
