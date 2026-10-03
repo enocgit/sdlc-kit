@@ -1,0 +1,128 @@
+# Machine-readable manifest of skills installed by this kit and runtime
+# capabilities used by the pipeline.
+#
+# kind:
+#   local       - maintained by this kit in skills/ and installed
+#                 project-locally by install.sh
+#   vendored    - third-party snapshot kept verbatim under vendor/skills and
+#                 pinned by vendor/skills.lock.json; installed project-locally
+#                 by install.sh
+#
+# `sourcePath` is packaging metadata relative to this kit checkout.
+# install.sh maps each bundled skill name into `$SKILLS_DIR/{name}`. The one
+# remaining snapshot pin lives in vendor/skills.lock.json.
+#
+# Runtime routing: use a project-local skill when present and invocable. If
+# absent or unavailable, consult user-global skill locations. If no invocable
+# user-global skill is available, use a runtime equivalent when available. If
+# none is available, say so and apply the stage reference's documented
+# procedure by hand - a runtime that cannot invoke skills consumes AGENTS.md
+# alone.
+#
+# `stage` binds a skill to pipeline stages; the conductor (skills/sdlc/SKILL.md)
+# routes by stage and owns per-stage procedure in skills/sdlc/references/. A
+# stage number means the conductor invokes the skill there; `conductor` is the
+# routing skill itself; `manual`/`communication` are unbound.
+
+version: 1
+
+skills:
+  # --- local (this kit) ---
+  - name: sdlc
+    kind: local
+    sourcePath: skills/sdlc
+    stage: conductor
+  - name: feature-start
+    kind: local
+    sourcePath: skills/feature-start
+    stage: 4
+  - name: project-status
+    kind: local
+    sourcePath: skills/project-status
+    stage: "3,7"
+  - name: definition-of-done-review
+    kind: local
+    sourcePath: skills/definition-of-done-review
+    stage: "6,7"
+  - name: address-review
+    kind: local
+    sourcePath: skills/address-review
+    stage: manual
+    note: >-
+      standalone, user-invoked — triages external PR review comments (human +
+      bots), not bound to a stage
+  - name: unslop
+    kind: local
+    sourcePath: skills/unslop
+    stage: communication
+    note: >-
+      automatic communication policy; follow the canonical unslop skill for
+      human-facing prose scope and exclusions
+
+  # --- pipeline skills maintained as adaptations of third-party work ---
+  # Borrow the technique, override the workflow: each SKILL.md header names its
+  # upstream and states the re-scope; the conductor owns artifact paths and
+  # transitions. Upstream license ships inside each skill directory.
+  - name: brainstorming
+    kind: local
+    sourcePath: skills/brainstorming
+    stage: 1
+  - name: documentation-and-adrs
+    kind: local
+    sourcePath: skills/documentation-and-adrs
+    stage: "0b,2"
+  - name: writing-plans
+    kind: local
+    sourcePath: skills/writing-plans
+    stage: 3
+  - name: webapp-testing
+    kind: local
+    sourcePath: skills/webapp-testing
+    stage: 5
+  - name: improve-codebase-architecture
+    kind: local
+    sourcePath: skills/improve-codebase-architecture
+    stage: 0
+  - name: to-spec
+    kind: local
+    sourcePath: skills/to-spec
+    stage: 1
+  - name: grilling
+    kind: local
+    sourcePath: skills/grilling
+    stage: "1,2"
+  - name: ponytail
+    kind: local
+    sourcePath: skills/ponytail
+    stage: 4
+  - name: diagnosing-bugs
+    kind: local
+    sourcePath: skills/diagnosing-bugs
+    stage: 4
+    note: >-
+      bug-fix tasks — root-cause procedure before the fix; the plan's
+      verification stays in force
+
+  - name: frontend-design
+    kind: vendored
+    sourcePath: vendor/skills/frontend-design
+    source: anthropics/skills
+    stage: 4
+    note: UI work only — skip for backend-only projects
+
+  # --- stage 6 review skills, shippable on any runtime ---
+  - name: code-review
+    kind: local
+    sourcePath: skills/code-review
+    stage: 6
+  - name: code-simplification
+    kind: local
+    sourcePath: skills/code-simplification
+    stage: 6
+  - name: security-review
+    kind: local
+    sourcePath: skills/security-review
+    stage: "0,0b,2,6"
+    note: >-
+      mandatory before landing sensitive planning or implementation changes —
+      not agent discretion

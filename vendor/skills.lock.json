@@ -1,0 +1,35 @@
+{
+  "version": 3,
+  "comment": [
+    "Content pins for third-party skill snapshots kept verbatim in this repository.",
+    "Each entry records upstream provenance and per-file SHA-256. `verify` in",
+    "scripts/validate-kit.py checks the files against these hashes. Update by hand:",
+    "replace the pinned tree at the new upstream commit, recompute the file hashes,",
+    "and record the commit. Maintained adaptations (skills/, with upstream license",
+    "shipped in the skill directory) are not pinned here."
+  ],
+  "pins": {
+    "frontend-design": {
+      "source": "https://github.com/anthropics/skills.git",
+      "commit": "3b3fad96af16a10759d930941b4520ba0c40edae",
+      "upstreamPath": "skills/frontend-design",
+      "path": "vendor/skills/frontend-design",
+      "license": "Apache-2.0 (vendor/skills/frontend-design/LICENSE.txt)",
+      "files": {
+        "LICENSE.txt": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "SKILL.md": "1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd"
+      }
+    },
+    "writing-clearly-and-concisely": {
+      "source": "https://github.com/obra/the-elements-of-style.git",
+      "commit": null,
+      "sourcePath": "skills/writing-clearly-and-concisely/SKILL.md",
+      "path": ".agents/skills/writing-clearly-and-concisely",
+      "license": "see source repository",
+      "files": {
+        "SKILL.md": "1448ea19147b339ce37ae70551b233bb329d6bdfa46f0bf627b43b6133372233",
+        "elements-of-style.md": "d0edf854b5d39e22da68793603830e5bbdddb9266d272007993bcb821ba2799d"
+      }
+    }
+  }
+}

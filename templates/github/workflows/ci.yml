@@ -1,0 +1,84 @@
+# Enforces the mechanical half of the Definition of Done on every PR, so "CI
+# green" is a real gate and not just agent discipline. Adjust the stack/commands
+# to your project.
+#
+# Docs-only changes (markdown, docs/) skip the suite — a learnings or README
+# edit lands without a full CI round-trip. Caveat: if branch protection marks
+# this check as required, a skipped run blocks the merge; either keep a small
+# docs-only job for that case or don't mark this check required.
+#
+# Minutes: the push trigger re-runs CI on main after a PR merge, a
+# near-duplicate of the pull_request run (which tests the merge result). Keep
+# it only if you push directly to main — there it is your only CI.
+# cancel-in-progress stops superseded runs (force-pushes, fixup chains) from
+# billing in parallel.
+
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        # Pin every action to its release SHA — tags are mutable refs, so a
+        # moved tag would run attacker code in this workflow. Bump = replace
+        # the SHA and its version comment together (check the release notes).
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        # v6.1.0
+        uses: pnpm/action-setup@d9184bf108216479bc5a137cc391f4d7b14c870b
+        # version is optional if package.json sets "packageManager";
+        # otherwise pin it here:
+        # with:
+        #   version: 9
+
+      - name: Setup Node.js
+        # v7.0.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          # Align with the project's stack floor (ADR). node-version-file can
+          # derive the version from package.json "engines" instead.
+          node-version: 24
+          cache: pnpm # or npm / yarn
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test --run
+
+      - name: Build
+        run: pnpm build
+
+      # Enable checks that apply to this project:
+      # - name: Dependency advisory scan
+      #   run: pnpm audit --audit-level=high
+      # - name: E2E (Playwright)
+      #   run: pnpm exec playwright test

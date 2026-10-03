@@ -1,0 +1,261 @@
+# Install
+
+The installer adds the kit to one project. It never overwrites an existing destination and uses a
+project-local skills directory by default. It does not use a registry.
+
+## Prerequisites
+
+You need:
+
+- A POSIX system (Linux or macOS, including WSL). Windows is unsupported: the installer relies on
+  POSIX file semantics and atomic no-replace renames.
+- Bash and Python 3.10+.
+- Filesystems that support descriptor-relative operations and atomic no-replace renames
+  (`renameat2` on Linux, `renameatx_np` on macOS).
+- Git 2.25 or newer. Before the first review, run `git rev-parse --show-object-format` in the target
+  repository. Upgrade Git if that command fails.
+- An agent that loads `SKILL.md` files and can run shell commands.
+- GitHub CLI (`gh`) when the project uses GitHub Issues or pull requests. Run `gh auth login` with `repo`
+  scope. Add `project` scope only for GitHub Projects:
+
+  ```bash
+  gh auth refresh -s project
+  ```
+
+A project with a remote must support non-interactive `git push`. For a GitHub SSH remote, load the
+key and test it:
+
+```bash
+ssh-add -l
+ssh -T git@github.com
+```
+
+GitHub may return status 1 after successful authentication because it does not provide shell access.
+To use HTTPS instead, configure GitHub CLI and change the remote explicitly:
+
+```bash
+gh auth login
+gh auth setup-git
+git remote set-url origin https://github.com/OWNER/REPOSITORY.git
+```
+
+Do not add a broad Git URL rewrite. Projects without a remote need no push credentials or PR host.
+
+## 1. Install the kit
+
+Clone this repository once, then enter its directory:
+
+```bash
+git clone https://github.com/enocgit/sdlc-kit.git
+cd sdlc-kit
+```
+
+Run the installer from that checkout:
+
+```bash
+./install.sh /path/to/your/project
+
+# Preview without writing
+./install.sh --dry-run /path/to/your/project
+```
+
+The table lists the files and directories the installer publishes.
+
+| Source | Destination |
+| --- | --- |
+| `templates/AGENTS.md` | `AGENTS.md` |
+| `templates/CLAUDE.md` | `CLAUDE.md` |
+| `required-skills.yml` | `required-skills.yml` |
+| `templates/docs/` | `docs/` |
+| `templates/github/` | `.github/` |
+| — | `.sdlc-kit-version` (release marker, updated on upgrade) |
+| `skills/`, `vendor/skills/` | `.agents/skills/` by default |
+
+Set `SKILLS_DIR` when the runtime reads another skills directory:
+
+```bash
+SKILLS_DIR=.claude/skills ./install.sh /path/to/your/project
+```
+
+Relative paths stay inside the target project. Explicit absolute paths may point outside the target,
+including shared or user-global directories. A project-local path remains the recommendation for
+reproducible setup.
+
+The installer copies skills into `.agents/skills` by default. If your runtime expects
+`.claude/skills`, create a symbolic link from the project root:
+
+```bash
+mkdir -p .claude
+ln -s ../.agents/skills .claude/skills
+```
+
+The link points `.claude/skills` to `.agents/skills`. Committed links can fail on Windows without
+developer mode, in some CI checkouts, or across Docker bind mounts.
+
+The installer stages each publication in a temp file or directory and renames it into place. If an
+install stops partway through, the next real install checks the target root, template-file parents,
+and configured skills root under their publication locks. It removes only regular files named
+`.sdlc-file-` plus 24 lowercase hexadecimal characters, and directories named `.sdlc-skill-`, a
+sanitized skill label, and a 24-character lowercase hexadecimal token. Ambiguous lookalikes and the
+legacy `.sdlc-staging-intent` marker are left untouched; `.sdlc-preserved-*` directories from older
+releases remain for manual inspection. Legacy `.sdlc-file-<24hex>` directories from the old 0.7.x
+publisher are also skipped; inspect their contents and remove them manually if they are leftovers.
+The installer records the release in `.sdlc-kit-version` at
+the target root, or `unreleased` when this checkout has a non-empty `[Unreleased]` changelog section;
+this marker is the one destination it updates when the value changes.
+
+### Upgrade an existing installation
+
+Installs made with 0.10.0 or later record what they published in `.sdlc-kit-manifest.json`.
+Upgrading is then one command — the installer replaces files it published that the adopter never
+edited, keeps adopter-modified files and reports them, and leaves files the new release removed:
+
+```bash
+# Preview what would change
+SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh --upgrade --dry-run "$TARGET"
+
+# Apply
+SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh --upgrade "$TARGET"
+```
+
+Upgrade semantics:
+
+- The manifest (`.sdlc-kit-manifest.json`) is self-contained: each recorded file carries its
+  routing class and the base content the kit last laid down — no snapshot directory in your
+  tree.
+- A file whose content still matches its base is an untouched kit copy → replaced with the new
+  release's content.
+- A living file (the conductor, `AGENTS.md`, `docs/context.md`, `docs/test-strategy.md`, the
+  published GitHub templates) that you edited is **three-way merged** with the new version
+  against that base: disjoint edits apply cleanly (`M` lines — review the hunks); overlapping
+  edits keep your copy untouched and write a conflict-marked resolution file next to it, named
+  `<file>.sdlc-conflict` (`C` lines) for you to resolve.
+- A filled template instance (`docs/prd/`, `docs/adr/`, `docs/architecture.md`,
+  `docs/security.md`, …) is adopter-owned once filled: kit template drift is never merged into
+  it. It is kept and reported (`!` lines).
+- A pinned snapshot (`frontend-design`) must stay byte-identical; if you edited one, the
+  upgrade reports the divergence instead of merging.
+- A merged file re-anchors on the new kit version, so the next upgrade merges the next delta
+  instead of replacing your merged content. Manifest records never adopt your file's content
+  as the kit's — consecutive upgrades cannot mistake your edits for kit output.
+- Manifests from versions 1 and 2 have no reliable anchor (v2 records could conflate adopter
+  content with kit content): adopter-modified files are kept and reported with a hand-verify
+  note instead of merged or replaced.
+- A file removed upstream is left on disk and reported (`-` lines). Delete it yourself after
+  checking nothing references it.
+- The version marker and `.sdlc-kit-manifest.json` update to the new release. The obsolete
+  `.sdlc-kit-base/` directory, if a version-2 install created one, is removed.
+
+Merges are textual: a clean merge can still read oddly where an edit removed a rule the new
+version rewrites. The `M` lines are the short list to eyeball, not a rubber stamp.
+
+**Installs made before this installer existed** have no manifest. The upgrade command changes
+nothing and prints the one-time manual path. To adopt manifest-based upgrades once: stop agents,
+move each skill directory you want refreshed out of `SKILLS_DIR_ABS` to a backup, run
+`./install.sh "$TARGET"` (it re-adds the kit files), delete any installed files the release
+removed, and verify. After that first run, the manifest exists and later upgrades run
+automatically.
+
+Always stop agents that use the target before upgrading, and read `CHANGELOG.md` for what the
+release touched.
+
+If the runtime does not read `AGENTS.md`, point its instruction file to it:
+
+```text
+@AGENTS.md
+```
+
+## 2. Bundled skills
+
+Projects may use the defaults only when their tracker, CI commands, and skill setup match. Read the
+rest of this section when you need to know what the installer adds or when you update a bundled skill.
+
+The installer copies these stage-bound skills to the configured `SKILLS_DIR`. It does not use a
+registry. Project-local installation remains the default recommendation.
+
+| Skill | Upstream | Stage |
+| --- | --- | --- |
+| `brainstorming` | sdlc kit (maintained adaptation of obra/superpowers) | Spec |
+| `to-spec` | mattpocock/skills | Spec |
+| `grilling` | mattpocock/skills | Spec, Architecture |
+| `documentation-and-adrs` | addyosmani/agent-skills | Foundation, Architecture |
+| `writing-plans` | obra/superpowers | Decompose |
+| `frontend-design` | anthropics/skills | Implement, UI only |
+| `ponytail` | DietrichGebert/ponytail | Implement, backend/domain and dependency choices |
+| `diagnosing-bugs` | sdlc kit (maintained adaptation of mattpocock/skills) | Implement, bug-fix tasks |
+| `webapp-testing` | sdlc kit (maintained adaptation of anthropics/skills) | QA, browser UI only |
+| `improve-codebase-architecture` | sdlc kit (maintained adaptation of mattpocock/skills) | Adopt an existing project |
+| `code-review` | sdlc kit (maintained adaptation) | Stage 6 Review |
+| `code-simplification` | sdlc kit (maintained adaptation of addyosmani/agent-skills) | Stage 6 Review |
+| `security-review` | sdlc kit (maintained adaptation) | Stages 0/0b/2 for sensitive planning/foundation/architecture; Stage 6 for sensitive implementation review |
+
+`vendor/skills/` contains the one snapshot the kit does not maintain (`frontend-design`). It is
+installed as-is; its source, commit, license, and per-file content hashes are pinned in
+[`vendor/skills.lock.json`](./vendor/skills.lock.json), which `scripts/validate-kit.sh` verifies.
+
+The kit's maintained adaptations (`brainstorming`, `documentation-and-adrs`, `writing-plans`,
+`to-spec`, `grilling`, `ponytail`, `diagnosing-bugs`, `improve-codebase-architecture`, `webapp-testing`, `code-review`,
+`code-simplification`, `security-review`) are owned here: each names its upstream and re-scoping in
+an adaptation header, re-scopes its body for the kit's stages, and ships the upstream license. `webapp-testing` scopes itself to UI flows,
+the project's lifecycle runner, and app-specific readiness signals. `security-review` is also
+mandatory for sensitive planning/foundation/architecture work at stages 0/0b/2. Use a
+project-local bundled skill first when it is present and invocable. If it is absent or
+cannot be invoked, consult the user-global skill locations (`~/.agents/skills`, `~/.claude/skills`).
+If no invocable user-global skill is available, use an equivalent runtime capability where one
+exists. If none is available, say so and follow the stage reference's documented procedure by
+hand — the stage references own the procedure, not the skill. A runtime that cannot invoke
+skills consumes `AGENTS.md` alone. The bundled `unslop` adaptation
+automatically applies to human-facing replies and prose. It leaves code, commands, contracts, logs,
+and other excluded content unchanged.
+
+Skills run with the agent's permissions. Keep the project-local copies committed so every team and
+CI environment uses the same instructions.
+
+`required-skills.yml` lists pipeline dependencies, standalone utilities, and their stage bindings.
+To add a pipeline skill, update `AGENTS.md`, `required-skills.yml`, its skill and attribution files,
+and the installed conductor at `$SKILLS_DIR/sdlc/SKILL.md`; update a snapshot and provenance when
+applicable.
+
+### Additional skills
+
+The kit does not manage skills outside `required-skills.yml`. Install any additional skill of your choice
+for the project.
+
+Teams may add `test-driven-development` when they want strict TDD for all behavior changes. The
+kit's default remains the proportional policy in `docs/test-strategy.md`.
+
+The optional `improve` skill can audit a completed epic or suggest a direction with `improve next`.
+It remains outside the pipeline. Install it only where you want it available and route selected
+directions through Stage 1 with `sdlc {chosen direction}`.
+
+## 3. Adapt the project
+
+Projects may skip this section only when their tracker, CI commands, and skill setup match the
+defaults. Otherwise, adapt them before relying on the workflow.
+
+### Tracker
+
+GitHub Issues is the default. If the project uses Linear or Jira, replace these integration points
+without changing the surrounding workflow:
+
+| Responsibility | GitHub default | Replacement |
+| --- | --- | --- |
+| Create tasks | `gh issue create` in `$SKILLS_DIR/sdlc/references/stage-3.md` | Tracker API or CLI |
+| Report status | `gh issue list` or `gh project item-list` in `$SKILLS_DIR/project-status/SKILL.md` | Tracker query |
+| Complete tasks | `Closes #N` in `$SKILLS_DIR/sdlc/references/rules.md` | Native Git integration or post-merge update |
+| Name branches | Issue number in `$SKILLS_DIR/feature-start/SKILL.md` | Tracker key such as `ENG-123` |
+
+### CI and end-to-end tests
+
+Before relying on CI, replace the commands in `.github/workflows/ci.yml` with the project's lint,
+typecheck, test, and build commands, keeping every action pinned to the release SHA (move the
+version comment with it). Existing CI must pass. An unreachable workflow blocks Land.
+
+Use the platform's E2E runner: Playwright for web, or Maestro or Detox for mobile. A Playwright MCP
+server is optional and useful only for interactive browser work.
+
+## 4. Smoke test
+
+Ask the agent to start `sdlc`. A fresh installation should find `> STATUS: TEMPLATE` in
+`docs/context.md`, begin Stage 0, and stop at the context gate. It must not enter Spec before Stage 0
+is complete.

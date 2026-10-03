@@ -1,0 +1,47 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Node (if you add tooling to this kit)
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# Python bytecode from validation tooling
+__pycache__/
+*.pyc
+
+# Env / secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Skill install artifacts — kit-owned source lives in skills/; third-party snapshots in vendor/skills/.
+.agents/
+.claude/skills/
+skills-lock.json
+
+# Maintainer transaction and installer recovery state
+.vendor-transaction.json
+.vendor-transaction.json.tmp-*
+.vendor-backup
+.vendor-staging-*
+.vendor-preserved-*
+.sdlc-staging-intent
+.sdlc-staging-intent.tmp-*
+.sdlc-file-*
+.sdlc-skill-*
+.sdlc-rename-probe-*
+.sdlc-preserved-*
+
+# Scratch
+*.log
+tmp/
+scratch/
+
+# Security review artifacts
+.pi/security-review/

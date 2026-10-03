@@ -1,0 +1,35 @@
+# Brief: {feature}
+
+> Follow the documentation writing standard in AGENTS.md. Use this optional pre-PRD note only for
+> fuzzy ideas. Keep it to one page: problem, audience, why now, success signal, and open questions.
+> Skip it for a well-understood feature and go straight to the PRD.
+
+- **Date / author:** YYYY-MM-DD / {name}
+- **Status:** Exploring | Promoted to PRD | Dropped
+
+## Problem
+
+<!-- What's broken or missing, and for whom. Concrete, not a solution. -->
+
+## Who has it
+
+- {persona}: when/where they hit this.
+
+## Why now
+
+<!-- What makes this worth doing in this cycle. -->
+
+## Success signal
+
+<!-- The one measurable thing that tells us this worked. -->
+
+- {metric and rough target}
+
+## Rough shape (optional)
+
+<!-- A possible approach, in one or two sentences; it is not a commitment. Use it to check
+     feasibility. -->
+
+## Open questions
+
+- {question to resolve before/while writing the PRD}

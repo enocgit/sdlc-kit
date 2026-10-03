@@ -1,0 +1,161 @@
+# sdlc
+
+`sdlc` is a project-local workflow kit for building software with AI agents. It gives an agent a
+repeatable way to plan, implement, verify, review, and land changes while recording the decisions
+in the project.
+
+The kit installs:
+
+- a conductor skill that routes work through the workflow;
+- a project operating manual from `templates/AGENTS.md`, installed as `AGENTS.md`;
+- templates for product, architecture, security, contract, test, and progress docs; and
+- stage skills installed project-locally by default for reproducible runs — maintained adaptations
+  the kit owns, plus exact third-party snapshots pinned under `vendor/skills/`.
+
+It works with web and API products, SaaS, backends, CLIs, libraries, and cross-platform mobile
+apps. The defaults assume contracts, continuous integration (CI), database migrations, and
+deployable branches. Projects can replace the UI, deployment, and test tools with their own.
+
+## Start here
+
+### 1. Check prerequisites
+
+Read the [installation prerequisites](./INSTALL.md#prerequisites).
+
+### 2. Install the kit
+
+Clone this repository once, then enter its directory:
+
+```bash
+git clone https://github.com/enocgit/sdlc-kit.git
+cd sdlc-kit
+```
+
+From that checkout, run:
+
+```bash
+./install.sh /path/to/your/project
+
+# Preview without writing
+./install.sh --dry-run /path/to/your/project
+
+# Use a runtime-specific skills directory
+SKILLS_DIR=/path/to/your/project/.claude/skills \
+  ./install.sh /path/to/your/project
+```
+
+### 3. Prepare and start the workflow
+
+Before starting `sdlc`, follow the [adaptation guidance](./INSTALL.md#3-adapt-the-project) if the
+project differs from the defaults.
+
+Then ask your agent to start `sdlc`.
+
+The installer adds missing files, never overwrites existing destinations, and writes only to the
+target project and any explicitly selected `SKILLS_DIR`. For a worked example,
+read [`EXAMPLE.md`](./EXAMPLE.md). Once the workflow is familiar, keep
+[`CHEATSHEET.md`](./CHEATSHEET.md) nearby. Maintainers should read
+[`CONTRIBUTING.md`](./CONTRIBUTING.md). Questions, friction, or adoption feedback: open an issue at
+<https://github.com/enocgit/sdlc-kit>.
+
+## How the workflow works
+
+Stage 0 establishes the project foundation once: context, test strategy, product requirements
+document (PRD), architecture, security, and the core contract. Each feature then gets its own
+optional brief, PRD, decisions, and contract slice. Durable documents live in `docs/`. GitHub Issues
+holds live tasks and status by default. Projects can use Linear or Jira; see the [tracker integration
+instructions](./INSTALL.md#tracker). Local-only projects use `docs/progress.md`.
+
+| # | Stage | Main output | Gate or handling |
+| --- | --- | --- | --- |
+| 0 | Context + Foundation | filled context, product requirements document (PRD), test strategy, foundational ADRs, architecture/security, and core contract | fill context, then approve the foundation |
+| 1 | Spec | optional brief and feature PRD | gate only when the feature freezes a contract |
+| 2 | Architecture + Contract | ADRs, architecture/security updates, and frozen contract when applicable | approve spec + approach (+ freeze) — one approval covers the PRD too |
+| 3 | Decompose | tracker tasks | disclose the breakdown with its parallel groups |
+| 4 | Implement | committed tasks on a `feat/*` branch | disclose the task plan; gate only for a sensitive area or scope deviation |
+| 5 | Quality assurance (QA) | tests, runtime or relevant non-runtime evidence, and CI | none |
+| 6 | Review | clean diff and, when required, security review | inline; no separate gate |
+| 7 | Land | pull request (PR) when supported, otherwise direct merge path | human merges |
+| 8 | Retro | 0–3 durable learnings after every merge; once after the final task, epic closure: delivery record, artifact reconciliation, parent-epic status | offer to land repository edits |
+
+The feature's parent tracker record, often called an epic, groups its child tasks. The workflow pauses
+for human approval at the foundation, specification and approach (a contract freeze takes its own
+specification gate), and merge points; a task plan needs approval only when it touches a sensitive
+area or deviates from the approved decomposition. Repository actions and external-tracker writes
+require separate approval; task commits, `feat/*` pushes, and PR openings need none — the merge is
+the stop.
+
+At Land, if hosting has no PR workflow, the agent pushes when a remote exists and runs available CI;
+the human merges directly. With no remote, the human merges the local branch.
+
+For a Stage 0 or Stage 2 planning package that touches a sensitive area, the agent updates
+`docs/security.md` and runs `security-review` before asking for the human's approval to land it. Stage
+6 reviews the implementation separately.
+
+## How the agent right-sizes work
+
+The agent selects the shortest safe path based on the change.
+
+| Change | Path |
+| --- | --- |
+| Feature, user-facing change, or risky work | Stages 1–8 after Stage 0 |
+| Bug fix or small enhancement | Implement → QA → Review → Land → Retro |
+| Chore, documentation, or dependency update | Implement → Review → Land → Retro |
+
+Use the full path whenever the change affects a contract, sensitive area, or recorded decision.
+
+## Existing projects
+
+Run the same installer. It adds missing files and leaves existing files untouched. Merge
+`templates/AGENTS.md` into the project's `AGENTS.md`, and merge `templates/docs/` into the project's
+`docs/` files instead of replacing them. Move runtime instructions into `AGENTS.md`; when supported,
+keep `CLAUDE.md` as a one-line pointer.
+
+The `adopt` path reconstructs the project foundation from existing code without changing its
+behavior. After foundation approval, the next feature follows the normal workflow.
+
+## Defaults and portability
+
+- `AGENTS.md` is canonical. Runtime-specific files such as `CLAUDE.md` should point to it.
+- The bundled `unslop` adaptation automatically applies to human-facing replies and prose. It leaves
+  code, identifiers, schemas, contracts, commands, logs, quoted text, machine-readable output, fixed
+  formats, vendor snapshots, and neutral technical records unchanged.
+- Skills are portable Markdown. A runtime that cannot invoke a skill consumes `AGENTS.md` alone;
+  each stage reference documents its procedure, not the skill.
+- Stage-bound third-party techniques arrive two ways: one exact snapshot pinned under `vendor/skills/`
+  (`frontend-design`), and maintained adaptations under `skills/` that carry an adaptation header and
+  the upstream license.
+- `required-skills.yml` records pipeline dependencies, standalone utilities, and their stages.
+  Adding another skill does not make it a pipeline stage.
+- GitHub is the default tracker and PR host, not a runtime requirement.
+- Stack, branch names, test tools, deployment targets, Definition of Done, and gates are defaults.
+  If a project changes them, update `AGENTS.md`, project docs, the installed conductor, affected
+  skills, and validation checks together.
+
+The one vendored snapshot is pinned in [`vendor/skills.lock.json`](./vendor/skills.lock.json) with
+its source, commit, license, and per-file content hashes; `validate-kit.sh` verifies the pin.
+Maintained adaptations name their upstream and ship the upstream license in the skill directory.
+Vendored snapshots remain unchanged.
+
+## Repository map
+
+| Path | Purpose |
+| --- | --- |
+| `AGENTS.md` | maintainer-repository workflow rules, lifecycle, and learnings |
+| `CHANGELOG.md` | release history; the installer reads the version from it |
+| `templates/AGENTS.md` | operating-manual template installed in projects |
+| `templates/CLAUDE.md` | one-line pointer to the operating manual |
+| `install.sh` | merge-aware installer with `--dry-run` and `--upgrade` |
+| `skills/` | conductor, kit-owned workflow skills, and maintained adaptations |
+| `vendor/skills/` | the one pinned, unmodified third-party snapshot |
+| `vendor/skills.lock.json` | upstream revisions, paths, content hashes, and license notes |
+| `scripts/install-safe.py` | no-clobber publication, install manifest, and `--upgrade` engine |
+| `templates/docs/` | project documentation templates |
+| `templates/github/` | CI, issue, and pull-request templates |
+| `required-skills.yml` | supported-skill manifest and stage bindings |
+| `scripts/validate-kit.sh` | maintainer validation and install smoke test |
+
+The optional `improve` skill reads code but does not edit it. It can write plans under `plans/` when
+it audits a completed epic. Offer it only after all tasks in the epic are complete, not after a single
+task. For `improve next`, decline its planning step and start `sdlc {chosen direction}` at Stage 1. Read
+[`INSTALL.md`](./INSTALL.md#additional-skills) before adding it.
