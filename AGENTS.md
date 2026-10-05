@@ -93,6 +93,9 @@ two in step.
   `scripts/validate-kit.py` asserts the operative ones.
 - Measure real line counts before writing a size target into a PRD; estimated baselines have been
   wrong before.
+- A runtime editor formatter can dirty committed files after the commit. Before binding review or
+  evidence to a head, check the tree is clean at that head and revert formatting-only churn; it
+  recurs on every edit.
 
 ## Verification
 

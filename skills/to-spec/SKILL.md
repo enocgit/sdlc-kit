@@ -23,7 +23,9 @@ testing decisions feed the test strategy, and Out of scope feeds Scope.
 
 2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
-   Check with the user that these seams match their expectations.
+   Check with the user that these seams match their expectations — one ask, only when the seam
+   choice is genuinely open; obvious or already-recorded seams proceed without asking (this skill
+   does not interview).
 
 3. Write the PRD using the kit's `docs/prd/TEMPLATE.md`, filling it from the synthesis above.
    The section map below says where each part of the upstream synthesis lands. Do not publish or

@@ -24,6 +24,10 @@ ci rules).
 
 ## Sequence
 
+A merge-conflict resolution during Land is part of the reviewed change: disclose it in the PR body
+or the stop report; if it alters code behavior (doc-wording resolutions do not), run a scoped
+fresh-context re-review before the merge gate.
+
 1. Confirm local readiness is complete (Stage 6). Required CI is a remote merge gate, never a
    reason to duplicate the suite locally; it need not be green before the PR opens.
 2. Open the PR where hosting supports it; the PR text follows `AGENTS.md`'s writing standard and
@@ -34,7 +38,9 @@ ci rules).
 3. Report the stop in one line — PR link, CI pending, merge after green — and stop; do not poll. A
    single status glance to catch an instant failure is fine; a later failure is a normal fix, not a
    babysat turn. Do not restate what the PR body or the tracker already states: the delivery recap
-   and checklist live there, not in the stop message.
+   and checklist live there, not in the stop message. The report always names the Stage 6 review
+   outcome — who reviewed it (fresh-context lanes or the named substitute) and the final verdict —
+   a Land report without it is incomplete.
 4. When CI finishes green, run the final Definition of Done confirmation (`definition-of-done-review`)
    and report whether the change is ready to merge. Green required CI is confirmed here, at the final
    merge-readiness check.

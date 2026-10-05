@@ -9,7 +9,8 @@ An optional Stage-1 brief, then a hardened feature PRD at `docs/prd/NNNN-{slug}.
 issues exist yet — tracker work begins at Stage 3.
 
 - **Brief** (`docs/briefs/NNNN-{slug}.md`): only for a fuzzy or speculative idea; a well-understood
-  feature skips the brief and goes straight to the PRD.
+  feature skips the brief and goes straight to the PRD. The brief carries the design — no inline
+  design print-out and no separate brief-review stop; the PRD gate reviews the artifact.
 - **PRD**: describe observable behavior and testable rules; state each requirement once with only
   the detail needed for approval and verification; define terms on first use.
 

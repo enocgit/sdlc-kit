@@ -55,9 +55,10 @@ fast-path work with no integration contract; the frozen contract matching its ac
   tracker, never in doc prose.
 - After the commit, verify its parent and tree, and rerun every metadata- or topology-dependent
   check against that commit before relying on it.
-- **Each task ends in its commit** — the commit precedes QA and review, and fixes found there
-  land as follow-up commits on the same branch. Commits need no ask; pushes and PR openings need
-  no ask; the merge is the stop (the CI seam, `references/rules.md`).
+- **Each task ends in its commit.** Run the task's QA evidence first (Stage 5's disclosure), then
+  commit; Stage 6 reviews the committed delta, and findings become follow-up commits. Commits,
+  the Stage 6 branch push, and the PR opening need no ask — the merge is the stop (the CI seam,
+  `references/rules.md`).
 
 ## Next
 

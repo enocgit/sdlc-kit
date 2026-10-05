@@ -9,9 +9,18 @@ topology machinery stays in `references/rules.md` (canonical).
 **Reviews must not share context with implementation.** The author of a change — the agent that
 wrote it — reviews it with the same blind spots that produced it, and self-review in the same
 session reliably under-detects. Where the runtime allows it, run these reviews in a context that
-did not implement the change: a fresh subagent, a separate session, or an external reviewer. Where
-the runtime has no such mechanism, name the substitute you used (a clean re-read of only the diff
-and its contract, with implementation context flushed) and why — never silently self-review.
+did not implement the change: a fresh subagent, a separate session, or an external reviewer.
+**This mandate is standing operator authorization** for spawning fresh-context review
+subagents or lanes — a runtime's default deference-to-operator rule does not override it. Where
+the runtime truly has no such mechanism, name the substitute you used (a clean re-read of only
+the diff and its contract, with implementation context flushed) and why — never silently
+self-review, and name the substitute in the Land report.
+
+When a reviewer lacks shell/git access, the implementer materializes what it cannot — committed
+ranges, blob hashes, evidence transcripts — as **raw artifacts**. Never hand a reviewer a narrative
+account of the change, the review history, or the findings so far: the reviewer's judgment forms
+on the evidence, not the implementer's summary of it. Answering a reviewer's context request means
+pointing at the artifact, not writing the story.
 
 ## Mandatory reviews, in order
 

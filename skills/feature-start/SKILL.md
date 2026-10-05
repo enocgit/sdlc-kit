@@ -79,17 +79,16 @@ decomposition.
      only after successful creation, and do not switch any existing checkout.
 
      After the task implementation is safely landed, or after setup/baseline/plan rejection before
-     implementation, inspect the worktree. Use non-forced removal only after the status is confirmed
-     clean and contains no tracked, untracked, or ignored content:
+     implementation, remove the worktree with git's own guard — no pre-check gate:
 
      ```text
-     git -C "{worktree_path}" status --short --ignored
      git worktree remove "{worktree_path}"
      ```
 
-     If status is dirty or cannot be inspected, or any output is present, leave the worktree and
-     branch in place and report both for inspection. The generic removal command is the only cleanup
-     this kit performs; the operator owns any parent-directory cleanup.
+     Git refuses modified or untracked files; ignored build output does not block it. On refusal,
+     leave the worktree and branch in place and report the refusal for the operator to inspect. The
+     generic removal command is the only cleanup this kit performs; the operator owns any
+     parent-directory cleanup.
 
    - **Green baseline:** In the selected workspace, install dependencies and run the project's
      setup and build commands as needed, then establish only a change-appropriate baseline — apply
@@ -120,26 +119,18 @@ decomposition.
 
    Keep it proportional to this one task and easy to scan:
    - **Outcome** — one sentence.
-   - **Affected files** — exact paths and why each changes.
-   - **Approach** — a few logical implementation steps, with verification paired to the risk.
-   - **Verification** — name automated coverage for non-trivial executable logic, including validation,
-     authorization or security denial, error, retry, timeout, and partial-failure branches; name focused
-     behavior evidence or runtime observation for accessibility, security, and interaction behavior in
-     styling, markup, or attributes; use a diff or one visual check for presentation-only markup,
-     attributes, copy, or styling; or a link or rendering check for documentation that affects links
-     or rendering, or a schema or generation check for configuration or generated output. For non-trivial
-     executable behavior, name the planned failing
-     automated test. For other bug fixes, name a planned failing automated test or observable reproducer
-     appropriate to the risk; if an existing check or observation already fails, record its result,
-     otherwise record the expected failure and create or run the check after disclosure (and approval when required).
-   - **Risks and case against:** record four separate facts:
-     - **Rejected approach** — what you rejected and why.
-     - **Likely failure** — the failure most likely to occur.
-     - **Least-confidence area** — where the plan is least certain.
-     - **Settling observation** — the observation or evidence that would settle the objection.
-     The plan gate requires all four elements; do not omit them. After the check runs, record its
-     observed result and resulting direction at the applicable gate; before then, name the prospective
-     observation.
+   - **Approach** — exact file paths and why each changes, the implementation steps, and the
+     verification paired to the risk: name the failing automated check for non-trivial executable
+     logic (validation, authorization or security denial, error, retry, timeout, partial-failure
+     branches); name the observed or expected RED for a bug fix; a diff or one visual check for
+     presentation-only markup, attributes, copy, or styling; focused behavior evidence for
+     accessibility, security, or interaction behavior; a link or rendering check for documentation
+     that affects links or rendering; or a schema or generation check for configuration or
+     generated output.
+   - **Settling observation** — required when the plan gates (a sensitive area or a deviation from
+     the approved decomposition): the observation or evidence that would settle the plan's
+     least-certain choice. After the check runs, record its observed result and resulting
+     direction at the gate; before then, name the prospective observation.
 
    Omit implementation code, repeated PRD/ADR/contract content, speculative work, mechanical
    microsteps, and commit instructions. After the plan is disclosed (and approved when required),

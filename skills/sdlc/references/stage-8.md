@@ -44,7 +44,9 @@ check out and sync the default branch, then ask to land the edit there. Landing 
 state: **no remote** → "Approve the retro package — commit to {default branch}?"; **remote,
 default branch unprotected** → "Approve the retro package — commit and push to {default
 branch}?" under the same approval; **remote, default branch protected** → `plan/{NNNN}-{slug}` →
-PR → merge, then confirm. Stage 8's learnings land before the next task or feature branch.
+PR → merge, then confirm. Stage 8's learnings land before the next task or feature branch; a
+ declared parallel group gets one learning pass at the group's last merge, before any new work
+ starts.
 
 The epilogue lands **directly on the default branch by design, not as a feature PR**: its content
 is post-merge fact (delivery record citing the merge, issue closures, shipped-behavior
@@ -69,13 +71,18 @@ When all child tasks are complete:
    not become implemented merely because it was approved. Keep the tracker authoritative for task
    status.
 3. Verify every child is complete, update the parent epic's task checklist, and confirm the epic
-   Definition of Done and end-to-end acceptance criteria. Confirm the `## Learnings` list in
-   `docs/context.md` is within its ~30-bullet cap and prune to it. Local-only: make the checklist
-   and `Done` transition in `docs/progress.md` part of this reconciliation.
+   Definition of Done and end-to-end acceptance criteria. Criteria ticked when their proving
+   evidence existed stay ticked if it holds; complete the unchecked remainder here. Confirm the
+   `## Learnings` list in `docs/context.md` is within its ~30-bullet cap and prune to it.
+   Local-only: make the checklist and `Done` transition in `docs/progress.md` part of this
+   reconciliation.
 4. Land all reconciliation repository edits on the default branch before completing the parent
    epic (wait for any `plan/*` PR to merge and confirm).
 5. Only then update the external tracker: **GitHub** — child PRs close only their task issues, so
-   ask for approval to update and close the parent issue explicitly. **Another external tracker** —
+   the epic checklist, DoD ticks, and parent close are outward writes. Bundle the whole close-out
+   into **one ask** — the reconciliation landing, the epic ticks and close, and any worktree
+   disposition — one approval covers the tail; sequence the execution in that order and never ask
+   twice after the merge gate. **Another external tracker** —
    verify whether its integration completed the parent; if not, ask before updating. Treat a
    local-only epic as complete only after its `docs/progress.md` transition has landed. Do not
    report the epic done until its authoritative tracker record is complete.

@@ -7,8 +7,11 @@ description: "You MUST use this before any creative work - creating features, bu
 
 A maintained adaptation of Jesse Vincent's `brainstorming` skill from
 [obra/superpowers](https://github.com/obra/superpowers) (MIT — see `LICENSE` in this directory).
-This fork keeps the discovery method (paths, hard gate, one-question-at-a-time, approaches,
-sectioned design) and re-scopes the outputs: the approved design lands as the kit's optional
+This fork keeps the discovery method (paths, hard gate, one-question-at-a-time, approaches) and
+re-scopes the outputs: the sectioned design lives in the written brief, not in chat — after the
+rounds settle the direction, write the brief, self-review it, and return to the conductor. No
+inline design print-out, no per-section approval, and no separate brief-review stop: the
+conductor's PRD gate reviews the artifact. The approved design lands as the kit's optional
 Stage-1 brief at `docs/briefs/NNNN-{slug}.md` — never `docs/superpowers/specs/` or an automatic
 hand-off to `writing-plans`: Stage 1 owns the PRD, and the conductor routes later tracker
 decomposition through Stage 3. Nothing is committed to Git unless the user asks. The upstream
@@ -112,13 +115,12 @@ your path and complete them in order.
 **Architectural:**
 1. **Explore project context** — check files, docs, recent commits
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-3. **Propose 2-3 approaches** — with trade-offs and your recommendation
-4. **Present design** — in sections scaled to their complexity, get user approval after each section
-5. **Write design doc** — save to `docs/briefs/NNNN-<slug>.md` (the kit's Stage-1 brief)
-6. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-7. **User reviews written spec** — ask user to review the spec file before proceeding
-8. **Return to the conductor** — hand the approved brief to Stage 1, which owns the PRD; the
-   conductor routes later tracker decomposition through Stage 3
+3. **Propose 2-3 approaches** — with trade-offs and your recommendation; settle the direction here
+4. **Write design doc** — save to `docs/briefs/NNNN-<slug>.md` (the kit's Stage-1 brief); the full
+   sectioned design lives in this artifact, not in chat
+5. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+6. **Return to the conductor** — no separate review stop for the brief; the PRD gate reviews it.
+   The conductor routes later tracker decomposition through Stage 3
 
 ## Process Flow
 

@@ -138,5 +138,6 @@ An unresolved Critical or HIGH finding blocks landing. Inaccessible required fil
 - [ ] All applicable weakness classes walked against the changed code
 - [ ] Removed or weakened controls checked as deliberately as added flaws
 - [ ] Each finding re-verified and confidence-rated
-- [ ] A dated record under `docs/security/records/` contains identity, scope, exclusions, findings,
-      resolutions, and limits; `docs/security.md` indexes the current record
+- [ ] A dated record under `docs/security/records/` — dated at write time, UTC — contains identity,
+      scope, exclusions, findings, resolutions, and limits; `docs/security.md` indexes the current
+      record

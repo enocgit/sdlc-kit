@@ -99,7 +99,7 @@ irreversible actions, and complex trade-offs; expand when asked.
 - [ ] **Configured CI is green before merge** (lint, typecheck, test, build, and other required checks). This is a remote merge gate, not a reason to duplicate the suite locally. If CI runs after PR creation, finish local QA and review first. N/A only where no CI workflow exists.
 - [ ] `code-review` + `code-simplification` clean in fresh context (the conductor's review stage owns the depth); a [sensitive area](#sensitive-areas) also needs `security-review` with complete scoped coverage recorded in `docs/security.md`
 - [ ] Diff hygiene: small and focused, references the issue when one exists, no stray or debug code
-- [ ] Current-behavior claims stay accurate per task; after the final child, reconcile all feature artifacts with implementation evidence
+- [ ] Current-behavior claims stay accurate per task; tick a PRD acceptance criterion once its proving evidence exists; after the final child, reconcile all feature artifacts with implementation evidence
 - [ ] Tracker linked and current; closure itself is a post-merge step
 
 ## Conventions

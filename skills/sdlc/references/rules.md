@@ -46,6 +46,10 @@ by remote state:
 Stage 4 branches from that clean ref; the branch carries the task implementation plus its required
 task-scoped tests and docs (`AGENTS.md` → Where planning commits land).
 
+**Complete what the ask named.** Before reporting a landing landed, verify every artifact the gate
+ask named is in the commit. If one was omitted, commit and push it under the same approval — the
+approval covered the package, not the omission — and say so in the report.
+
 ## Task completion by tracker
 
 **`Closes #N` is GitHub-only syntax.** On Linear/Jira it either fails to close the real task or
@@ -154,7 +158,8 @@ cannot waive relevant sensitive changes. If required content is inaccessible, re
 coverage and block the planning landing or implementation readiness rather than returning a clean
 verdict — even when a tool reports no findings. No particular agent runtime is required.
 
-Record coverage and verification limits in a dated record under `docs/security/records/`, and add
+Record coverage and verification limits in a dated record under `docs/security/records/` — the
+actual write date, UTC, not an expected review or merge date — and add
 its current entry to the index in `docs/security.md`. After substantive edits, refresh the affected
 review and its coverage identity. A planning review certifies the design only, never runtime
 enforcement.

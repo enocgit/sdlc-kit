@@ -71,7 +71,9 @@ commit (`references/rules.md`).
 `Consumes` chains are satisfied within earlier tasks may run in parallel worktrees at Stage 4.
 Name each group explicitly ("tasks 3, 4, 7 — one parallel group"); tasks without a declared
 group run serially. Tasks sharing a file, a shared config, or a tracker row never join a group.
-Contested or unclear → serial, which is the default.
+Contested or unclear → serial, which is the default. A declared group gets one ask: execute it
+as parallel worktrees — the paths are the human's to supply or explicitly delegate — or serial.
+No declared group, no question.
 
 ## Next
 

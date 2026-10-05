@@ -28,9 +28,12 @@ current truth.
 2. **Summarize.** Group by epic (the `Features` table and task `Parent` keys in local-only mode).
    Per task show status (Todo / In progress / In review / Done), assignee, and linked PR. Give a
    per-epic completion count and a **Now / Next / Blocked** view.
-3. **Flag drift from reality.** Call out anything off — an issue closed without meeting its
-   acceptance criteria / Definition of Done, or a PR merged without the docs (`architecture.md` /
-   ADR) updated. Report it; don't silently fix it.
+3. **Flag drift from reality.** Real drift is a claim contradicted by evidence: an issue closed
+   without meeting its acceptance criteria / Definition of Done, a current-behavior claim the code
+   no longer satisfies, or a PR merged without the docs (`architecture.md` / ADR) updated. Report
+   it; don't silently fix it. Unchecked epic checklists, epic DoD items, and PRD acceptance
+   criteria that closed tasks already prove are **scheduled reconciliation**, not drift — Stage 8
+   epic closure owns them (`stage-8.md`); list them as pending reconciliation at most.
 
 ## Rules
 
