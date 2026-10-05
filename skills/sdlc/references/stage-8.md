@@ -70,12 +70,11 @@ When all child tasks are complete:
    summaries against evidence. Preserve decision history — an Accepted ADR or frozen contract does
    not become implemented merely because it was approved. Keep the tracker authoritative for task
    status.
-3. Verify every child is complete, update the parent epic's task checklist, and confirm the epic
-   Definition of Done and end-to-end acceptance criteria. Criteria ticked when their proving
-   evidence existed stay ticked if it holds; complete the unchecked remainder here. Confirm the
-   `## Learnings` list in `docs/context.md` is within its ~30-bullet cap and prune to it.
-   Local-only: make the checklist and `Done` transition in `docs/progress.md` part of this
-   reconciliation.
+3. Verify every child sub-issue is closed — the tracker is the record of task state — and confirm
+   the epic Definition of Done and end-to-end acceptance criteria. Criteria ticked when their
+   proving evidence existed stay ticked if it holds; complete the unchecked remainder here.
+   Confirm the `## Learnings` list in `docs/context.md` is within its ~30-bullet cap and prune to
+   it. Local-only: make the `Done` transition in `docs/progress.md` part of this reconciliation.
 4. Land all reconciliation repository edits on the default branch before completing the parent
    epic (wait for any `plan/*` PR to merge and confirm).
 5. Only then update the external tracker: **GitHub** — child PRs close only their task issues, so

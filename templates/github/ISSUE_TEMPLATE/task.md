@@ -9,8 +9,10 @@ labels: ["task"]
 
 **Part of** #NN · **Refs:** PRD §X / Contract §X / FR-N / NFR-N · {area, e.g. apps/vendor}
 
-<!-- Optional: blockers and the skills to follow. Delete if none. -->
-Depends on #NN. Follow `{skill}` skills.
+<!-- Optional: blockers and the specialist skills this task needs beyond the pipeline's
+     stage skills (feature-start, review, retro are the conductor's). List as many as apply;
+     delete if none. -->
+Depends on #NN. Follow {skills}.
 
 ## Scope
 
