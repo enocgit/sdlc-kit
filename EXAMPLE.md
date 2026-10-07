@@ -12,7 +12,7 @@ auth model, and sketches `docs/architecture.md`, `docs/security.md`, and `docs/t
 
 It sets `pnpm check` as the check command and wires it into CI. Then it plants a type error, a
 failing test, and a lint violation one at a time, sees `pnpm check` fail at each part, and reverts
-each. CI fails on one plant pushed to a throwaway branch.
+each.
 
 **Gate:** approve the foundation. With a protected `main`, it lands through a `plan/0000-foundation`
 PR.
@@ -59,6 +59,7 @@ running, then stops. The human merges after CI passes.
 
 ## 6. Retro
 
-GitHub closes the issue. One learning qualifies: the provider sends webhook timestamps in seconds, not
+GitHub closes the issue. The first merged CI run's log shows lint, typecheck, and all tests ran,
+matching the local count. One learning qualifies: the provider sends webhook timestamps in seconds, not
 milliseconds. When the third task merges, the agent checks the payments spec against the code and
 marks the proposal Shipped with links to its three PRs.

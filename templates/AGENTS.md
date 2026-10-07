@@ -38,9 +38,9 @@ Open every workflow response with `SDLC ▸ Stage {N}/6 {Name} · {next gate or 
 
 - **Right-size the path.** New feature: Stages 1–6. Bug fix or chore: Stages 3–6. A contract
   change, a trust-boundary change, or a new decision sends small work back to Stage 1.
-- **Gates are hard stops.** A gate message is three plain lines at most: what is done, naming
-  anything unproven and any decision the human did not make; what you need; which files to read.
-  The files are the record; do not restate them.
+- **Gates are hard stops.** A gate message is three plain lines at most: what is done and anything
+  unproven; what you need; which files to read. Then list each choice you made that the human did
+  not state, however small, or write "Your calls: none". The files are the record.
 - **Disclose-and-continue stages** report what was done and any decision a human might override,
   then move on.
 - **No ask needed** for task commits, pushing `feat/*`, or opening a PR. The merge is the stop.

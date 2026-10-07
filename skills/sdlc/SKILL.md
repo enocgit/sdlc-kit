@@ -30,23 +30,27 @@ Use bundled skills when the harness can invoke them; otherwise apply the procedu
 ## Stage 0 — Foundation
 
 Stage 0 is incomplete while any `STATUS: TEMPLATE` marker or `{placeholder}` remains in
-`AGENTS.md` or `docs/`, outside files named `TEMPLATE.md`.
+`AGENTS.md` or `docs/`, or any workflow term (`Stage N`, gate, "solo developer") appears in `docs/`,
+source, or CI. Files named `TEMPLATE.md` are exempt.
 
 - **New project:** fill `docs/context.md` (product, Lifecycle, outside consumers, hard
   constraints), set the stack and check command in `AGENTS.md`, set `docs/test-strategy.md`, and
-  write only the ADRs a first feature cannot start without. Describe only what exists: with no code
-  yet, `docs/architecture.md` records the scaffold, `docs/specs/README.md` lists areas without links
-  until their spec exists, and `docs/security.md` claims only controls in place. Planned shape goes
-  in the first change proposal. Write no product code; the checks need one trivial module and test.
+  write only the ADRs a first feature cannot start without. Describe only what exists; a plan
+  labelled "intended" is still a plan and goes in the first change proposal. With no code yet:
+  - `docs/architecture.md` keeps Context and one Parts row for the scaffold; delete Data, Key
+    flows, and Cross-cutting until code exists.
+  - `docs/specs/README.md` lists areas without links until their spec exists.
+  - `docs/security.md` may list trust boundaries the product will have, with control "none yet";
+    a baseline control stays only if code or CI enforces it today. Records start empty.
+  - Write no product code; the checks need one trivial module and test.
 - **Existing codebase:** reconstruct the same set read-only from the code. Write specs for the
   areas that exist, backfill ADRs only for hard-to-reverse choices already made, and fold any
   existing PRDs into specs. `improve-codebase-architecture` can supply the reading heuristics.
 - **Prove the checks.** Plant one type error, run `{check command}`, see it fail at the typecheck,
   and revert; repeat for one failing test and one lint violation. One plant per run: a chained
   command stops at its first failure. Only the check command's output counts, not editor or harness
-  diagnostics. Then see CI fail on one plant. With no remote, CI is unproven: say so at the gate and
-  add it to the production register with the trigger "first push". A check that cannot fail is not
-  a check.
+  diagnostics. A check that cannot fail is not a check. CI runs the same command; its first run is
+  checked at Retro.
 
 **Gate: approve foundation.** Then land it per `references/rules.md` → Landing.
 
@@ -124,7 +128,9 @@ After the merge, switch to the synced default branch.
 1. **Close the loop.** Confirm the tracker moved (`references/rules.md` → Tracker). When the last
    task of a change lands, check that specs, architecture, contracts, and `docs/security.md` match
    what shipped, then mark the proposal Shipped with links to its merges. If the change gives the
-   product its first deployed consumer, real data, or traffic, propose the Lifecycle update.
+   product its first deployed consumer, real data, or traffic, propose the Lifecycle update. After
+   the first merge that ran CI, read that run's log: lint, typecheck, and tests each ran, and the
+   test count matches the local run. A part that did not run is a bug to fix now.
 2. **Learnings.** Add one only if a future agent would do the wrong thing without it: 0–3 dated
    bullets in `docs/context.md`, each at most three lines. If the "learning" is a bug in the
    project, fix the bug instead. Prune fixed or covered bullets; promote a bullet that applies across

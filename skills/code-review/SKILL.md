@@ -51,6 +51,8 @@ list. Then:
   (contract docblocks, module docstrings): search for `TODO`, `PENDING`, `Planned`, `In progress`,
   `Partially implemented`, and template markers. Each hit is deleted, moved to the tracker, or
   backed by evidence from this change.
+- **No workflow terms in the product:** changed docs, comments, and the PR body never mention
+  stages, gates, or the workflow (`Stage 1`, "solo developer"). Rewrite them in product terms.
 - **Budgets:** count changed artifacts against `AGENTS.md` → Writing standard (`wc -l`).
 - **Size:** about 300 changed lines reviews well; past about 1,000, ask whether it should be split.
 

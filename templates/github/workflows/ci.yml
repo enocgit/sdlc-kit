@@ -43,5 +43,5 @@ jobs:
 
       - name: Check
         # Lint, typecheck, and test: affected packages on pull_request, everything on push.
-        # Stage 0 proves each part fails on a planted error.
+        # Prove each part fails on a planted error before relying on it.
         run: echo "Replace with the project's check command" && exit 1

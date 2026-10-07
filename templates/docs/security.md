@@ -12,16 +12,16 @@
 
 ## Baseline controls
 
-- Every entry point checks identity and permission.
-- Input is validated at the boundary; output is encoded.
-- Secrets come from the environment or a secret manager, never code or logs.
-- Personal data is minimized and kept out of logs.
-- Dependencies are scanned for known vulnerabilities in CI.
+<!-- Only controls code or CI enforces today. Candidates: every entry point checks identity and
+     permission; input is validated at the boundary and output encoded; secrets come from the
+     environment, never code or logs; personal data stays out of logs; CI scans dependencies. -->
+
+- {control enforced today, or "none yet"}
 
 ## Records
 
-<!-- Newest first. One row per security-review record. -->
+<!-- Newest first. One row per security-review record; empty until the first review runs.
+     Row: | YYYY-MM-DD | change or PR | count by severity, or none | open count | [`records/file.md`](./security/records/file.md) | -->
 
 | Date | Change | Findings | Open | Record |
 | --- | --- | --- | --- | --- |
-| YYYY-MM-DD | {change or PR} | {count by severity, or none} | {count, or 0} | [`records/{file}.md`](./security/records/{file}.md) |
