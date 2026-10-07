@@ -8,8 +8,10 @@ and `SKILL.md` files. It has no build step.
 
 - Preserve runtime neutrality. Skill invocation routes project-local → user-global → runtime
   equivalent; a runtime that cannot invoke skills consumes `AGENTS.md` alone.
-- Keep `skills/sdlc/SKILL.md` focused on routing and gates. Put stage detail in the relevant skill or
-  template.
+- Keep the stage procedure in `skills/sdlc/SKILL.md` itself; agents skip referenced files. Keep the
+  gates and no-compromise rules in `templates/AGENTS.md` too, because some harnesses read only that.
+- Apply the deletion test before adding a rule: keep it only if a current frontier model with no
+  instruction would get it wrong.
 - Use `{placeholder}`, not `<placeholder>`; angle brackets break Markdown previews. Keep template
   comments in `<!-- ... -->`.
 - Strengthen existing stages before adding one. Preserve the right-sized paths for fixes and chores.
@@ -49,5 +51,5 @@ pinned there; their upstream license ships inside the skill directory.
    and regression checks.
 4. Install Python 3.10+ and PyYAML, then run `./scripts/validate-kit.sh` as part of the complete
    [verification checklist](./AGENTS.md#verification). The script checks critical installer safety,
-   manifests, snapshot pins, and stage-reference self-sufficiency; the linked checklist covers the
+   manifests, snapshot pins, and the workflow rules in the files agents read; the linked checklist covers the
    remaining release checks.

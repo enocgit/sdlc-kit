@@ -1,17 +1,12 @@
-# Enforces the mechanical half of the Definition of Done on every PR, so "CI
-# green" is a real gate and not just agent discipline. Adjust the stack/commands
-# to your project.
+# The merge gate: the project's check command must pass before a human merges.
+# Replace the setup step and CHECK command with your stack's.
 #
-# Docs-only changes (markdown, docs/) skip the suite — a learnings or README
-# edit lands without a full CI round-trip. Caveat: if branch protection marks
-# this check as required, a skipped run blocks the merge; either keep a small
-# docs-only job for that case or don't mark this check required.
+# Pull requests run the packages a change affects (use your build tool's affected filter when it has
+# one). The push to main runs everything: it catches what the filter missed and what two pull
+# requests break only together, and it seeds caches that pull requests reuse.
 #
-# Minutes: the push trigger re-runs CI on main after a PR merge, a
-# near-duplicate of the pull_request run (which tests the merge result). Keep
-# it only if you push directly to main — there it is your only CI.
-# cancel-in-progress stops superseded runs (force-pushes, fixup chains) from
-# billing in parallel.
+# Docs-only changes skip CI. If branch protection marks this job as required, a skipped run blocks
+# the merge: either drop paths-ignore or don't mark the job required.
 
 name: CI
 
@@ -28,57 +23,25 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 jobs:
-  verify:
+  check:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
     steps:
-      - name: Checkout
-        # Pin every action to its release SHA — tags are mutable refs, so a
-        # moved tag would run attacker code in this workflow. Bump = replace
-        # the SHA and its version comment together (check the release notes).
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Setup pnpm
-        # v6.1.0
-        uses: pnpm/action-setup@d9184bf108216479bc5a137cc391f4d7b14c870b
-        # version is optional if package.json sets "packageManager";
-        # otherwise pin it here:
-        # with:
-        #   version: 9
-
-      - name: Setup Node.js
-        # v7.0.0
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+      # Pin actions to a commit SHA: tags can move. Update the SHA and its comment together.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # Align with the project's stack floor (ADR). node-version-file can
-          # derive the version from package.json "engines" instead.
-          node-version: 24
-          cache: pnpm # or npm / yarn
+          persist-credentials: false
 
-      - name: Install
-        run: pnpm install --frozen-lockfile
+      # Set up your toolchain here, pinned by SHA, for example actions/setup-node,
+      # actions/setup-python, or actions/setup-go, then install dependencies.
 
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Test
-        run: pnpm test --run
-
-      - name: Build
-        run: pnpm build
-
-      # Enable checks that apply to this project:
-      # - name: Dependency advisory scan
-      #   run: pnpm audit --audit-level=high
-      # - name: E2E (Playwright)
-      #   run: pnpm exec playwright test
+      - name: Check
+        # Lint, typecheck, and test: affected packages on pull_request, everything on push.
+        # Stage 0 proves each part fails on a planted error.
+        run: echo "Replace with the project's check command" && exit 1

@@ -37,8 +37,8 @@ KIT_BASE_DIR = ".sdlc-kit-base"
 # adopter fills one in, it is their document and kit template drift must not
 # be spliced into it. Everything else the kit publishes is living (mergeable)
 # except pinned snapshots, which are decided by their kit source path.
-INSTANCE_DOC_STEMS = {"architecture.md", "security.md", "progress.md"}
-INSTANCE_DOC_DIRS = {"prd", "adr", "briefs", "contracts"}
+INSTANCE_DOC_STEMS = {"architecture.md", "security.md"}
+INSTANCE_DOC_DIRS = {"specs", "changes", "adr", "contracts"}
 INSTALLED_DIRECTORY_MODE = 0o755
 INSTALLED_REGULAR_MODE = 0o644
 INSTALLED_EXECUTABLE_MODE = 0o755
@@ -413,8 +413,13 @@ def file_class(kind: str, rel: str, source: Path, kit: Path) -> str:
     carries rules agents read, so an adopter-modified copy is merged with the
     kit's new version. instance — a fill-once template the adopter owns once
     filled; kept. pinned — a snapshot that must stay byte-identical; adopter
-    edits there are reported divergence, never merge input.
+    edits there are reported divergence, never merge input. seed — a file that
+    runs as installed (CI workflows): even an unedited copy is live, so it is
+    never replaced, merged, or deleted after install; template changes are
+    reported.
     """
+    if kind == "target" and rel.startswith(".github/workflows/"):
+        return "seed"
     if kind == "skills":
         try:
             source.relative_to(kit / "vendor/skills")
@@ -475,6 +480,19 @@ def three_way_merge(current: Path, base: Path, other: Path) -> tuple[bytes | Non
     return result.stdout, result.returncode != 0
 
 
+def remove_empty_parents(root: Path, directory: Path) -> None:
+    """Remove directories left empty by a deletion, stopping below root."""
+    root = root.absolute()
+    directory = directory.absolute()
+    while directory != root and root in directory.parents:
+        try:
+            directory.rmdir()
+        except OSError:
+            break
+        directory = directory.parent
+    fsync_directory(directory)
+
+
 def load_manifest(manifest_path: Path) -> dict:
     try:
         manifest = json.loads(read_text_guarded(manifest_path))
@@ -523,7 +541,7 @@ def write_manifest(target: Path, skills_dir: Path, kit_version: str,
             if isinstance(existing, dict) and existing.get("version") == MANIFEST_VERSION:
                 manifest["target"] = dict(existing.get("target", {}))
                 previous_skills = existing.get("skills", {})
-                if previous_skills.get("root") == str(skills_dir):
+                if same_skills_root(previous_skills.get("root"), target, skills_dir):
                     manifest["skills"] = dict(previous_skills.get("files", {}))
         except json.JSONDecodeError:
             pass
@@ -553,8 +571,31 @@ def write_manifest(target: Path, skills_dir: Path, kit_version: str,
         "version": MANIFEST_VERSION,
         "kit": kit_version,
         "target": manifest["target"],
-        "skills": {"root": str(skills_dir), "files": skill_files},
+        "skills": {"root": skills_root_record(target, skills_dir), "files": skill_files},
     })
+
+
+def skills_root_record(target: Path, skills_dir: Path) -> str:
+    """The skills root as the manifest records it: relative when inside the target."""
+    try:
+        return skills_dir.absolute().relative_to(target.absolute()).as_posix()
+    except ValueError:
+        return str(skills_dir)
+
+
+def same_skills_root(recorded: object, target: Path, skills_dir: Path) -> bool:
+    """Whether a recorded skills root names this skills directory.
+
+    Older manifests stored an absolute path, which a clone or moved checkout
+    no longer matches; the same in-repository suffix still identifies it.
+    """
+    if not isinstance(recorded, str):
+        return False
+    current = skills_root_record(target, skills_dir)
+    if recorded in (current, str(skills_dir)):
+        return True
+    return (not Path(current).is_absolute() and Path(recorded).is_absolute()
+            and recorded.endswith("/" + current))
 
 
 def kit_skill_source(kit: Path, rel: str) -> Path:
@@ -572,7 +613,8 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
     """Content-anchored upgrade against the recorded install manifest.
 
     Each manifest entry carries the base content the kit last laid down. A
-    file still matching its base is an untouched kit copy and is replaced;
+    file still matching its base is an untouched kit copy and is replaced,
+    or deleted when the kit no longer ships it;
     a diverged living file is three-way merged with the kit's new version;
     filled template instances and pinned snapshots are never merged. Merged
     files re-anchor on the new kit version so the next upgrade merges again
@@ -595,16 +637,17 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
     manifest = load_manifest(manifest_path)
     manifest_version = manifest.get("version")
     old_by_kind = {"target": dict(manifest.get("target", {})), "skills": {}}
-    if manifest.get("skills", {}).get("root") == str(skills_dir):
+    if same_skills_root(manifest.get("skills", {}).get("root"), target, skills_dir):
         old_by_kind["skills"] = dict(manifest.get("skills", {}).get("files", {}))
 
     actions: dict[str, list[str]] = {"add": [], "update": [], "current": [], "merged": [],
                                      "conflict": [], "modified": [], "removed": [],
-                                     "adopted": []}
+                                     "deleted": [], "adopted": []}
     adopt_set = {item.strip() for item in adopt if item.strip()}
     kept_detail: dict[str, str] = {}
     plan: list[tuple[str, Path, Path]] = []
     merge_writes: list[tuple[str, Path, bytes]] = []
+    deletions: list[tuple[str, Path]] = []
     conflict_writes: list[tuple[str, Path, bytes]] = []
     new_entries: dict[str, dict[str, object]] = {"target": {}, "skills": {}}
     seen: dict[str, set[str]] = {"target": set(), "skills": set()}
@@ -642,6 +685,11 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
             continue
         if installed_bytes == new_bytes:
             actions["current"].append(rel)
+            new_entries[kind][rel] = {"class": klass, "base": new_text}
+            continue
+        if klass == "seed":
+            kept_detail[rel] = " (CI workflow, never replaced: compare with the new template by hand)"
+            actions["modified"].append(rel)
             new_entries[kind][rel] = {"class": klass, "base": new_text}
             continue
         # v3 entries carry the base anchor; legacy records (plain hashes — and
@@ -707,9 +755,30 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
             )
         actions["modified"].append(rel)
         new_entries[kind][rel] = {"class": klass, "base": None}
+    # A file the kit no longer ships is deleted only when it still matches the
+    # base the kit laid down; edited, adopted, or unanchored files stay.
     for kind in ("target", "skills"):
+        root = target if kind == "target" else skills_dir
         for rel in sorted(set(old_by_kind[kind]) - seen[kind]):
-            actions["removed"].append(rel + (" (skills)" if kind == "skills" else ""))
+            destination = root / rel
+            if not os.path.lexists(destination):
+                continue
+            entry = old_by_kind[kind][rel]
+            label = rel + (" (skills)" if kind == "skills" else "")
+            base = entry.get("base") if isinstance(entry, dict) else None
+            if isinstance(entry, dict) and entry.get("adopted"):
+                kept_detail[label] = " (adopted)"
+            elif kind == "target" and file_class(kind, rel, destination, kit) == "seed":
+                kept_detail[label] = " (CI workflow, never deleted)"
+            elif (isinstance(base, str) and destination.is_file() and not destination.is_symlink()
+                  and destination.read_bytes() == base.encode("utf-8")):
+                actions["deleted"].append(label)
+                deletions.append((kind, destination))
+                continue
+            else:
+                kept_detail[label] = (" (adopter-modified)" if isinstance(base, str)
+                                      else " (no installed-base anchor)")
+            actions["removed"].append(label)
 
     unknown = sorted(adopt_set - (seen["target"] | seen["skills"]))
     if unknown:
@@ -721,7 +790,8 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
           f"{len(actions['current'])} current, {len(actions['merged'])} merged, "
           f"{len(actions['conflict'])} conflicts, {len(actions['modified'])} kept "
           f"(adopter-modified), {len(actions['adopted'])} adopted, "
-          f"{len(actions['removed'])} removed upstream", file=stream)
+          f"{len(actions['deleted'])} deleted and {len(actions['removed'])} kept of those "
+          f"removed upstream", file=stream)
     for rel in actions["adopted"]:
         print(f"  A {rel}{kept_detail.get(rel, ' (adopted — kit will not write this path)')}",
               file=stream)
@@ -735,8 +805,10 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
         print(f"  C {rel} (conflict — your copy kept; resolution at {rel}.sdlc-conflict)", file=stream)
     for rel in actions["modified"]:
         print(f"  ! kept, adopter-modified{kept_detail.get(rel, '')}: {rel}", file=stream)
+    for rel in actions["deleted"]:
+        print(f"  - {rel} (removed upstream, untouched)", file=stream)
     for rel in actions["removed"]:
-        print(f"  - left in place, removed upstream: {rel}", file=stream)
+        print(f"  ! left in place, removed upstream{kept_detail.get(rel, '')}: {rel}", file=stream)
     if dry_run:
         return 0
 
@@ -761,6 +833,16 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
     for kind, destination, content in conflict_writes:
         write_installed_bytes(target if kind == "target" else skills_dir,
                               conflict_sibling(destination), content)
+    for kind, destination in deletions:
+        root = target if kind == "target" else skills_dir
+        contained_parent(root, destination)
+        try:
+            destination.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError as error:
+            raise InstallError(f"could not delete {destination}: {error}") from error
+        remove_empty_parents(root, destination.parent)
     # The v2 snapshot directory is obsolete; its content now lives in the manifest.
     legacy_dir = target / KIT_BASE_DIR
     if legacy_dir.is_dir() and not legacy_dir.is_symlink():
@@ -773,7 +855,7 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
         "version": MANIFEST_VERSION,
         "kit": kit_version,
         "target": new_entries["target"],
-        "skills": {"root": str(skills_dir), "files": new_entries["skills"]},
+        "skills": {"root": skills_root_record(target, skills_dir), "files": new_entries["skills"]},
     })
 
     marker = target / KIT_VERSION_MARKER

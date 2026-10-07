@@ -1,32 +1,23 @@
-## Summary
+## What
 
-<!-- What changed and why? If the change completes a pre-existing issue, reference it (on GitHub with `Closes #N`; another tracker: its native transition) — never create an issue just to have one to close. Link the PRD and ADRs when applicable. -->
+<!-- The behavior change in two or three lines. Link the change proposal and issue (`Closes #N` on GitHub). -->
 
-- PRD: `docs/prd/...` | N/A
-- ADR(s): `docs/adr/...` | N/A
+## Where to look
 
-## Notes
+<!-- The reviewer reads this instead of the whole diff. Delete empty bullets. -->
 
-<!-- Follow AGENTS.md's one-point writing rule for decisions, compatibility, and review notes.
-     Do not pack scope, safeguards, review results, and outstanding work into one impact bullet. -->
+- **Behavior changes:** <!-- what a user or consumer now experiences -->
+- **Decisions not in the plan:** <!-- or "none" -->
+- **Read these hunks:** <!-- 1–3 file:line ranges where a mistake would hurt most -->
+- **Known gaps:** <!-- deferred items and where they are recorded, or "none" -->
 
-- Contract impact: N/A | describe the frozen contract change.
-- Security impact: N/A | link the updated threat model or review.
+## Proof
 
-## Acceptance criteria
+<!-- Each acceptance criterion and the test or observation that proves it. -->
 
-<!-- Carry over the issue or PRD criteria, splitting bundled obligations into independently
-     verifiable checkboxes without changing meaning, limits, exceptions, or source references.
-     Delete this section when the change has none. -->
-- [ ] {criterion}
+| Criterion | Proven by |
+| --- | --- |
+| {ID} | {test name or observation} |
 
-## Verification
-
-<!-- Record checks run, observed results, and verification gaps here, not in source comments.
-     Comments describe intended guarantees; they do not prove the implementation enforces them.
-     Name the check that proves the change. Presentation-only markup, attributes, copy, and styling
-     are proven by a diff or one visual check; styling, markup, or attributes that change
-     accessibility, security, or interaction behavior need focused behavior evidence. -->
-
-- [ ] Proportional local verification: <!-- cite the applicable test, runtime observation, link, schema, diff, or visual check -->
-- [ ] CI verification: <!-- cite green required checks, or record that no CI workflow is configured -->
+- **Review:** <!-- who reviewed in fresh context, rounds, verdict; security record link if sensitive -->
+- **CI:** <!-- running / green / not configured -->

@@ -1,121 +1,63 @@
 # Workflow example
 
-This example follows TenantPay, a new rental-payment product, through the full workflow. Backticks
-mark skills, paths, branches, and commands.
+TenantPay lets tenants pay rent online through verified property listings. This follows it from an
+empty repository to its first shipped feature. Backticks mark skills, paths, and commands.
 
-## New project: TenantPay
+## 0. Foundation
 
-TenantPay lets tenants pay rent online through verified property listings.
+The agent fills `docs/context.md`: product, Lifecycle (`team`, no deployed consumers, no real data,
+no traffic), the mobile client as an outside consumer, and two hard constraints. It lists the areas
+`auth` and `payments` in `docs/specs/README.md`, writes ADRs for the stack, the datastore, and the
+auth model, and sketches `docs/architecture.md`, `docs/security.md`, and `docs/test-strategy.md`.
 
-### 0a. Fill context
+It sets `pnpm check` as the check command and wires it into CI. Then it plants a type error, a
+failing test, and a lint violation; `pnpm check` and CI each fail on them; it reverts them.
 
-The agent records TenantPay's users, domain terms, and constraints in `docs/context.md`. No feature
-code exists yet.
+**Gate:** approve the foundation. With a protected `main`, it lands through a `plan/0000-foundation`
+PR.
 
-**Gate:** the context is filled. The agent stops before foundation work.
+## 1. Plan
 
-### 0b. Establish the foundation
+The user says, "Tenants should pay rent online." `grilling` asks in rounds, each question with a
+recommended answer, and settles partial payments, failed callbacks, and refunds.
 
-The agent creates the product requirements document (PRD), foundational architecture decision
-records (ADRs), architecture skeleton, core contract, and threat model. It replaces the test
-strategy's placeholder runners with TenantPay's real tools. Authentication is sensitive, so it runs
-`security-review` on this planning diff.
+The agent writes `docs/changes/0001-rent-payment.md` (62 lines): the spec delta adds `PAY-1` to
+`PAY-4`, five acceptance criteria, the provider ADR, and the frozen `api/openapi.yaml` slice the
+mobile client needs. Payments move a trust boundary, so the threat delta is in the proposal and
+`security-review` runs on it before the gate.
 
-**Gate:** approve the foundation and land the context-and-foundation package on `main` — the commit,
-and the push when a remote's `main` is unprotected. If `main` is protected, use a `plan/*` pull
-request (PR) and wait for the human to merge it.
+**Gate:** approve the plan. The team shape lands it on `main` before any branch is cut.
 
-### 1. Write the feature specification
+## 2. Decompose
 
-The user says, "Tenants should pay rent online." `brainstorming` asks one question at a time and
-records an optional brief. `to-spec` turns the result into
-`docs/prd/0001-rent-payment.md`. `grilling` resolves partial payments, failed callbacks, and refunds.
+Three GitHub issues under an epic, each one reviewable PR: the payment record and provider client,
+the webhook handler, and the tenant payment screen. Each lists its acceptance criteria with
+requirement IDs and test layers. The agent discloses the order and continues.
 
-**Gate:** approve the feature PRD. No tracker tasks exist yet.
+## 3. Build
 
-### 2. Choose the architecture and freeze the contract
+For the webhook task the agent branches `feat/12-payment-webhook`. Because the task is sensitive, it
+stops for approval of its short plan. It writes `PAY-3 rejects an unsigned webhook` as an
+integration test against the test database, sees it fail, and implements the handler. It moves
+`PAY-3` into `docs/specs/payments.md` and updates the webhook row in `docs/security.md` in the same
+commit.
 
-The agent records the payment-provider decision in an ADR, adds the payment component to
-`docs/architecture.md`, and threat-models payments and personally identifiable information (PII) in
-`docs/security.md`. For TenantPay, the contract lives in `api/openapi.yaml`; the agent generates
-shared types from it. Other projects can freeze tRPC routers, ts-rest contracts, schemas, or interface
-definitions instead.
+## 4. Review
 
-`grilling` stress-tests the architecture and the contract shape before the agent freezes either, so
-the interface is challenged while it is still cheap to change.
+A fresh subagent receives the diff, the proposal, the payments spec, and the contract. `code-review`
+asks for one change: the handler retries on every error, including a bad signature.
+`security-review` records two findings in a 24-line record. It fixes one; the other, rate limiting the
+webhook endpoint, goes to the production register until there is production traffic. After the fix,
+a second round approves.
 
-The agent runs `security-review` on this sensitive planning diff. Stage 6 reviews the implementation
-diff separately.
+## 5. Land
 
-**Gate:** approve the approach, freeze the interface, and land the Stage 1–2 planning package on
-`main` — the commit, and the push when a remote's `main` is unprotected, so the shared `main` holds
-the contract. If `main` is protected, use a `plan/*` PR and wait for the human to merge it. Frontend
-and backend can then work against the same contract.
+The agent pushes and opens the PR. "Where to look" points at the signature check and the idempotency
+key, and the proof table maps each criterion to its test. It reports the PR link and that CI is
+running, then stops. The human merges after CI passes.
 
-### 3. Break the feature into tasks
+## 6. Retro
 
-`writing-plans` turns the PRD into tracker tasks. `project-status` reports the breakdown. The agent
-discloses it and continues without waiting for another approval.
-
-### 4. Implement a task
-
-`feature-start` creates `feat/3-payment-intent` and loads the relevant PRD, ADR, and contract. Because
-payments and PII are sensitive, the agent discloses its compact in-session plan and stops for approval
-before implementation. After approval, it implements against the frozen contract. It creates no plan
-file unless the human asks for one.
-
-### 5. Verify the change
-
-The agent runs tests, starts the app, and completes a sandbox payment. Continuous integration (CI)
-runs before Land when possible. If the project needs a PR to start CI, Land opens it first.
-
-### 6. Review the diff
-
-`code-review` and `code-simplification` inspect the diff. Because the feature touches payments and PII, the
-agent also runs `security-review` and fixes its findings. `definition-of-done-review` confirms local
-readiness. Required CI is the only pending item before Land.
-
-### 7. Land the change
-
-After local review, the agent pushes the branch and opens the PR without asking — commits already
-happened per task, and the merge is the only decision that is never the agent's. The GitHub PR uses
-`Closes #N`, and the issue stays open until merge.
-
-After required CI passes, the agent runs the final Definition of Done check and reports whether the
-change is ready to merge.
-
-**Gate:** the human merges after CI is green and the final check passes. GitHub then closes the issue.
-
-### 8. Record what was learned
-
-After each task, the agent keeps only durable learnings, such as "payment callbacks may arrive twice;
-handlers must be idempotent." If tasks remain, it leaves feature artifacts and the epic checklist
-alone. If it records a durable learning in a project file, it checks out and syncs the updated default
-branch before editing, then asks to land that change before the next task. If no repository file
-changed, there is no extra landing action.
-
-After the final task, the agent checks out and syncs the updated default branch before reconciling
-feature artifacts: it writes the delivery record into the PRD once — what shipped, with evidence
-links — moves planned-changes facts into current-state sections, and updates stale summaries against
-evidence. It asks for approval to land those edits. After they land, it verifies the epic Definition
-of Done and asks for approval to update and close the parent GitHub issue. After that approval and
-verified closure, it offers the optional `improve` audit, `improve next`, or the next `sdlc {feature}` run.
-
-## Existing project
-
-The `adopt` path changes only Stage 0. The agent reads the code, configures `docs/test-strategy.md`,
-and reconstructs `docs/context.md`, `docs/architecture.md`, contract pointers, and retrospective
-ADRs. It documents existing behavior without changing it.
-
-After foundation approval, the next feature follows Stages 1–8. Extend existing architecture and
-contracts instead of creating duplicates. A shipped-contract change with a deployed consumer
-requires a versioning or deprecation ADR. If there is no deployed consumer, compatibility versioning
-may be deferred only with applicable approval: follow the [contract guide](./templates/docs/contracts/README.md),
-re-freeze the contract, and record the deferral in the [production register](./templates/docs/context.md)
-with its owner and first-deployed-consumer trigger.
-
-## Gate behavior
-
-At every gate, the agent names the artifact and asks for approval. It does nothing downstream until
-the human responds. At other stages, it works, reports decisions worth changing, and continues. The
-human can interrupt at any time and always controls merge.
+GitHub closes the issue. One learning qualifies: the provider sends webhook timestamps in seconds, not
+milliseconds. When the third task merges, the agent checks the payments spec against the code and
+marks the proposal Shipped with links to its three PRs.

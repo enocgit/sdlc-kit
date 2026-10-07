@@ -282,68 +282,45 @@ class Validator:
         if declared != expected:
             raise CheckError(f"skill declarations mismatch: missing={sorted(expected - declared)} extra={sorted(declared - expected)}")
 
-    def stage_self_sufficiency(self) -> None:
-        """Stage references restate the operative rules their stage acts on.
+    def workflow_rules(self) -> None:
+        """The files agents actually read carry the operative workflow rules.
 
-        Agents read the router and the operating manual but reliably skip
-        referenced files: a pipeline run that never opens the stage reference
-        acts on the router's one-line cell alone. Each stage file must
-        therefore carry the rules its stage acts on inline; rules.md stays
-        canonical.
+        A harness without skills reads only AGENTS.md, so the template manual
+        must carry the gates and the no-compromise rules; the conductor keeps
+        the per-stage procedure in one file because agents skip referenced
+        files.
         """
         required: dict[str, tuple[str, ...]] = {
-            "stage-0.md": ("No remote** → commit to the local default branch",
-                           "default branch protected"),
-            "stage-1.md": (),
-            "stage-2.md": ("No remote** → commit to the local default branch",
-                           "default branch protected",
-                           "hard to reverse"),
-            "stage-3.md": ("Closes #N` is GitHub-only",
-                           "outward-facing",
-                           "docs/plans/README.md",
-                           "Tracker follows capability"),
-            "stage-4.md": ("failing automated test",
-                           "RED → GREEN",
-                           "Each task ends in its commit"),
-            "stage-5.md": ("RED → GREEN",
-                           "API level"),
-            "stage-6.md": ("Fresh context first",
-                           "pushes, not asks",
-                           "**block** rather than return a",
-                           "not authoritative",
-                           "other worktrees and stashes",
-                           "reviewed-subject identities\nincluded",
-                           "configured but blocked is a blocker",
-                           "no remote is dormant"),
-            "stage-7.md": ("Closes #N",
-                           "in review",
-                           "blocker, not a mode",
-                           "Tracker follows capability",
-                           "next gate: merging"),
-            "stage-8.md": ("Approve the retro package",
-                           "Promote before you prune",
-                           "~30 bullets",
-                           "references/stage-1.md"),
+            "templates/AGENTS.md": (
+                "1. A human performs every merge.",
+                "2. Review runs in a context that did not write the change",
+                "3. A change to a trust boundary gets a security review before merge",
+                "4. Implementation never drifts from a frozen contract.",
+                "5. Behavior ships with tests, and each check is proven able to fail.",
+                "6. The spec states what actually shipped.",
+                "7. No secrets in the repository, logs, or artifacts.",
+                "**Gate**: approve foundation",
+                "**Gate**: approve plan",
+                "**Gate**: the human merges",
+            ),
+            "skills/sdlc/SKILL.md": (
+                "**Gate: approve foundation.**",
+                "**Gate: approve plan.**",
+                "**Prove the checks.**",
+                "Test first.",
+                "Review in a context that did not write the change",
+                "do not poll CI",
+                "fix the bug instead",
+            ),
         }
         for name, needles in required.items():
-            path = self.kit / "skills/sdlc/references" / name
-            text = path.read_text(encoding="utf-8")
+            text = (self.kit / name).read_text(encoding="utf-8")
             missing = [needle for needle in needles if needle not in text]
             if missing:
                 raise CheckError(f"{name} is missing operative rules: {missing}")
-        # Forward chaining: each stage file hands off to the next.
-        for n in range(8):
-            path = self.kit / "skills/sdlc/references" / f"stage-{n}.md"
-            if f"stage-{n + 1}.md" not in path.read_text(encoding="utf-8"):
-                raise CheckError(f"stage-{n}.md does not forward-chain to stage-{n + 1}.md")
-        # The router is the file agents reliably read; its Stage 6 cell and the
-        # transition rule must agree with the stage references.
-        router = (self.kit / "skills/sdlc/SKILL.md").read_text(encoding="utf-8")
-        for needle in ("**fresh context** (a reviewer that did not implement",
-                       "**At every stage transition**",
-                       "read that\nstage's reference"):
-            if needle not in router:
-                raise CheckError(f"router is missing operative rules: {needle!r}")
+        lines = len((self.kit / "templates/AGENTS.md").read_text(encoding="utf-8").splitlines())
+        if lines > 150:
+            raise CheckError(f"templates/AGENTS.md is {lines} lines; the budget is 150")
 
     def smoke(self) -> None:
         with Fixture(self.kit) as fx:
@@ -369,7 +346,7 @@ class Validator:
                 if source.is_dir():
                     assert_same_tree(source, target / ".agents/skills" / source.name)
 
-            assert_mode(target / ".agents/skills/brainstorming/SKILL.md", 0o644)
+            assert_mode(target / ".agents/skills/grilling/SKILL.md", 0o644)
             marker = target / ".sdlc-kit-version"
             if marker.read_text() != kit_version(self.kit) + "\n":
                 raise CheckError(f"installed kit version marker is wrong: {marker.read_text()!r}")
@@ -394,7 +371,7 @@ class Validator:
         with Fixture(self.kit) as fx:
             target = fx.target()
             expect_ok(fx.install(target, umask=0o077), "restrictive umask install")
-            for path in (target / "AGENTS.md", target / ".agents/skills/brainstorming/SKILL.md"):
+            for path in (target / "AGENTS.md", target / ".agents/skills/grilling/SKILL.md"):
                 assert_mode(path, 0o644)
 
     def no_clobber(self) -> None:
@@ -412,7 +389,7 @@ class Validator:
                 raise CheckError("existing file was overwritten")
             if (target / "docs/adr/existing.md").read_text() != "keep this document\n":
                 raise CheckError("existing nested document was overwritten")
-            if not (target / "docs/adr/0001-record-architecture-decisions.md").is_file():
+            if not (target / "docs/adr/TEMPLATE.md").is_file():
                 raise CheckError("merge install did not preserve the existing directory")
             if existing_skill.read_text() != "keep this skill\n":
                 raise CheckError("existing local skill was overwritten")
@@ -630,7 +607,7 @@ class Validator:
                 raise CheckError("upgrade did not record the kit version in the manifest")
 
     def upgrade_applies(self) -> None:
-        """Untouched kit files update, adopter edits survive, removals report.
+        """Untouched kit files update, adopter edits survive, removals apply.
 
         RED→GREEN for the checksum-gated upgrade contract: the installed
         manifest distinguishes an untouched kit copy from an adopter-modified
@@ -645,7 +622,7 @@ class Validator:
             agents = kit / "templates/AGENTS.md"
             agents.write_text(agents.read_text() + "\nNew kit rule.\n")
             (kit / "templates/docs").joinpath("new-template.md").write_text("new payload\n")
-            (kit / "templates/docs/progress.md").unlink()
+            (kit / "templates/docs/test-strategy.md").unlink()
             skill = kit / "skills/sdlc/SKILL.md"
             skill.write_text(skill.read_text() + "\nRouter update.\n")
             # Adopter-side edit of an installer-added file:
@@ -662,9 +639,9 @@ class Validator:
                 raise CheckError("upgrade did not add a new kit file")
             if "Adopter note." not in context.read_text():
                 raise CheckError("upgrade overwrote an adopter-modified file")
-            if not (target / "docs/progress.md").is_file():
-                raise CheckError("upgrade deleted a file removed upstream")
-            for needle in ("docs/context.md", "docs/progress.md"):
+            if (target / "docs/test-strategy.md").exists():
+                raise CheckError("upgrade left an untouched file removed upstream")
+            for needle in ("docs/context.md", "docs/test-strategy.md"):
                 if needle not in report:
                     raise CheckError(f"upgrade report did not mention {needle}")
             try:
@@ -675,7 +652,7 @@ class Validator:
             entry = manifest["target"]["AGENTS.md"]
             if not isinstance(entry, dict) or entry.get("base") != new_agents.read_text():
                 raise CheckError("upgrade manifest does not anchor the updated file to the new version")
-            if "docs/progress.md" in manifest["target"]:
+            if "docs/test-strategy.md" in manifest["target"]:
                 raise CheckError("upgrade manifest still tracks a file removed upstream")
             if (target / ".sdlc-kit-version").read_text() != kit_version(kit) + "\n":
                 raise CheckError("upgrade did not refresh the version marker")
@@ -785,20 +762,24 @@ class Validator:
             kit = fx.kit_copy()
             arch = kit / "templates/docs/architecture.md"
             arch.write_text(arch.read_text() + "\nKit template drift.\n")
+            specs = kit / "templates/docs/specs/README.md"
+            specs.write_text(specs.read_text() + "\nKit spec-index drift.\n")
             pinned = kit / "vendor/skills/frontend-design/SKILL.md"
             pinned.write_text(pinned.read_text() + "\nKit edit to a pinned snapshot.\n")
             adopter_arch = target / "docs/architecture.md"
             adopter_arch.write_text(adopter_arch.read_text() + "\nAdopter shipped-architecture note.\n")
+            adopter_specs = target / "docs/specs/README.md"
+            adopter_specs.write_text(adopter_specs.read_text() + "\nAdopter product area.\n")
             adopter_pinned = target / ".agents/skills/frontend-design/SKILL.md"
             adopter_pinned.write_text(adopter_pinned.read_text() + "\nAdopter edit to a pinned snapshot.\n")
-            before = (adopter_arch.read_bytes(), adopter_pinned.read_bytes())
+            before = (adopter_arch.read_bytes(), adopter_specs.read_bytes(), adopter_pinned.read_bytes())
             result = fx.install(target, upgrade=True, kit=kit)
             expect_ok(result, "class-routing upgrade")
-            if (adopter_arch.read_bytes(), adopter_pinned.read_bytes()) != before:
+            if (adopter_arch.read_bytes(), adopter_specs.read_bytes(), adopter_pinned.read_bytes()) != before:
                 raise CheckError("class routing merged a non-mergeable file")
             if "\n  C " in result.stdout or "\n  M " in result.stdout:
                 raise CheckError("class routing merged a non-mergeable file")
-            for needle in ("docs/architecture.md", "frontend-design/SKILL.md"):
+            for needle in ("docs/architecture.md", "docs/specs/README.md", "frontend-design/SKILL.md"):
                 if needle not in result.stdout:
                     raise CheckError(f"upgrade report did not mention {needle}")
 
@@ -873,28 +854,143 @@ class Validator:
             expect_ok(fx.install(target, upgrade=True, kit=kit), "upgrade after adoption")
             if agents.read_bytes() != before:
                 raise CheckError("a later upgrade modified an adopted file")
-            progress = target / "docs/progress.md"
-            progress.unlink()
-            result = fx.install(target, upgrade=True, kit=kit, adopt=("docs/progress.md",))
+            strategy = target / "docs/test-strategy.md"
+            strategy.unlink()
+            result = fx.install(target, upgrade=True, kit=kit, adopt=("docs/test-strategy.md",))
             expect_ok(result, "adopt an absent file")
-            if progress.exists():
+            if strategy.exists():
                 raise CheckError("adopting an absent file re-added it")
             try:
                 manifest = json.loads((target / ".sdlc-kit-manifest.json").read_text())
             except (OSError, json.JSONDecodeError) as exc:
                 raise CheckError(f"upgrade did not write a readable manifest: {exc}") from exc
-            if not (isinstance(manifest["target"].get("docs/progress.md"), dict)
-                    and manifest["target"]["docs/progress.md"].get("adopted")):
+            if not (isinstance(manifest["target"].get("docs/test-strategy.md"), dict)
+                    and manifest["target"]["docs/test-strategy.md"].get("adopted")):
                 raise CheckError("manifest did not record the absent adopted file")
             expect_ok(fx.install(target, upgrade=True, kit=kit),
                       "upgrade with an absent adopted file")
-            if progress.exists():
+            if strategy.exists():
                 raise CheckError("a later upgrade re-added an adopted absent file")
             result = fx.install(target, upgrade=True, kit=kit, adopt=("no/such/file.md",))
             if result.returncode == 0:
                 raise CheckError("an unknown --adopt target was accepted")
             if "not part of the kit payload" not in result.stdout + result.stderr:
                 raise CheckError("an unknown --adopt target failed without explanation")
+
+    def upgrade_removes_untouched(self) -> None:
+        """Files removed upstream are deleted only when the adopter never touched them.
+
+        RED→GREEN for removal: an untouched kit copy goes, along with a
+        directory it leaves empty; an edited, adopted, or adopter-added file
+        stays and is reported; a dry run deletes nothing.
+        """
+        with Fixture(self.kit) as fx:
+            target = fx.target()
+            expect_ok(fx.install(target), "install before removal")
+            epic = ".github/ISSUE_TEMPLATE/epic.md"
+            expect_ok(fx.install(target, upgrade=True, adopt=(epic,)), "adopt before removal")
+            skill_dir = target / ".agents/skills/address-review"
+            (skill_dir / "notes.md").write_text("adopter notes\n")
+            strategy = target / "docs/test-strategy.md"
+            strategy.write_text(strategy.read_text() + "\nAdopter layer.\n")
+            kit = fx.kit_copy()
+            shutil.rmtree(kit / "skills/address-review")
+            (kit / "templates/docs/test-strategy.md").unlink()
+            (kit / "templates/github/ISSUE_TEMPLATE/epic.md").unlink()
+            (kit / "templates/github/ISSUE_TEMPLATE/task.md").unlink()
+
+            before = self._payload_hashes(target)
+            dry = fx.install(target, upgrade=True, kit=kit, dry_run=True)
+            expect_ok(dry, "dry-run removal")
+            if self._payload_hashes(target) != before:
+                raise CheckError("a dry-run upgrade deleted files")
+            if "address-review/SKILL.md" not in dry.stdout:
+                raise CheckError("dry-run report did not list the pending deletion")
+
+            result = fx.install(target, upgrade=True, kit=kit)
+            expect_ok(result, "upgrade with removals")
+            if (skill_dir / "SKILL.md").exists():
+                raise CheckError("upgrade left an untouched skill file removed upstream")
+            if not (skill_dir / "notes.md").is_file():
+                raise CheckError("upgrade deleted an adopter-added file")
+            if (target / ".github/ISSUE_TEMPLATE/task.md").exists():
+                raise CheckError("upgrade left an untouched template removed upstream")
+            if not (target / ".github/ISSUE_TEMPLATE").is_dir():
+                raise CheckError("upgrade removed a directory that still holds an adopted file")
+            if not (target / epic).is_file():
+                raise CheckError("upgrade deleted an adopted file removed upstream")
+            if "Adopter layer." not in strategy.read_text():
+                raise CheckError("upgrade deleted an adopter-modified file removed upstream")
+            for needle in ("docs/test-strategy.md", epic):
+                if needle not in result.stdout:
+                    raise CheckError(f"upgrade report did not mention kept file {needle}")
+            try:
+                manifest = json.loads((target / ".sdlc-kit-manifest.json").read_text())
+            except (OSError, json.JSONDecodeError) as exc:
+                raise CheckError(f"upgrade did not write a readable manifest: {exc}") from exc
+            stale = [rel for rel in manifest["skills"]["files"] if rel.startswith("address-review/")]
+            if stale or "docs/test-strategy.md" in manifest["target"]:
+                raise CheckError("upgrade manifest still tracks files removed upstream")
+
+            skill_dir2 = target / ".agents/skills/grilling"
+            shutil.rmtree(kit / "skills/grilling")
+            expect_ok(fx.install(target, upgrade=True, kit=kit), "upgrade removing a whole skill")
+            if skill_dir2.exists():
+                raise CheckError("upgrade left the empty directory of a removed skill")
+
+    def upgrade_after_move(self) -> None:
+        """A moved or cloned checkout still upgrades its project-local skills.
+
+        RED→GREEN: the manifest once recorded the skills root as an absolute
+        path, so a teammate's clone at another path silently skipped every
+        skill update. Both the current record and a legacy absolute record
+        from another location must still match.
+        """
+        with Fixture(self.kit) as fx:
+            original = fx.target("original")
+            expect_ok(fx.install(original), "install before move")
+            moved = fx.root / "moved"
+            original.rename(moved)
+            kit = fx.kit_copy()
+            skill = kit / "skills/sdlc/SKILL.md"
+            skill.write_text(skill.read_text() + "\nRouter update.\n")
+            expect_ok(fx.install(moved, upgrade=True, kit=kit), "upgrade after move")
+            if "Router update." not in (moved / ".agents/skills/sdlc/SKILL.md").read_text():
+                raise CheckError("upgrade skipped skills in a moved checkout")
+            manifest_path = moved / ".sdlc-kit-manifest.json"
+            manifest = json.loads(manifest_path.read_text())
+            manifest["skills"]["root"] = "/elsewhere/clone/.agents/skills"
+            manifest_path.write_text(json.dumps(manifest))
+            skill.write_text(skill.read_text() + "\nSecond update.\n")
+            expect_ok(fx.install(moved, upgrade=True, kit=kit), "upgrade with a legacy absolute root")
+            if "Second update." not in (moved / ".agents/skills/sdlc/SKILL.md").read_text():
+                raise CheckError("upgrade skipped skills recorded under another clone's absolute path")
+
+    def upgrade_keeps_workflows(self) -> None:
+        """An installed CI workflow is never replaced or deleted by an upgrade.
+
+        RED→GREEN: an unedited workflow is still a running pipeline, so a
+        kit template change (or removal) must be reported, not applied.
+        """
+        with Fixture(self.kit) as fx:
+            target = fx.target()
+            expect_ok(fx.install(target), "install before workflow upgrade")
+            workflow = target / ".github/workflows/ci.yml"
+            before = workflow.read_bytes()
+            kit = fx.kit_copy()
+            kit_workflow = kit / "templates/github/workflows/ci.yml"
+            kit_workflow.write_text(kit_workflow.read_text() + "# kit template change\n")
+            result = fx.install(target, upgrade=True, kit=kit)
+            expect_ok(result, "upgrade with a changed workflow template")
+            if workflow.read_bytes() != before:
+                raise CheckError("upgrade replaced an installed CI workflow")
+            if ".github/workflows/ci.yml" not in result.stdout:
+                raise CheckError("upgrade report did not mention the changed workflow template")
+            kit_workflow.unlink()
+            result = fx.install(target, upgrade=True, kit=kit)
+            expect_ok(result, "upgrade with a removed workflow template")
+            if workflow.read_bytes() != before:
+                raise CheckError("upgrade deleted an installed CI workflow")
 
     def identical_tracking(self) -> None:
         """Existing files identical to kit content are tracked for upgrades.
@@ -921,7 +1017,7 @@ class Validator:
 
     def run(self) -> int:
         checks = (("syntax, schemas, and provenance", self.static), ("snapshot pins", self.pins),
-                  ("stage reference self-sufficiency", self.stage_self_sufficiency),
+                  ("workflow rules in the files agents read", self.workflow_rules),
                   ("clean install", self.smoke),
                   ("dry-run immutability", self.dry_run), ("restrictive umask", self.umask),
                   ("no-clobber publication", self.no_clobber),
@@ -939,6 +1035,9 @@ class Validator:
                   ("upgrade routes instance and pinned classes without merging", self.upgrade_class_routing),
                   ("consecutive upgrades preserve adopter content", self.upgrade_second_run_preserves_adopter),
                   ("adopted files are never written, merged, or re-added", self.upgrade_adopted_files),
+                  ("upgrade deletes untouched files removed upstream", self.upgrade_removes_untouched),
+                  ("upgrade works after the checkout moves", self.upgrade_after_move),
+                  ("upgrade never replaces a CI workflow", self.upgrade_keeps_workflows),
                   ("identical existing files are tracked", self.identical_tracking))
         for name, function in checks:
             self.check(name, function)

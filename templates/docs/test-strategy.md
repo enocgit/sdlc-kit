@@ -1,51 +1,33 @@
 # Test strategy
 
-> Follow the documentation writing standard in AGENTS.md. Keep this doc focused on test-specific
-> policy and links to real tools; do not duplicate the canonical Definition of Done from AGENTS.md.
-> Delete placeholder runners once the stack is set.
->
-> **STATUS: TEMPLATE** — set the tools below from your **real** stack; the tool names are
-> placeholders, not a decision (e.g. the starter may be wired for Jest, not Vitest). The
-> authoritative completion policy lives in the project's operating manual. This doc adds only the
-> test-specific bar (see "Verification bar" below).
+> STATUS: TEMPLATE — set the real tools at Stage 0 and delete this marker.
 
-## Policy
+Test where a bug would surface. Mocks hide the behavior of databases, auth libraries, and frameworks,
+which is where most real bugs live; unit tests are fastest for logic with many cases.
 
-Apply the verification standard in `AGENTS.md` — proportional evidence, RED → GREEN for non-trivial
-executable behavior, the smallest check that proves the change, no full local suite by default.
-This document adds only the test-specific layering below. The Lifecycle block in `docs/context.md`
-sets the reach of the bar; record deferred cases in the production register instead of writing the
-test.
+## Layers
 
-## Test layers (the pyramid)
+| Code under test | Layer | Tool | Rule |
+| --- | --- | --- | --- |
+| Pure logic with many cases: policies, matrices, parsers, mappers | Unit | {runner} | One test per case; the full case matrix lives here |
+| Wiring to the database, auth, HTTP, queues, or third parties | Integration, against real infrastructure | {runner} + {test database} | One test per path through the wiring, plus one denial and one failure or rollback; never the full matrix |
+| Critical user journeys | End-to-end | {e2e tool} | A few per change, named in the change proposal |
 
-| Layer | Tool | What it covers | When required |
-| ------- | ------ | ---------------- | --------------- |
-| Unit | {unit runner — e.g. Vitest or Jest} | Pure logic, edge cases | All non-trivial logic |
-| Integration | {same runner} + test DB | Module ↔ DB, API handlers against the contract | Any data/contract change |
-| Contract | (contract-defined types, generated or directly shared) + schema validation | FE/BE agree on the frozen interface | Any contract change |
-| Failure path | {same runner} | Validation, authorization or security denial, error, retry, timeout, and partial-failure behavior | Whenever the executable branch can be exercised; defer only cases whose required deployed consumer, real data, deployment, traffic, load, compatibility, or multi-version condition is unavailable; see Lifecycle |
-| Load / perf | {tool} | Throughput, latency, saturation | When staging or production traffic exists |
-| E2E | {e2e tool — e.g. Playwright, Cypress, Maestro, or Detox} | Critical user flows end-to-end | Per epic's key flow |
+A task's acceptance criteria name the layer for each behavior. Test names cite the requirement ID
+they prove (`AUTH-3 rejects an expired session`).
 
-**Rule of thumb:** test logic at the lowest layer that gives confidence; reserve E2E for the few
-flows that matter most. Non-trivial executable behavior must be _covered_, not merely _touched_;
-`AGENTS.md` owns what else may serve as evidence.
+## Execution
 
-## Verification bar
+- Every new test is seen failing for the right reason before it passes.
+- Tests are safe to run in parallel: each worker gets its own database or schema.
+- Tests are deterministic: no uncontrolled network, time, or randomness.
+- Pull requests run the packages a change affects; the push to the default branch runs everything.
+- No run repeats the same work: one workflow per check, and a new push cancels the PR's older run.
+- One test runner per stack unless an ADR says otherwise.
+- Locally, run the touched packages; CI is the merge gate.
 
-The project's operating manual defines the broader completion policy. This document adds only the
-test-specific bar: automated coverage for non-trivial executable behavior at the **right layer**,
-and configured CI fully green before merge when a CI workflow exists.
+## Deferred
 
-## Conventions
-
-- Deterministic tests (no real network/time/randomness without control).
-- Test names describe behavior, not implementation.
-- A regression test earns its place by reproducing a failure that actually occurred. For an
-  unobserved condition that cannot be exercised before deployment, name the behavior it would protect
-  and put it in the production register instead of writing the test now. This exception does not
-  cover executable validation, authorization, security denial, error, retry, timeout, or partial-failure
-  branches.
-- Name the invariant, not the history: no "previously failed" or incident narration in test names
-  or comments.
+Tests that need deployed consumers, real data, or production traffic wait in the production register
+in `docs/context.md`. Executable validation, authorization, error, and failure branches are never
+deferred.

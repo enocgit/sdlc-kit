@@ -1,145 +1,71 @@
 ---
 name: code-review
 description: >
-  Reviews the complete target-to-tree diff across five axes — correctness, readability,
-  architecture, security, and performance — with severity-labeled findings and a verdict. Use at
-  Stage 6 before the Definition of Done check, during QA after implementation, or when the user
-  asks to review a diff or "check my changes before merge".
+  Fresh-context review of a change before merge: correctness, simplicity, structure, security, and
+  readiness against the project's Definition of Done, with severity-labelled findings and a
+  verdict. Use at the workflow's Review stage, or when the user asks to review a diff or "check
+  my changes before merge".
 ---
 
 # code-review
 
-A maintained adaptation of Addy Osmani's `code-review-and-quality` skill, re-scoped from PR review
-to the complete target-to-tree diff this pipeline reviews. Attribution and license live in
-`NOTICE.md` and `LICENSE.txt`.
+Review-only: report findings to the author; do not edit, commit, or land.
+
+## Inputs
+
+Review the committed diff against the target branch (`git diff {target}...HEAD`) on a clean tree,
+plus every file it adds or removes. Read the change proposal, the specs it touches, relevant ADRs,
+and any frozen contract. Do not accept the author's summary in place of these artifacts.
 
 ## The approval standard
 
-Approve a change when it definitely improves overall code health, even if it isn't perfect. Don't
-block a change because it isn't exactly how you would have written it. Do block a change that
-introduces a defect, weakens an invariant, or makes structure worse.
+Approve a change that clearly improves the codebase, even if you would have written it differently.
+Block a change that introduces a defect, weakens an invariant, or makes the structure worse.
 
-## Scope
+## Walk the change
 
-Review the complete target-to-tree delta on a clean materialization: changed lines with enough
-surrounding context to judge them, plus every file the change adds, removes, or retypes. Do not
-review unrelated code; do note when an unrelated area is load-bearing for the change.
+1. **Correctness.** Does it do what the spec and acceptance criteria say? Edge cases: empty, null,
+   boundaries, concurrency, failure paths. Do the tests prove behavior rather than implementation,
+   and would they fail on a regression? Is each test at the layer `docs/test-strategy.md` assigns?
+2. **Simplicity.** Is there a smaller design: reuse of an existing helper, the standard library, or
+   an installed dependency; fewer branches, modes, or layers? A refactor that moves complexity
+   without removing it is not a simplification. Name the simpler design; do not just say "simplify".
+3. **Structure.** Feature logic in its owning module; no near-duplicate of a canonical helper; no
+   silent fallback hiding an unclear invariant; no unrelated conditional bolted onto a shared flow.
+4. **Security.** Input validated at the boundary; secrets out of code and logs; authorization on
+   every new entry point; queries parameterized; new dependencies trustworthy. A trust-boundary
+   change also needs `security-review`.
+5. **Performance.** N+1 queries, unbounded loops or fetches, missing pagination, work repeated in a
+   hot path.
 
-Before reviewing, read the project's instruction and architecture docs for the touched area
-(`AGENTS.md`, `docs/architecture.md`, relevant ADRs and contracts) so local patterns are
-distinguished from defects.
+## Readiness
 
-## Kit integration
+Read the Definition of Done in the project's `AGENTS.md` and check the change against that exact
+list. Then:
 
-This pass is review-only. Run it against the complete clean materialization of the current
-candidate; do not edit that materialization, commit, or perform landing actions. Report findings,
-including confirmed candidate-owned dead code, to the parent or author. The parent or author may
-apply accepted cleanup to the source candidate; after any such change, create a fresh materialization
-and rerun the affected reviews. Uncertain findings are review notes, not a reason to block this pass.
-
-## The five-axis review
-
-### 1. Correctness
-
-- Does the code do what the spec, task, or contract says it should?
-- Are edge cases handled: empty, null, boundary values, concurrency, failure paths?
-- Do tests cover the change's behavior, not its implementation details? Would they catch a
-  regression? Verification must be proportional to risk: non-trivial executable behavior needs
-  focused automated coverage, and bug fixes start from a failing test or reproducer.
-- Are there off-by-one errors, race conditions, or state inconsistencies?
-
-### 2. Readability
-
-- Are names descriptive and consistent with project conventions?
-- Is control flow straightforward — no nested ternaries, deep callbacks, or clever tricks?
-- Are abstractions earning their complexity? Don't generalize until the third use case.
-- Is a new conditional bolted onto an unrelated flow? That is a design smell, not a nit — push the
-  logic into its own helper, state, or policy instead of tangling an existing path.
-- Do repeated conditionals on the same shape appear? They signal a missing model or dispatcher; a
-  "temporary" branch is usually permanent debt.
-
-### 3. Architecture
-
-- Does the change follow existing patterns or justify a new one? Are module boundaries and
-  dependency directions preserved?
-- Does a refactor reduce complexity or just relocate it? Count the concepts a reader must hold. If
-  a "cleaner" version leaves that count unchanged, it isn't cleaner — prefer the restructuring that
-  makes whole branches, modes, or layers disappear.
-- Is feature-specific logic leaking into a shared or general-purpose module? Keep logic in its
-  owning layer and reuse the existing canonical helper instead of a near-duplicate.
-- Are type boundaries explicit? Question gratuitous `any`/`unknown`/casts and silent fallbacks that
-  paper over an unclear invariant.
-
-### 4. Security
-
-Flag what this diff-level review can see; a sensitive-area change additionally requires the
-separate `security-review` pass with full scoped coverage.
-
-- Is external input validated at the boundary before use in logic or rendering?
-- Are secrets kept out of code, logs, and version control?
-- Are authentication and authorization checks present where the change adds or moves an entry
-  point?
-- Are queries parameterized, outputs encoded, and external data treated as untrusted?
-- Are new dependencies from trusted sources, actively maintained, and license-compatible?
-
-### 5. Performance
-
-- N+1 query patterns, unbounded loops, or unconstrained data fetching?
-- Synchronous operations that should be async; large objects built in hot paths?
-- Missing pagination on list endpoints; repeated work that could be hoisted?
-
-## Structural remedies
-
-When you flag a structural problem, propose the move, not just the problem: replace a conditional
-chain with a typed model or dispatcher, collapse duplicate branches, separate orchestration from
-business logic, move feature logic to its owning module, reuse the canonical helper, delete a
-pass-through wrapper, or extract a helper. Prefer the remedy that removes moving pieces over one
-that spreads the same complexity around.
-
-## Change sizing
-
-Roughly 100 changed lines review well in one sitting; ~300 is acceptable as one logical change;
-~1000 is too large — split it (stack, by file group, horizontal, or vertical slices). When a small
-diff pushes an already-large file further past a healthy boundary, ask for decomposition before
-piling on. Keep unrelated refactors out of scope. In this kit's inline Stage 6 workflow, review
-findings and necessary cleanup for the current candidate stay in the same reviewed candidate and
-follow the conductor's review, commit, and human-controlled landing rules. Complete file
-deletions and mechanical refactors are acceptable at any size.
+- **Acceptance criteria:** map each one to the test or observation that proves it.
+- **Checks can fail:** a new test was seen failing first; a new or changed check command fails on a
+  planted error.
+- **Docs match the code:** specs, architecture, and contract index describe the shipped behavior.
+  Run a stale-claim scan over changed docs *and source comments that carry current-behavior claims*
+  (contract docblocks, module docstrings): search for `TODO`, `PENDING`, `Planned`, `In progress`,
+  `Partially implemented`, and template markers. Each hit is deleted, moved to the tracker, or
+  backed by evidence from this change.
+- **Budgets:** count changed artifacts against `AGENTS.md` → Writing standard (`wc -l`).
+- **Size:** about 300 changed lines reviews well; past about 1,000, ask whether it should be split.
 
 ## Findings
 
-Label every finding so the author knows what is required:
+| Label | Meaning |
+| --- | --- |
+| **Critical:** | Blocks merge: security hole, data loss, broken behavior |
+| *(none)* | Required before merge |
+| **Consider:** | The author decides |
+| **Nit:** | Optional |
 
-| Prefix | Meaning | Author action |
-| --- | --- | --- |
-| *(no prefix)* | Required change | Must address before merge |
-| **Critical:** | Blocks merge | Security vulnerability, data loss, broken functionality |
-| **Nit:** | Minor, optional | May ignore — formatting, style preference |
-| **Consider:** | Suggestion | Worth weighing, not required |
-| **FYI** | Informational | No action needed |
+Order by leverage, correctness and security first. A few high-conviction findings beat a long list.
+Each finding names the location, the problem, and the fix. Weigh hardening findings against the
+Lifecycle block in `docs/context.md`: hardening for traffic or data that does not exist yet is a
+**Consider:** with a production-register entry, not a required change.
 
-Order findings by leverage: correctness and security first, then structural regressions and missed
-simplifications, then everything else. A few high-conviction comments beat a long list. Quantify
-where possible. Do not soften real issues, and do not rubber-stamp.
-
-**Presumptive blockers** — surface the simpler design for each; escalate to Required only when the
-change actively makes structure worse: a refactor that relocates complexity; growth past a file's
-healthy size without decomposition; feature logic in a shared module; a near-duplicate of a
-canonical helper; a silent fallback hiding an unclear invariant.
-
-## Dead code
-
-After refactoring, list newly unreachable or unused elements explicitly. Report confirmed dead code
-owned by the current candidate to the parent or author; do not remove it from the clean materialization.
-When deadness, ownership, public API impact, or scope is uncertain, leave the element untouched,
-record or escalate the uncertainty as a finding or review note, and continue the Stage 6 review. Do
-not silently remove elements or refactor unrelated code.
-
-## Verification of the review
-
-- [ ] Context understood: what the change does, why, and against which spec or contract
-- [ ] Tests reviewed before implementation; coverage proportional to risk
-- [ ] All five axes walked for each changed file
-- [ ] Every finding severity-labeled and ordered by leverage
-- [ ] Author's verification story checked: what was run, what was shown
-- [ ] Verdict stated: approve, or request changes with the required items listed
+End with a verdict: **approve**, or **request changes** listing the required items.

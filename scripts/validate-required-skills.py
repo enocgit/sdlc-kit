@@ -14,7 +14,7 @@ NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SOURCE_RE = re.compile(
     r"^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?/[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$"
 )
-STAGE_TOKEN_RE = re.compile(r"^(?:0[ab]|[0-8])$")
+STAGE_TOKEN_RE = re.compile(r"^[0-6]$")
 KINDS = {"local", "vendored"}
 ENTRY_KEYS = {"name", "kind", "sourcePath", "source", "stage", "note"}
 
@@ -96,8 +96,8 @@ def validate_stage(entry: dict[str, Any], name: str, kind: str) -> None:
     if isinstance(stage, bool) or not isinstance(stage, (int, str)):
         fail(f"{name}: stage must be an integer or supported stage string")
     if isinstance(stage, int):
-        if not 0 <= stage <= 8:
-            fail(f"{name}: stage integer must be between 0 and 8")
+        if not 0 <= stage <= 6:
+            fail(f"{name}: stage integer must be between 0 and 6")
         return
 
     value = stage.strip()
@@ -105,7 +105,7 @@ def validate_stage(entry: dict[str, Any], name: str, kind: str) -> None:
         return
     tokens = [token.strip() for token in value.split(",")]
     if not tokens or any(not token or not STAGE_TOKEN_RE.fullmatch(token) for token in tokens):
-        fail(f"{name}: stage must use 0-8, 0a/0b, a comma-separated list, conductor, communication, or manual")
+        fail(f"{name}: stage must use 0-6, a comma-separated list, conductor, communication, or manual")
 
 
 def validate_entry(entry: Any, names: set[str]) -> None:

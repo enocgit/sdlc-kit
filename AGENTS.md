@@ -88,10 +88,10 @@ two in step.
 
 ## Learnings
 
-- Agents read a router and skip referenced files unless the transition re-anchors them: when
-  changing pipeline rules, grep the router's stage table for contradicting cells;
-  `scripts/validate-kit.py` asserts the operative ones.
-- Measure real line counts before writing a size target into a PRD; estimated baselines have been
+- Agents read the router and skip referenced files, and harnesses without skills read only
+  `AGENTS.md`: keep stage procedure in `skills/sdlc/SKILL.md` and the gates in
+  `templates/AGENTS.md`; `scripts/validate-kit.py` asserts the operative ones.
+- Measure real line counts before writing a size target into a plan; estimated baselines have been
   wrong before.
 - A runtime editor formatter can dirty committed files after the commit. Before binding review or
   evidence to a head, check the tree is clean at that head and revert formatting-only churn; it

@@ -1,118 +1,129 @@
 ---
 name: sdlc
 description: >
-  Orchestrates an end-to-end, plan-gated software build pipeline: routes each stage to the right
-  skill while enforcing human approval gates. Covers discovery, PRD, stress-test, architecture,
-  API contracts, decomposition, implementation, QA, review, landing, and retro. The single entry
-  point for the workflow. Use when the user wants to build a feature or product the disciplined
-  way, start or resume structured development, asks "what stage are we at" / "what's next", or
-  says "start the sdlc" / "run the pipeline".
+  Runs the project's gated delivery workflow end to end: foundation, plan, decompose, build,
+  review, land, and retro, with human approval at each gate and the human performing every merge.
+  Use when the user wants to build a feature or fix "the disciplined way", start or resume
+  structured work, asks "what stage are we at" or "what's next", or says "start the sdlc".
 ---
 
-# sdlc — the conductor (router)
+# sdlc
 
-You are running a fixed, plan-gated pipeline. Your job is to (1) determine the current stage,
-(2) read that stage's reference before acting, and (3) **STOP at every gate** for explicit human
-approval. You guide; you do not silently skip ahead.
+You run the workflow defined in the project's `AGENTS.md`. This skill adds the per-stage detail.
+`AGENTS.md` wins any conflict. Read `AGENTS.md`, `docs/context.md`, and `docs/test-strategy.md`
+before acting. Landing, tracker, and amendment mechanics are in `references/rules.md`; read it
+before any landing or tracker write.
 
-## Read order (non-negotiable)
+## Orient
 
-1. Read `AGENTS.md` — the operating manual owns communication, documentation writing standards,
-   Definition of Ready/Done, sensitive areas, and guardrails. This router and the stage references
-   own pipeline mechanics; where they overlap, `AGENTS.md` wins.
-2. Also read `docs/context.md` and `docs/test-strategy.md`.
-3. **Before producing any stage output, read `references/stage-{N}.md`** for the stage you are
-   entering. Never act from this router alone — the stage references own the procedure.
-4. Cross-stage mechanics (tracker semantics, default-branch landings, verification, review
-   topology, security-review coverage) live in `references/rules.md`. Read it whenever a stage
-   reference points there.
-5. Resolve skills: use the project's local bundled skill when present and invocable; if absent or
-   not invocable, consult user-global directories (`~/.agents/skills`, `~/.claude/skills`); then
-   a runtime equivalent. If none is available, say so and apply the stage's documented procedure
-   by hand — the stage references own the procedure, not the skill.
+1. Infer the stage from the artifacts: unfilled templates mean Stage 0; an approved change proposal
+   with no tasks means Stage 2; open tasks mean Stage 3; and so on. Read the tracker that
+   `docs/context.md` → Lifecycle names, or the proposal's task checklist when it names none.
+2. Pick the path: feature (Stages 1–6), bug fix or chore (Stages 3–6). A contract change, a
+   trust-boundary change, or a new decision moves small work to Stage 1. When unsure, ask.
+3. If the repository contradicts `docs/context.md` → Lifecycle (a production deploy workflow while it
+   says no traffic, a migration on real data while it says none), flag it and ask for the update.
+4. State the path, stage, and next action, then act.
 
-## Two altitudes
+Use bundled skills when the harness can invoke them; otherwise apply the procedure below by hand.
 
-- **Project-level (foundation)** — set once at Stage 0: product PRD (`docs/prd/0000-product.md`),
-  cross-cutting ADRs, architecture skeleton, foundational threat model, core contract.
-- **Feature-level** — per feature (Stages 1–8): brief, PRD, ADR(s), contract slice.
-  Don't design every feature up front; lock only what a first feature can't start without.
+## Stage 0 — Foundation
 
-## Status header (every response)
+Stage 0 is incomplete while any `STATUS: TEMPLATE` marker or `{placeholder}` remains in
+`AGENTS.md` or `docs/`, outside files named `TEMPLATE.md`.
 
-Open every pipeline response with one line:
+- **New project:** fill `docs/context.md` (product, Lifecycle including team shape, outside
+  consumers, hard constraints), set the stack and check command in `AGENTS.md`, list the product
+  areas in `docs/specs/README.md`, write only the ADRs a first feature cannot start without, and
+  sketch `docs/architecture.md`, `docs/security.md`, and `docs/test-strategy.md`.
+- **Existing codebase:** reconstruct the same set read-only from the code. Write specs for the
+  areas that exist, backfill ADRs only for hard-to-reverse choices already made, and fold any
+  existing PRDs into specs. `improve-codebase-architecture` can supply the reading heuristics.
+- **Prove the checks.** Plant one type error, one failing test, and one lint violation; confirm
+  `{check command}` and CI each fail on them; revert. A check that cannot fail is not a check.
 
-`SDLC ▸ Stage {N}/8 {Name} · {next gate or action}`
+**Gate: approve foundation.** Then land it per `references/rules.md` → Landing.
 
-Examples: `SDLC ▸ Stage 0b/8 Foundation · next gate: approve foundation` ·
-`SDLC ▸ Stage 4/8 Implement · task #5 · next: plan disclosure` ·
-`SDLC ▸ Stage 6/8 Review · running security-review (sensitive area)`.
-On-ramp sub-stages keep their letter (`0a`/`0b`/`0adopt`).
+## Stage 1 — Plan
 
-## Right-size the path
+1. Interview with `grilling` until no open question remains: one round at a time, each question
+   with your recommended answer. No code.
+2. Write `docs/changes/NNNN-{slug}.md` from its template: why, the spec delta (requirements added,
+   changed, or removed, with IDs), acceptance criteria, approach, contract impact, and risks. Stay
+   within its budget.
+3. Write an ADR only for a choice that is hard to reverse or constrains later work.
+4. Freeze a contract only when `docs/context.md` lists an outside consumer that cannot change in
+   the same PR. Interfaces used only inside this repo stay unfrozen and covered by tests.
+5. When the plan changes a trust boundary, put the threat delta in the proposal and run
+   `security-review` on the proposal before the gate.
 
-- **Feature / user-facing / risky** → establish Stage 0 once if needed, then Stages 1→8.
-- **Bug fix / small enhancement** → Stages 4→5→6→7→8; reference an issue when one exists — never
-  create one just for the reference; no PRD/contract/ADR.
-- **Chore / docs / dep bump** → Stages 4→6→7→8; trivial diff, CI green before merge.
-- Touching a **contract**, a **sensitive area**, or making a **decision** graduates a small change
-  to the full path. When unsure, ask.
-- Orient before routing: read the tracker (via `gh` / `project-status`) and the active PRD to infer
-  the current stage and feature (local-only: `docs/progress.md`). State the chosen path, current
-  stage, and next action before proceeding.
+**Gate: approve plan.** Landing follows team shape (`references/rules.md` → Landing).
 
-## The stages
+## Stage 2 — Decompose
 
-| Stage | Use skill | Output | After producing output |
-| ----- | --------- | ------ | ---------------------- |
-| 0a Context (new) | installer templates (fill) | `AGENTS.md`, filled `docs/context.md` | **GATE — context filled** |
-| 0b Foundation (new) | `documentation-and-adrs` | product PRD, foundational ADRs, architecture skeleton, core contract scaffold, threat model, configured `docs/test-strategy.md` | **GATE — approve foundation** |
-| 0 adopt (existing) | `improve-codebase-architecture` + read-only analysis | reconstructed foundation (see `references/stage-0.md`) | **GATE — approve** |
-| 1 Spec | `brainstorming` → `to-spec` → `grilling` | optional brief, then hardened PRD `docs/prd/NNNN-{slug}.md` | proceed when the feature freezes no contract; otherwise **GATE — approve PRD** |
-| 2 Architecture + Contract | `documentation-and-adrs` + `grilling` | ADR(s), `docs/architecture.md`, `docs/security.md`, **frozen** contract (when applicable) | **GATE — approve spec + approach** (+ freeze interface; for a contract-free feature this one approval covers the PRD too) |
-| 3 Decompose | `writing-plans` + `project-status` | tracker issues, `docs/progress.md` rows, or an audit plan backlog (`docs/plans/`) | disclose the breakdown with its parallel groups, then continue |
-| 4 Implement | `feature-start`; `frontend-design` (UI only), `ponytail` (backend/domain) | committed tasks on a `feat/*` branch; declared-parallel tasks in isolated worktrees | disclose the compact plan, then continue; **GATE only for a sensitive area or scope deviation** |
-| 5 QA | proportional local verification + runtime checks | change-scope evidence; CI green now or after PR creation | proceed (disclose results) |
-| 6 Review | `code-review`, `code-simplification`, `definition-of-done-review` | clean diff, local DoD evidence, findings fixed | **fresh context** (a reviewer that did not implement — read `stage-6.md`); **`security-review` mandatory if a sensitive area is touched** |
-| 7 Land | `project-status` | PR (or direct-merge path), tracker transition | **GATE — the human merges** |
-| 8 Retro | reflect + write (native) | 0–3 durable learnings after every merge; final-child epic closure | offer to land repository edits |
+Split the change into vertical slices, each one PR a reviewer can read in one sitting: one behavior
+end to end with its tests, usually under ~300 changed lines. Each task states its acceptance criteria
+(citing requirement IDs), the test layer for each behavior, its dependencies, and the files it
+likely touches. Write tasks to the tracker (`references/rules.md` → Tracker); a one-task change needs
+no epic.
 
-**At every stage transition** — announce the new stage with its status header and read that
-stage's reference (`references/stage-{N}.md`) before acting on it. The reference restates the
-rules the stage acts on; the skill alone is not the procedure. Agents reliably read the router
-and the skills but skip referenced files unless the transition re-anchors them — so the
-transition itself carries the instruction.
+Declare parallel groups only for tasks with disjoint files and satisfied dependencies; everything
+else runs serially. Disclose the breakdown and continue.
 
-## Gate discipline
+## Stage 3 — Build
 
-- **GATE rows are hard stops.** Do not run the next stage's skill until the user approves. Skills
-  are guidance injected into context — only YOU enforce these stops; be explicit every time.
-- **Decompose, QA, Review are proceed-with-disclosure:** do the work, state what you did and any
-  decision a human might override, and continue. The human can always interrupt.
-- At every **GATE**: three lines maximum — state, the ask, and the artifact path — then the stage
-  handoff in one line ("Approve to proceed, or tell me what to change?"). The artifact is the
-  record; never restate its contents in chat. Stage-specific landing asks are specified in the
-  stage references; landing mechanics live in `references/rules.md`.
-- Keep gate prompts concise: artifact, decision, next action. Never append a second explanation of
-  routine permissions or standing guardrails — follow them silently and report deviations.
-- **Task commits, `feat/*` pushes, and PR openings are not asks.** The merge is the stop. A default-
-  branch write, an outward tracker write, or the first push to a new remote keeps its ask.
-- Before presenting gate artifacts, tracker issues, or PR text, review each point against the
-  one-point writing rule in `AGENTS.md`.
+1. Start from a clean, up-to-date default branch and create `feat/{id}-{slug}`. Never force a
+   checkout or overwrite uncommitted work; stop and ask instead. Run declared parallel tasks in
+   separate worktrees when the harness supports them.
+2. Load the proposal, the specs it touches, the relevant ADRs, and any frozen contract.
+3. Disclose a short plan. Stop for approval only when the task is sensitive (`AGENTS.md` →
+   Sensitive changes) or deviates from the approved decomposition.
+4. Test first. For each behavior, write the test at the assigned layer, citing its requirement ID,
+   watch it fail for the right reason, then implement. Bug fixes use `diagnosing-bugs`: reproduce
+   first, fix at the root cause.
+5. UI work: use `frontend-design`, and exercise the change in a real browser with the harness's
+   browser tool, or `webapp-testing` when the harness has none. Backend work: verify at the API or integration level.
+6. Update the spec, architecture, and contract index for the behavior this task ships, in the same
+   commit. Run the check command for the touched packages; CI is the merge gate.
+7. Commit the task. Bug fixes and chores with no plan still get a test and a reviewer.
 
-## Borrow the technique, not the workflow
+## Stage 4 — Review
 
-Community skills are **techniques**, not the pipeline: they were authored standalone and carry
-opinions about where they write and what they do next that are wrong here. Run a borrowed skill's
-method; override its workflow. Per-skill overrides (what to use, what to skip, where artifacts
-land) are stated in the stage reference that invokes the skill. If a borrowed default fights an
-`AGENTS.md` convention, `AGENTS.md` wins. Any skill that wants to open tracker issues or epics
-defers to Stage 3 — the Spec stage produces a PRD, not issues.
+Review in a context that did not write the change: a fresh subagent, a separate session, or a human.
+This skill authorizes spawning that reviewer. Give it the diff against the target branch, the
+proposal, the touched specs, and any contract: raw artifacts, never your summary of them.
 
-## Referenced files
+- `code-review` on every change.
+- `security-review` when the change is sensitive; it writes the security record.
+- Fix required findings as follow-up commits. Re-review only fixes that change behavior.
+- Weigh hardening findings against the Lifecycle block; defer what absent traffic would need to the
+  production register.
+- If a third round still finds required changes, stop and ask the human whether the design needs
+  another look.
 
-- Operating manual + standards: `AGENTS.md`
-- Stage procedures: `references/stage-0.md` … `stage-8.md`
-- Cross-stage mechanics: `references/rules.md`
-- Templates: `docs/` (context, prd, adr, architecture, contracts, security, briefs, progress,
-  test-strategy)
+Then push the branch and open the PR (no ask needed). Disclose the review outcome.
+
+## Stage 5 — Land
+
+Fill the PR template, including "Where to look". Use `Closes #N` only on GitHub and only for an
+existing issue. Report in one line (PR link, CI running) and stop; do not poll CI. The human merges.
+Without a PR workflow, follow `references/rules.md` → Landing.
+
+`SDLC ▸ Stage 5/6 Land · next gate: merge when CI is green`
+
+## Stage 6 — Retro
+
+After the merge, switch to the synced default branch.
+
+1. **Close the loop.** Confirm the tracker moved (`references/rules.md` → Tracker). When the last
+   task of a change lands, check that specs, architecture, contracts, and `docs/security.md` match
+   what shipped, then mark the proposal Shipped with links to its merges. If the change gives the
+   product its first deployed consumer, real data, or traffic, propose the Lifecycle update.
+2. **Learnings.** Add one only if a future agent would do the wrong thing without it: 0–3 dated
+   bullets in `docs/context.md`, each at most three lines. If the "learning" is a bug in the
+   project, fix the bug instead. Prune fixed or covered bullets; promote a bullet that applies across
+   features into `AGENTS.md`, `docs/test-strategy.md`, or an ADR. Keep at most 30.
+3. Land any edits per `references/rules.md` → Landing. An empty retro lands nothing.
+
+Next feature: return to Stage 1. After a large change, offer an `improve-codebase-architecture`
+pass; its findings enter as a new change proposal.

@@ -1,12 +1,12 @@
 ---
 name: diagnosing-bugs
-description: Root-cause procedure for bug-fix tasks — build a tight, red-capable feedback loop, minimise the repro, test ranked falsifiable hypotheses, then fix at a correct seam. Use at Stage 4 when the task is a bug fix, or when a reported failure has no known cause.
+description: Root-cause procedure for bug-fix tasks — build a tight, red-capable feedback loop, minimise the repro, test ranked falsifiable hypotheses, then fix at a correct seam. Use at the Build stage when the task is a bug fix, or when a reported failure has no known cause.
 ---
 
 # Diagnosing bugs
 
 Maintained adaptation of `diagnosing-bugs` from mattpocock/skills (MIT, bundled as
-LICENSE). Re-scoped for this pipeline: Stage 4 bug tasks, kit communication and
+LICENSE). Re-scoped for this workflow: bug-fix tasks, kit communication and
 verification rules, no bundled scripts. Skip a phase only with a stated reason.
 
 Load context first: `docs/context.md`, the ADRs for the area you will touch, the
@@ -31,8 +31,8 @@ Construct one, in this order:
 1. Failing test at whatever seam reaches the bug: unit, integration, e2e.
 2. HTTP script against a running server, diffing observed against expected.
 3. CLI invocation on a fixture input against a known-good snapshot.
-4. Headless browser script asserting on DOM, console, or network (the Stage 5
-   webapp-testing scope).
+4. Headless browser script asserting on DOM, console, or network (use the
+   harness's browser tool).
 5. Replay of a captured trace through the code path in isolation.
 6. Throwaway harness exercising the bug path with one call.
 7. Property or fuzz loop for "sometimes wrong output" bugs.

@@ -1,81 +1,54 @@
 # Project context
 
-> Follow the documentation writing standard in AGENTS.md. This file is loaded every session, so keep
-> only durable domain facts and agent-critical gotchas. Link detail elsewhere.
->
-> STATUS: TEMPLATE — replace this marker and every `{placeholder}` while completing the project context.
-> Keep only durable facts that future contributors and agents need. This file loads every session, so
-> prune stale entries rather than append.
+> STATUS: TEMPLATE — replace this marker and every `{placeholder}` at Stage 0.
+> Loaded every session: keep durable facts only, ~120 lines at most. Link detail elsewhere.
 
 ## Product
 
-<!-- What we're building, for whom, what success looks like. 1–2 paragraphs. -->
+<!-- What we're building, for whom, what success looks like. One paragraph. -->
 
 ## Lifecycle
 
-> STATUS: TEMPLATE — set the real values at Stage 0 and keep them current. Rules across the kit
-> route on this block; a stale value silently misroutes them.
+<!-- Rules route on these values; a stale value misroutes them. -->
 
-- **Stage:** {prototype | pre-production | internal | live}
-- **Deployed consumers:** {none | internal only | external, and who}
-- **Real data:** {none | seed only | real rows in {tables}, read or written by {process}}
-- **Production traffic:** {none | staging only | live}
+- **Team shape:** {solo | team}
+- **Tracker:** {GitHub Issues | Linear | Jira | none: tasks live in each change proposal}
+- **Deployed consumers:** {none | internal | external: who}
+- **Real data:** {none | seed only | real rows in {tables}}
+- **Production traffic:** {none | staging | live}
 
 ## Production register
 
-> Work we will owe, each with the trigger that forces it. Out of scope is a choice; this is debt
-> with an owner and a tripwire. The promotion event that trips a trigger is a gate, so land the item
-> before it. The conductor's `Before Land, re-evaluate lifecycle triggers` rule owns the downgrade,
-> retirement, and trigger requirements; this table is the register it reads.
+<!-- Work we will owe and the event that forces it. Land an item before its trigger fires. -->
 
-| Deferred | Trigger that forces it | Owner |
+| Deferred | Trigger | Owner |
 | --- | --- | --- |
-| {e.g. API versioning and deprecation} | First deployed consumer | {owner} |
-| {e.g. expand/contract migration} | First real row or first deployed process reading from or writing to the table | {owner} |
-| {e.g. load/performance tests} | First staging or production traffic | {owner} |
-| {e.g. deployed-compatibility tests} | First deployed consumer | {owner} |
-| {e.g. multi-version tests} | First overlapping-version rollout | {owner} |
-
-## Personas
-
-- **{persona}**: goals, constraints, what they care about.
-
-## Glossary
-
-<!-- Domain terms an agent would otherwise guess wrong. -->
-
-| Term | Meaning |
-| --- | --- |
-| {term} | {definition} |
+| {e.g. API versioning} | First deployed consumer | {owner} |
+| {e.g. expand/contract migrations} | First real row in the table | {owner} |
+| {e.g. load tests and rate-limit hardening} | First production traffic | {owner} |
 
 ## Outside consumers
 
-<!-- What outside this repo imports, calls, or builds on your code: other
-repositories, published packages, client apps or services, other teams. Stage
-2's contract-freeze decision reads this recorded fact instead of guessing. -->
+<!-- What outside this repo imports, calls, or builds on this code. Contract freezes read this. -->
 
-- {consumer, and what it consumes}
+- {consumer and what it consumes, or "none"}
+
+## Glossary
+
+| Term | Meaning |
+| --- | --- |
+| {term} | {definition an agent would otherwise guess wrong} |
 
 ## Hard constraints
 
-<!-- Non-negotiables: regulatory, regional, technical, business. -->
-
 - {constraint and why it exists}
-
-## Out of scope (for now)
-
-- {thing we are deliberately not doing}
 
 ## Learnings
 
-<!-- Durable gotchas ONLY: things a future contributor or agent would get wrong without this line.
-     Keep a flat list of dated bullets, each <=3 lines; no per-feature headings.
+<!-- Only traps a future agent would get wrong without this line. One dated bullet each, at most
+     three lines, at most 30 bullets. A bug in the project is fixed, not recorded here. Prune fixed
+     or covered bullets; promote rules that apply across features into AGENTS.md,
+     docs/test-strategy.md, or an ADR. Not here: what shipped, why we chose X, system shape, what's
+     next. -->
 
-     Does NOT go here: what shipped (git/PR has it), why we chose X (ADR), system shape
-     (architecture.md), what's next (the tracker), test approach (test-strategy.md), or process.
-
-     Prune when you append: delete fixed gotchas, fold covered ones into their ADR/doc, rewrite
-     superseded bullets in place, and promote a bullet that keeps applying across features into
-     AGENTS.md, test-strategy.md, or an ADR. Keep under ~30 bullets; at the cap, remove one to add one. -->
-
-- **YYYY-MM-DD**: {the trap, and the rule that avoids it}
+- **YYYY-MM-DD:** {the trap, and the rule that avoids it}

@@ -1,149 +1,145 @@
-# AGENTS.md — Operating manual for AI agents on this project
->
-> Canonical agent instructions. `CLAUDE.md` and other per-tool files point here.
-> **Keep it lean**: target ≤150 lines. Single-source: point to the doc or skill, don't restate it.
+# AGENTS.md — operating manual for coding agents on this project
+
+> Canonical agent instructions; other per-tool files import or point here. Keep it under 150 lines.
+> This file alone is enough to run the workflow. The `sdlc` skill, when installed, adds per-stage
+> detail; a harness without skills follows this file.
 
 ## What this project is
 
 <!-- One paragraph: product, users, current phase. -->
-See [`docs/context.md`](./docs/context.md) for domain, glossary, personas, and hard constraints.
+Domain, glossary, lifecycle, and hard constraints: [`docs/context.md`](./docs/context.md).
 
-## Two altitudes: foundation vs feature
+## No-compromise rules
 
-- **Foundation (project-level)** — the few cross-cutting decisions set once at **Stage 0**: product PRD, foundational ADRs, architecture and security skeleton, core contract. Keep it minimal.
-- **Feature-level** (Stages 1–8) — brief, PRD, ADRs, and contract slice, designed as you build.
+These hold in every task. Everything else in this file is a default the team may change here.
 
-## How we work: the plan-gated pipeline
+1. A human performs every merge.
+2. Review runs in a context that did not write the change: a fresh subagent, a separate session, or
+   a human. Where neither exists, say so in the PR.
+3. A change to a trust boundary gets a security review before merge (see [Sensitive changes](#sensitive-changes)).
+4. Implementation never drifts from a frozen contract.
+5. Behavior ships with tests, and each check is proven able to fail.
+6. The spec states what actually shipped.
+7. No secrets in the repository, logs, or artifacts.
 
-The conductor (`sdlc`) routes each stage and owns the stage table, skills, and per-stage outputs. Stop
-at every gate (✅) for explicit human approval; at non-gate stages do the work, disclose decisions
-worth overriding, then continue.
+## The workflow
 
-- **Stages:** 0 Context + Foundation · 1 Spec · 2 Architecture + Contract · 3 Decompose · 4 Implement · 5 QA · 6 Review · 7 Land · 8 Retro
-- **Gates (✅):** context filled, foundation, spec + approach (one approval; a contract freeze takes its own gate), human merge. Decompose, QA, Review, and the per-task plan are proceed-with-disclosure; a task plan gates only on a sensitive area or a decomposition deviation.
-- **Fast paths:** bug fix → 4→5→6→7→8; chore → 4→6→7→8. Stage 0 runs once, then features run 1→8. A contract change, a sensitive area, or a new decision takes the full feature path.
+Open every workflow response with `SDLC ▸ Stage {N}/6 {Name} · {next gate or action}`.
 
-Open every pipeline response with `SDLC ▸ Stage {N}/8 {Name} · {next gate or action}`.
+| Stage | Output | Stop |
+| --- | --- | --- |
+| 0 Foundation | `docs/context.md`, spec skeleton, foundational ADRs, a working `check` command | **Gate**: approve foundation |
+| 1 Plan | Change proposal in `docs/changes/`; ADRs for hard-to-reverse choices; frozen contract when an outside consumer exists | **Gate**: approve plan |
+| 2 Decompose | Tracker tasks, each with acceptance criteria and the test layer per behavior | Disclose, continue |
+| 3 Build | One committed task with its verification evidence | Disclose, continue; **gate** on a trust-boundary change or a deviation from the plan |
+| 4 Review | Fresh-context `code-review`; `security-review` on trust-boundary changes; findings fixed | Disclose, continue |
+| 5 Land | Pushed branch and PR with a "Where to look" section | **Gate**: the human merges |
+| 6 Retro | Specs and architecture match what shipped; 0–3 learnings | Disclose |
+
+- **Right-size the path.** New feature: Stages 1–6. Bug fix or chore: Stages 3–6. A contract
+  change, a trust-boundary change, or a new decision sends small work back to Stage 1.
+- **Gates are hard stops.** At a gate write three lines at most: the state, the ask, the artifact
+  path. The artifact is the record; do not restate it.
+- **Disclose-and-continue stages** report what was done and any decision a human might override,
+  then move on.
+- **No ask needed** for task commits, pushing `feat/*`, or opening a PR. The merge is the stop.
+  Writing the default branch, an external tracker, or a new remote needs an ask.
+- QA, tests, and review are part of the workflow, not extras the human has to request.
 
 ## Where things live
 
-- **Product PRD** (project-level vision/scope, set at Stage 0) → `docs/prd/0000-product.md`
-- **Feature PRDs** → `docs/prd/NNNN-{slug}.md` (numbered from 0001, status-tracked)
-- **Briefs** (optional pre-PRD note for a fuzzy idea) → `docs/briefs/NNNN-{slug}.md`
-- **ADRs** (decision history; edit Proposed or Accepted ADRs only while unimplemented and dependency-free; supersede implemented or depended-on decisions) → `docs/adr/NNNN-{slug}.md`
-- **Architecture** (current system shape, living) → `docs/architecture.md`
-- **Contracts** (the integration source of truth) → in the codebase (`api/openapi.yaml`, tRPC routers, `schema.prisma`, Zod schemas). See `docs/contracts/README.md`.
-- **Task status** → your tracker, reported live by `project-status`. _Local-only:_ `docs/progress.md` **is** the tracker
-- **Test strategy, verification policy, and Definition of Ready/Done** → `docs/test-strategy.md` and this file
+| What | Where | Rule |
+| --- | --- | --- |
+| Current behavior | `docs/specs/{area}.md` | Present tense; requirement IDs (`AUTH-3`) that tests cite |
+| Proposed change | `docs/changes/NNNN-{slug}.md` | Merged into specs when it ships, then marked Shipped |
+| Decisions | `docs/adr/NNNN-{slug}.md` | Hard-to-reverse choices only |
+| System shape | `docs/architecture.md` | Current state only; plans stay in the change proposal |
+| Contracts | in code (OpenAPI, schemas, typed routers); index in `docs/contracts/README.md` | Frozen only for outside consumers |
+| Trust boundaries | `docs/security.md`; records in `docs/security/records/` | Short threat model plus record index |
+| Test policy | `docs/test-strategy.md` | Layers and execution rules |
+| Task state | the tracker, or the proposal's task list when there is none | Never in doc prose |
 
-## Documentation writing standard
+## Writing standard
 
-Write docs, issues, and PRs for contributor decisions and verification, not narrative: lead with
-status, scope, outcome, rationale, constraints, and open questions, and link authoritative details
-rather than duplicating facts.
+Write for a reader who skims. Lead with the decision or outcome, state each fact once, link instead
+of repeating, and delete unused template sections. Apply `unslop` to prose; not to code, commands,
+logs, quotes, or fixed formats.
 
-**One point per line.** Each bullet, numbered item, checkbox, or table cell expresses one clear rule,
-decision, or outcome; each checkbox has one independently verifiable outcome, stated by a label that
-checks once without rewording — an unmet outcome stays unchecked, not annotated. Prefer one sentence
-per point, a second only to explain or qualify it; split additional obligations into separate points,
-not semicolons or inline lists. Preserve requirement IDs when splitting their supporting rules.
+| Artifact | Budget |
+| --- | --- |
+| Change proposal | ~80 lines |
+| ADR | ~60 lines (one screen) |
+| Security record | ~40 lines |
+| Issue or task | ~15 lines |
+| `docs/context.md` | ~120 lines; at most 30 learnings |
 
-Write current-state docs in the present tense: do not use "used to" or "no longer" for completed
-history. When a Lifecycle trigger requires a migration or deprecation, document the active transition,
-its owner, and its trigger; history belongs in `docs/adr/` and git.
+Over budget means split it or cut it. Count with `wc -l` before presenting.
 
-Preserve exact limits, exceptions, risks, security boundaries, failure behavior, compatibility,
-verification limits, and fixed formats. Remove unused scaffold and filler, and name owners or triggers
-for deferred sections. Keep process instructions here and prompts in templates. Use underscores for
-emphasis and asterisks for bold; apply `unslop` with its canonical scope and exclusions.
+- **Specs and architecture:** present tense, current behavior only; history lives in ADRs and git.
+- **Code comments:** explain non-obvious intent, constraints, and failure behavior. Cite
+  requirements with their spec (`spec auth AUTH-3`). A comment claim is not proof.
+- **Product copy:** written from the user's position, not the system's rules.
 
-**Briefs and PRDs:** state each requirement once, with only the detail needed for approval and
-verification. Briefs explain the problem; PRDs describe observable behavior and testable rules.
-Define terms on first use, link implementation decisions to ADRs and contracts, and keep existing
-document structure and PRD/ADR introductions intact.
+## Communication
 
-**Code comments:** explain non-obvious intent, constraints, state transitions, and failure behavior
-beside the relevant code; keep them precise and durable, avoid syntax narration and quotas, and link
-the reason and the condition that retires a workaround. Cite requirements with their document
-(`PRD 0001 FR9`, never a bare `FR9`) and keep process provenance out of code per the
-project-facing-artifacts convention. Change summaries and verification results go in the PR;
-a comment claim is not proof.
-
-**Product copy:** written from the user's current position, not the system's rules. State a rule
-only where the user confronts it in that moment — a blocked state, not a success path.
-
-## Communication standard
-
-Keep user-facing replies compact: lead with the outcome, state each fact once, and omit filler.
-Report factual actions, progress, blockers, results, deviations, decisions, and verification evidence.
-Never narrate your own constraints, permissions, or the rule behind an action ("I am not polling",
-"merging is your call", "per the gate protocol"); turn each into an ask or an outcome, or delete it. A gate or stop message is three lines maximum — state, the ask, artifact link — and never
-restates what the PR body, tracker, or another artifact already states; the artifact is the record.
-Keep the status header and safety warnings. Use complete sentences for gates, security warnings,
-irreversible actions, and complex trade-offs; expand when asked.
-
-## Definition of Ready (before a task enters Implement)
-
-- [ ] Acceptance criteria are written and testable
-- [ ] Applicable contract frozen; fast-path N/A recorded when no integration contract applies
-- [ ] Frozen contract matches its accepted ADR and the `docs/architecture.md` update
-- [ ] No open questions remain (resolved during the Stage 1 stress-test)
-- [ ] Task is small enough to ship in ~a day, else split it
+Lead with the outcome, state each fact once, omit filler. Report actions, results, blockers, and
+evidence. Do not narrate your own permissions or rules ("merging is your call"); turn them into an
+ask or an outcome. Agree or disagree only with evidence: name the file, check, or observation that
+decides it. Agreeing because the human proposed it is not evidence, and neither is disagreeing to
+appear independent.
 
 ## Definition of Done (every task)
 
-- [ ] Meets the acceptance criteria in its PRD/issue
-- [ ] Honors frozen contracts; fast-path N/A recorded when no integration contract applies
-- [ ] DB schema changes follow expand/contract (migrate → deploy → clean up) **once the table holds real data or any deployed process reads or writes it**; before that, change it outright
-- [ ] Verification evidence matches the risk (see `docs/test-strategy.md`). Name the smallest local check that proves the change: links or rendering for documentation changes that affect links or rendering; a diff or one visual check for presentation-only styling, markup, attributes, or copy; focused behavior evidence for styling, markup, or attributes that change accessibility, security, or interaction behavior; syntax, schema, or generation for config or generated output; focused automated tests and runtime observation for non-trivial runtime behavior. Broaden to all impacted packages/modules for shared paths, contracts, or sensitive areas; reserve the full suite for broad or high-risk fan-out or an explicit project rule.
-- [ ] **Configured CI is green before merge** (lint, typecheck, test, build, and other required checks). This is a remote merge gate, not a reason to duplicate the suite locally. If CI runs after PR creation, finish local QA and review first. N/A only where no CI workflow exists.
-- [ ] `code-review` + `code-simplification` clean in fresh context (the conductor's review stage owns the depth); a [sensitive area](#sensitive-areas) also needs `security-review` with complete scoped coverage recorded in `docs/security.md`
-- [ ] Diff hygiene: small and focused, references the issue when one exists, no stray or debug code
-- [ ] Current-behavior claims stay accurate per task; tick a PRD acceptance criterion once its proving evidence exists; after the final child, reconcile all feature artifacts with implementation evidence
-- [ ] Tracker linked and current; closure itself is a post-merge step
+- [ ] Acceptance criteria met, each proven by a named test or observation
+- [ ] Tests at the layer `docs/test-strategy.md` assigns; new checks seen failing before passing
+- [ ] Contract honored; schema changes use expand/contract once the table holds real data or a deployed process uses it
+- [ ] Fresh-context review clean; trust-boundary changes also have a security record
+- [ ] Specs, architecture, and contract index match the change; no stale status or planned-behavior claims
+- [ ] Diff small and focused, no debug leftovers, references its issue when one exists
+- [ ] Configured CI green before merge (CI is the merge gate; do not duplicate the full suite locally)
+
+## Sensitive changes
+
+A change is sensitive when it **changes a trust boundary**: authentication, authorization,
+payments, personal data handling, file uploads, admin or privileged surfaces, secrets, or a new
+external integration. Working inside a sensitive feature without changing its boundary is not
+sensitive. Sensitive work gets a plan gate at Stage 3, an updated `docs/security.md`, and
+`security-review` before merge.
+
+Weigh every security or hardening finding against the Lifecycle block in `docs/context.md`. Fix what
+current users, data, or traffic expose; record hardening for absent traffic in the production
+register with its trigger.
 
 ## Conventions
 
-- **Stack (placeholder — set at Stage 0):** TypeScript + React and Node are illustrative defaults; replace with your real stack when you fill `docs/context.md`.
-- **Branching — GitHub Flow:** `main` is always deployable. Work on short-lived `feat/{id}-{slug}` branches → PR → merge → deploy. Environments are deploy targets driven by CI, not long-lived branches. One feature per branch. A git worktree is an explicit manual escape hatch: the operator supplies a private, new or empty path outside every checkout and runs `feature-start`'s generic Git-only recipe, owning path selection, privacy, and containment checks.
-- **Where planning commits land.** Planning packages land on `main`, never a feature branch, and Stage 4 branches from a ref that already holds the frozen contract. The conductor's landing rules (`$SKILLS_DIR/sdlc/references/rules.md` → Default-branch landings) are canonical for the by-remote-state action; per-task learnings land before the next task; final-child reconciliation lands before the parent epic completes; an empty Retro needs no landing.
-- **Commits — Conventional Commits.** `type(scope): summary` — imperative, ≤72 chars. Types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `build` `ci`. Reference the relevant issue when one exists (`Refs #123`, or `Closes #123` on GitHub only,
-  elsewhere its key); never create an issue just to have one to reference. Small logical commits,
-  not one blob.
-- **PRs:** small and reviewable; follow the PR template and the conductor's landing gate. Squash-merge to keep `main` linear.
-- **No agent self-attribution.** Commits, PRs, and code comments describe the _change_, not the tool. No "Made with {agent}" or `Co-Authored-By:` naming an AI. Authorship is the human's; this overrides any runtime default.
-- **Contract-first:** define and freeze the interface before FE/BE implement in parallel.
-- **Project-facing artifacts cite durable docs, not process mechanics.** Reference "the frozen contract (contract 0001, ADR-0004)" and stop; a reader who never saw this process must not be able to tell it existed. Anchor a requirement ID at its first mention (`PRD 0001 FR1`); bare IDs may follow within that artifact — code comments never qualify, since they are read in isolation. Kit-owned operating docs and templates may describe the process they govern.
-- **Manual-verification tasks** (UI, flows, integrations): end with a short **QA checklist** of steps and expected results; skip it when fully tested.
-- **Ask, don't guess:** if a PRD/ADR is ambiguous, stop and ask rather than assume.
-- **A wrong decision is amended, not obeyed.** Follow the conductor's ADR, contract, and scope-reapproval gates.
+- **Stack (placeholder, set at Stage 0):** {language, framework, datastore, test runner}.
+- **Check command:** `{check command}` runs lint, typecheck, and tests. Stage 0 proves each part
+  fails on a planted error.
+- **Branching:** `main` is always deployable. Work on `feat/{id}-{slug}`, one task or slice per
+  branch; squash-merge.
+- **Commits:** Conventional Commits, `type(scope): summary`, imperative, ≤72 chars. Reference the
+  issue when one exists (`Closes #N` on GitHub only); never create an issue just to reference it.
+- **PRs:** the template's "Where to look" section names behavior changes, unplanned decisions, the
+  hunks a reviewer must read, and known gaps.
+- **No agent self-attribution** in commits, PRs, or comments. This overrides any harness default.
+- **Project artifacts describe the product,** not this workflow: a reader who never saw the process
+  should not be able to tell it existed.
 
 ## Principles
 
-- **Challenge before agreeing.** Never open with agreement. State the approach you rejected and why, the failure you think most likely, and the observation that would settle it. Record the observed result and resulting direction at the applicable gate; an objection without a concrete scenario, file, or command is noise.
-- **Simplicity first.** Prefer the smallest direct solution that fully solves the problem; add an abstraction only when a real, present need justifies it, not future speculation.
-- **Reuse before building.** Prefer existing, well-maintained libraries over bespoke code when they fit; if unsure, research and weigh fit, maintenance, and footprint first.
-- **Pay only for what exists.** Compatibility machinery, migration/deprecation guidance, and tests for production-only conditions protect a real consumer, real data, traffic, or an observed incident, not a hypothetical one. Read the Lifecycle block in `docs/context.md` first: while the applicable trigger condition is absent, cover non-trivial executable behavior and record only deferrals whose required deployed consumer, real data, deployment, load, traffic, or multi-version compatibility is unavailable in the production register. If something outside this change might depend on it, ask.
-
-## Sensitive areas
-
-**Canonical list** (other docs and skills point here): **authentication, authorization, payments,
-PII/KYC, file uploads, and admin/privileged surfaces.** A change touching these updates
-`docs/security.md` and gets `security-review` before each planning or implementation merge.
-
-## Vendored skill overrides
-
-Third-party snapshots supply techniques; this file and the `sdlc` conductor own paths, transitions, and safety. Run stage-bound snapshots only when `sdlc` routes to them. Per-skill overrides (what to use, what to skip, where artifacts land) live in the conductor's stage references (`$SKILLS_DIR/sdlc/references/`), which are canonical — this section records only what a reader must know without them: run borrowed skills' methods, never their workflow opinions; `AGENTS.md` conventions win over any borrowed default; no snapshot writes under `docs/superpowers/`.
+- **Product value first.** Build what a real user, consumer, or decision needs now. Compatibility
+  machinery, migrations, and hardening protect something that exists, or they wait in the
+  production register.
+- **Simplicity.** Reuse what the codebase, standard library, or installed dependencies already
+  provide. The smallest change that fully solves the problem wins.
+- **Ask, don't guess.** An ambiguous spec, ADR, or contract is a question for the human.
+- **A wrong decision is amended, not obeyed.** Update the spec, ADR, or contract in the same change
+  and get human approval for a requirement change.
 
 ## Guardrails
 
-> These rules depend on agent adherence, CI, and review gates; this file alone enforces nothing.
-
-- Commit per task and push `feat/*` without asking; the merge is the gate, and the human performs
-  every landing merge; ff-only default-branch sync and review-only integration commits are not
-  landing merges. Never write the default branch outside the conductor's landing asks.
-- At Land, don't poll CI: open the PR and report CI running, or push the branch to start CI, then stop. Don't `gh run watch`. Required CI must be green before merging.
-- Don't improvise git transports or remote URLs. If a GitHub HTTPS push fails on auth, surface it and point to `gh auth login` then `gh auth setup-git`. Change a remote URL only after the human approves the reviewed URL, using `git remote set-url origin {url}`; never silently switch transports.
-- Do not change a shipped contract with a deployed consumer without a versioning/deprecation decision (a new ADR); if there is no deployed consumer, apply the ADR matrix and re-freeze the contract.
-- Do not write a breaking DB migration against a table holding real data or read/written by any deployed process; use expand/contract so `main` stays deployable through the rollout.
-- A change touching a [sensitive area](#sensitive-areas) gets a threat model + `security-review`.
+- Do not improvise git remotes or transports. On a GitHub HTTPS auth failure, point to
+  `gh auth login` then `gh auth setup-git`.
+- Do not poll CI. Push, report that CI is running, and stop.
+- A required CI or PR workflow that is unreachable is a blocker, not a reason to route around it.
+- Do not change a shipped contract that has a deployed consumer without a versioning ADR.

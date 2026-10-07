@@ -20,9 +20,9 @@ is net-negative. So is answering comments that asked for nothing. The job of thi
 (with rationale), and deferring what's out of scope.
 
 This is standalone and **manually invoked** — it isn't bound to a pipeline stage. But it inherits
-the kit's conventions: the frozen contract is authoritative, sensitive areas (canonical list in
-the project's `AGENTS.md` → Sensitive areas) get extra care, and comments cite the durable doc
-(ADR/PRD/contract) rather than the pipeline. Invoking this skill **is** the approval: fixing,
+the kit's conventions: the frozen contract is authoritative, sensitive changes (`AGENTS.md` →
+Sensitive changes) get extra care, and comments cite the durable doc
+(spec, ADR, contract) rather than the workflow. Invoking this skill **is** the approval: fixing,
 committing, pushing the PR branch, and posting brief replies proceed without further asks. Only a
 decision reversal, a sensitive-area or contract change, an external issue creation, or a merge
 still gates — merge ownership follows `sdlc`'s landing rules.
@@ -52,7 +52,7 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
    mixes both, carry forward only the actionable part.
 
 3. **Triage each actionable comment — verify and challenge.** Do not take a comment at face value.
-   Check each against the actual code, the frozen contract, and the relevant ADR/PRD. Assign a
+   Check each against the actual code, the frozen contract, and the relevant spec and ADR. Assign a
    verdict and print a triage table **before touching anything**:
 
    | Comment (source · location) | Verdict | Planned action |
@@ -61,7 +61,7 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
 
    - **Valid** — a real defect; the reviewer is right.
    - **Decision** — actionable only by changing a decision: the comment contradicts the frozen
-     contract, an ADR, or the PRD, or asks for a redesign. These are Stage 2-class questions
+     contract, an ADR, or the spec, or asks for a redesign. These are planning questions
      wearing a comment's clothing.
    - **False positive** — wrong, or already handled; the code is correct as written.
    - **Out of scope** — legitimate but not this PR's job.
@@ -72,7 +72,7 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
      commits only — never force-push while review is open: it destroys the reviewer's inline
      comment anchors and the reviewed diff.
    - **Decision** → **STOP and gate.** Draft the reply, but the human decides the question; apply
-     the conductor's amending rules for the ADR, contract, and PRD routes before any code change,
+     the conductor's amending rules for the spec, ADR, and contract before any code change,
      and record any deferral in the `docs/context.md` production register. A reply that reopens a
      decision is a decision ask, not a comment reply.
    - **False positive** → do **not** change code. Post a brief reply explaining why, citing the
@@ -102,10 +102,10 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
   clear, doc-backed rationale is a first-class outcome, not a failure to "address" it.
 - **Invoking the skill is the approval** for fixes, commits, pushes, and replies. Decision
   reversals, sensitive-area or contract changes, external issue creation, and merges still gate.
-- **The contract is frozen.** Contract changes follow the conductor's `Amending a decision
-  mid-implementation` rules; a change to a shipped contract with a deployed consumer needs a
+- **The contract is frozen.** Contract changes follow the conductor's `Amending decisions`
+  rules; a change to a shipped contract with a deployed consumer needs a
   versioning/deprecation ADR, not an inline edit.
 - **No force-push while review is open.** Follow-up commits only; a force-push destroys the
   reviewer's inline-comment anchors and the reviewed diff.
 - **Brief replies, citing docs, not stages.** Replies post unseen, so they stay short and cite the
-  durable doc (ADR/PRD/contract), never the pipeline.
+  durable doc (spec, ADR, contract), never the workflow.
