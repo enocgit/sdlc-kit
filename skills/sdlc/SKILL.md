@@ -65,8 +65,8 @@ grep -rsniE 'stage [0-6]|solo developer' docs src test .github --exclude=TEMPLAT
 1. Interview with `grilling` until no open question remains: one round at a time, each question
    with your recommended answer. No code.
 2. Write `docs/changes/NNNN-{slug}.md` from its template: why, the spec delta (requirements added,
-   changed, or removed, with IDs), acceptance criteria, approach, contract impact, and risks. Stay
-   within its budget.
+   changed, or removed, with IDs), acceptance criteria, approach, contract impact, and risks. Every
+   added or changed requirement has at least one criterion, with its test layer. Stay within budget.
 3. Write an ADR only for a choice that is hard to reverse or constrains later work.
 4. Freeze a contract only when `docs/context.md` lists an outside consumer that cannot change in
    the same PR. Interfaces used only inside this repo stay unfrozen and covered by tests.

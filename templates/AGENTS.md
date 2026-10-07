@@ -6,7 +6,7 @@
 
 ## What this project is
 
-{One paragraph: product, users, current phase.}
+{One paragraph: the product and its users.}
 Domain, glossary, lifecycle, and hard constraints: [`docs/context.md`](./docs/context.md).
 
 ## No-compromise rules
@@ -38,10 +38,9 @@ Open every workflow response with `SDLC ▸ Stage <N>/6 <Name> · <next gate or 
 
 - **Right-size the path.** New feature: Stages 1–6. Bug fix or chore: Stages 3–6. A contract
   change, a trust-boundary change, or a new decision sends small work back to Stage 1.
-- **Gates are hard stops.** A gate message is three plain lines at most: what is done and anything
-  unproven; what you need; which files to read. Then name up to three choices you made that the
-  human would most likely override (product behavior, scope, constraints, deferrals, anything hard
-  to reverse), most important first, or write "Your calls: none". The files are the record.
+- **Gates are hard stops.** A gate message is three plain lines at most: what is done, plus anything
+  unproven and any check you skipped and why; what you need; which files to read. The files are the
+  record; do not restate them.
 - **Disclose-and-continue stages** report what was done and any decision a human might override,
   then move on.
 - **No ask needed** for task commits, pushing `feat/*`, or opening a PR. The merge is the stop.
@@ -104,8 +103,9 @@ appear independent.
 
 A change is sensitive when it **changes a trust boundary**: authentication, authorization,
 payments, personal data handling, file uploads, admin or privileged surfaces, secrets, or a new
-external integration. Working inside a sensitive feature without changing its boundary is not
-sensitive. Sensitive work gets a plan gate at Stage 3, an updated `docs/security.md`, and
+external integration. Those are examples: a change that adds or alters code on any boundary listed
+in `docs/security.md` is sensitive. Working inside a sensitive feature without changing its
+boundary is not sensitive. Sensitive work gets a plan gate at Stage 3, an updated `docs/security.md`, and
 `security-review` before merge.
 
 Weigh every security or hardening finding against the Lifecycle block in `docs/context.md`. Fix what

@@ -19,7 +19,9 @@
 
 ## Acceptance criteria
 
-- [ ] {Observable outcome, citing its requirement ID}
+<!-- At least one per added or changed requirement. -->
+
+- [ ] {ID}: {observable outcome} ({unit | integration | end-to-end})
 
 ## Approach
 
