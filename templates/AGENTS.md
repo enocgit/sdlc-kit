@@ -6,7 +6,7 @@
 
 ## What this project is
 
-<!-- One paragraph: product, users, current phase. -->
+{One paragraph: product, users, current phase.}
 Domain, glossary, lifecycle, and hard constraints: [`docs/context.md`](./docs/context.md).
 
 ## No-compromise rules
@@ -24,7 +24,7 @@ These hold in every task. Everything else in this file is a default the team may
 
 ## The workflow
 
-Open every workflow response with `SDLC ▸ Stage {N}/6 {Name} · {next gate or action}`.
+Open every workflow response with `SDLC ▸ Stage <N>/6 <Name> · <next gate or action>`.
 
 | Stage | Output | Stop |
 | --- | --- | --- |
@@ -39,8 +39,9 @@ Open every workflow response with `SDLC ▸ Stage {N}/6 {Name} · {next gate or 
 - **Right-size the path.** New feature: Stages 1–6. Bug fix or chore: Stages 3–6. A contract
   change, a trust-boundary change, or a new decision sends small work back to Stage 1.
 - **Gates are hard stops.** A gate message is three plain lines at most: what is done and anything
-  unproven; what you need; which files to read. Then list each choice you made that the human did
-  not state, however small, or write "Your calls: none". The files are the record.
+  unproven; what you need; which files to read. Then name up to three choices you made that the
+  human would most likely override (product behavior, scope, constraints, deferrals, anything hard
+  to reverse), most important first, or write "Your calls: none". The files are the record.
 - **Disclose-and-continue stages** report what was done and any decision a human might override,
   then move on.
 - **No ask needed** for task commits, pushing `feat/*`, or opening a PR. The merge is the stop.
@@ -51,9 +52,9 @@ Open every workflow response with `SDLC ▸ Stage {N}/6 {Name} · {next gate or 
 
 | What | Where | Rule |
 | --- | --- | --- |
-| Current behavior | `docs/specs/{area}.md` | Present tense; requirement IDs (`AUTH-3`) that tests cite |
-| Proposed change | `docs/changes/NNNN-{slug}.md` | Merged into specs when it ships, then marked Shipped |
-| Decisions | `docs/adr/NNNN-{slug}.md` | Hard-to-reverse choices only |
+| Current behavior | `docs/specs/<area>.md` | Present tense; requirement IDs (`AUTH-3`) that tests cite |
+| Proposed change | `docs/changes/NNNN-<slug>.md` | Merged into specs when it ships, then marked Shipped |
+| Decisions | `docs/adr/NNNN-<slug>.md` | Hard-to-reverse choices only |
 | System shape | `docs/architecture.md` | Current state only; plans stay in the change proposal |
 | Contracts | in code (OpenAPI, schemas, typed routers); index in `docs/contracts/README.md` | Frozen only for outside consumers |
 | Trust boundaries | `docs/security.md`; records in `docs/security/records/` | Short threat model plus record index |
@@ -116,10 +117,11 @@ register with its trigger.
 - **Stack (placeholder, set at Stage 0):** {language, framework, datastore, test runner}.
 - **Check command:** `{check command}` runs lint, typecheck, and tests. Stage 0 proves each part
   fails on a planted error.
-- **Branching:** `main` is always deployable. Work on `feat/{id}-{slug}`, one task or slice per
+- **Branching:** `main` is always deployable. Work on `feat/<id>-<slug>`, one task or slice per
   branch; squash-merge.
 - **Commits:** Conventional Commits, `type(scope): summary`, imperative, ≤72 chars. Reference the
   issue when one exists (`Closes #N` on GitHub only); never create an issue just to reference it.
+  Describe the change in product terms; no stage or workflow names.
 - **PRs:** the template's "Where to look" section names behavior changes, unplanned decisions, the
   hunks a reviewer must read, and known gaps.
 - **No agent self-attribution** in commits, PRs, or comments. This overrides any harness default.

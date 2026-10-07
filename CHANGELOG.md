@@ -23,6 +23,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - `code-review` absorbs `code-simplification` and `definition-of-done-review`; the conductor holds all stage procedure in one file.
 - `code-review` and `security-review` are rewritten as kit-owned skills and no longer carry upstream notices.
 - The PR template adds a "Where to look" section and a criterion-to-test proof table. The CI template is stack-neutral and fails until the project sets its check command.
+- Nothing lands before its gate's approval. Gate messages name up to three choices the human would most likely override. Stage 0 ends with two exact scans for leftover placeholders and workflow terms.
 - Lifecycle records team shape: solo projects land the proposal with the first task's PR; team projects land it on `main` first.
 - Projects without an external tracker keep tasks in the change proposal instead of `docs/progress.md`.
 

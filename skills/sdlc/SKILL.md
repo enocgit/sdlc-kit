@@ -29,9 +29,13 @@ Use bundled skills when the harness can invoke them; otherwise apply the procedu
 
 ## Stage 0 — Foundation
 
-Stage 0 is incomplete while any `STATUS: TEMPLATE` marker or `{placeholder}` remains in
-`AGENTS.md` or `docs/`, or any workflow term (`Stage N`, gate, "solo developer") appears in `docs/`,
-source, or CI. Files named `TEMPLATE.md` are exempt.
+Stage 0 is complete when both scans print nothing: no template marker or `{placeholder}` left, and
+no workflow term in the product's files.
+
+```bash
+grep -rnE 'STATUS: TEMPLATE|\{[A-Za-z][^}]*\}' AGENTS.md docs --exclude=TEMPLATE.md
+grep -rsniE 'stage [0-6]|solo developer' docs src test .github --exclude=TEMPLATE.md
+```
 
 - **New project:** fill `docs/context.md` (product, Lifecycle, outside consumers, hard
   constraints), set the stack and check command in `AGENTS.md`, set `docs/test-strategy.md`, and
@@ -48,11 +52,13 @@ source, or CI. Files named `TEMPLATE.md` are exempt.
   existing PRDs into specs. `improve-codebase-architecture` can supply the reading heuristics.
 - **Prove the checks.** Plant one type error, run `{check command}`, see it fail at the typecheck,
   and revert; repeat for one failing test and one lint violation. One plant per run: a chained
-  command stops at its first failure. Only the check command's output counts, not editor or harness
+  command stops at its first failure, so a plant must trip only its own part: if an earlier part
+  fails first, change the plant. Only the check command's output counts, not editor or harness
   diagnostics. A check that cannot fail is not a check. CI runs the same command; its first run is
   checked at Retro.
 
-**Gate: approve foundation.** Then land it per `references/rules.md` → Landing.
+**Gate: approve foundation.** Commit nothing before approval; then land it per
+`references/rules.md` → Landing.
 
 ## Stage 1 — Plan
 

@@ -45,10 +45,10 @@
 
 ## Learnings
 
-<!-- Only traps that actually happened and a future agent would hit again. One dated bullet each, at most
-     three lines, at most 30 bullets. A bug in the project is fixed, not recorded here. Prune fixed
-     or covered bullets; promote rules that apply across features into AGENTS.md,
-     docs/test-strategy.md, or an ADR. Not here: what shipped, why we chose X, system shape, what's
-     next. -->
+<!-- Only traps that actually happened and a future agent would hit again. One dated bullet
+     each, at most three lines, at most 30 bullets. A bug in the project is fixed, not recorded
+     here. Prune fixed or covered bullets; promote rules that apply across features into
+     AGENTS.md, docs/test-strategy.md, or an ADR. Not here: what shipped, why we chose X, system
+     shape, what's next. -->
 
 - **YYYY-MM-DD:** {the trap, and the rule that avoids it}

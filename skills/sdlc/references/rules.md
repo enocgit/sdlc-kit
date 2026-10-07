@@ -4,7 +4,8 @@ Mechanics the conductor points to. `AGENTS.md` wins any conflict.
 
 ## Landing
 
-Decide on what the hosting actually supports, not on whether a remote exists.
+Land only after the gate's approval; that approval is the ask. Decide on what the hosting actually
+supports, not on whether a remote exists.
 
 **Planning and retro edits** (Stage 0 foundation, Stage 1 proposal, Stage 6 retro):
 

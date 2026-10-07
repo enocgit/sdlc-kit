@@ -38,8 +38,8 @@ jobs:
         with:
           persist-credentials: false
 
-      # Set up your toolchain here, pinned by SHA, for example actions/setup-node,
-      # actions/setup-python, or actions/setup-go, then install dependencies.
+      # Set up your toolchain here, pinned to the latest release's commit SHA, for example
+      # actions/setup-node, actions/setup-python, or actions/setup-go; then install dependencies.
 
       - name: Check
         # Lint, typecheck, and test: affected packages on pull_request, everything on push.
