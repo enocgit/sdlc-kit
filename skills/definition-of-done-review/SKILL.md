@@ -179,7 +179,9 @@ How to judge the items that need interpretation:
   Current-behavior claims and security controls must reflect the task's evidence,
   with planned and partial behavior identified. Full epic reconciliation may wait for the final
   child; inaccurate claims about enforced behavior may not. Link evidence, not duplicate task lists.
-- **Stale-claim scan (mechanical).** In the changed docs, search for intermediate status tokens
+- **Stale-claim scan (mechanical).** In the changed docs *and in source comments that carry
+  current-behavior claims* (contract JSDoc, module docstrings — "not composed", "has no handler",
+  "planned"), search for intermediate status tokens
   (`PENDING`, `TODO`, `In progress`, `Partially implemented`, `Planned`), template markers, and
   statements of delivery state outside the tracker and ADRs. For each hit: if it is live state, it
   moves to the tracker or is deleted; if it is a decision record, it moves to the ADR; if it is a
