@@ -32,15 +32,21 @@ Use bundled skills when the harness can invoke them; otherwise apply the procedu
 Stage 0 is incomplete while any `STATUS: TEMPLATE` marker or `{placeholder}` remains in
 `AGENTS.md` or `docs/`, outside files named `TEMPLATE.md`.
 
-- **New project:** fill `docs/context.md` (product, Lifecycle including team shape, outside
-  consumers, hard constraints), set the stack and check command in `AGENTS.md`, list the product
-  areas in `docs/specs/README.md`, write only the ADRs a first feature cannot start without, and
-  sketch `docs/architecture.md`, `docs/security.md`, and `docs/test-strategy.md`.
+- **New project:** fill `docs/context.md` (product, Lifecycle, outside consumers, hard
+  constraints), set the stack and check command in `AGENTS.md`, set `docs/test-strategy.md`, and
+  write only the ADRs a first feature cannot start without. Describe only what exists: with no code
+  yet, `docs/architecture.md` records the scaffold, `docs/specs/README.md` lists areas without links
+  until their spec exists, and `docs/security.md` claims only controls in place. Planned shape goes
+  in the first change proposal. Write no product code; the checks need one trivial module and test.
 - **Existing codebase:** reconstruct the same set read-only from the code. Write specs for the
   areas that exist, backfill ADRs only for hard-to-reverse choices already made, and fold any
   existing PRDs into specs. `improve-codebase-architecture` can supply the reading heuristics.
-- **Prove the checks.** Plant one type error, one failing test, and one lint violation; confirm
-  `{check command}` and CI each fail on them; revert. A check that cannot fail is not a check.
+- **Prove the checks.** Plant one type error, run `{check command}`, see it fail at the typecheck,
+  and revert; repeat for one failing test and one lint violation. One plant per run: a chained
+  command stops at its first failure. Only the check command's output counts, not editor or harness
+  diagnostics. Then see CI fail on one plant. With no remote, CI is unproven: say so at the gate and
+  add it to the production register with the trigger "first push". A check that cannot fail is not
+  a check.
 
 **Gate: approve foundation.** Then land it per `references/rules.md` → Landing.
 

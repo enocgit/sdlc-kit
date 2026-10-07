@@ -11,7 +11,8 @@ no traffic), the mobile client as an outside consumer, and two hard constraints.
 auth model, and sketches `docs/architecture.md`, `docs/security.md`, and `docs/test-strategy.md`.
 
 It sets `pnpm check` as the check command and wires it into CI. Then it plants a type error, a
-failing test, and a lint violation; `pnpm check` and CI each fail on them; it reverts them.
+failing test, and a lint violation one at a time, sees `pnpm check` fail at each part, and reverts
+each. CI fails on one plant pushed to a throwaway branch.
 
 **Gate:** approve the foundation. With a protected `main`, it lands through a `plan/0000-foundation`
 PR.

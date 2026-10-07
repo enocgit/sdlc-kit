@@ -48,9 +48,9 @@ Rate each finding against current exposure, not worst case:
 
 ## Record
 
-Write `docs/security/records/YYYY-MM-DD-{slug}.md` (UTC write date), at most ~40 lines, and add a
-row to the Records table in `docs/security.md`. Update the trust-boundary table there if a boundary
-moved.
+Write `docs/security/records/YYYY-MM-DD-{slug}.md` (today's UTC date from the system clock), at most
+~40 lines, and add a row to the Records table in `docs/security.md`. Update the trust-boundary table
+there if a boundary moved.
 
 ```markdown
 # Security review: {change}

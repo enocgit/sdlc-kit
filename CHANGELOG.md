@@ -18,7 +18,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - Living specs (`docs/specs/`) state current behavior with requirement IDs that tests cite; change proposals (`docs/changes/`) replace feature PRDs, amendment PRDs, and briefs.
 - Artifacts have line budgets. ADRs fit one screen; security records are a findings-and-resolutions table; `docs/security.md` is a trust-boundary table.
 - Sensitive now means a change to a trust boundary, and review findings are weighed against the project's Lifecycle: hardening for absent traffic goes to the production register.
-- Stage 0 proves each part of the check command fails on a planted error.
+- Stage 0 proves each part of the check command fails on its own planted error, one per run, and records CI as unproven until the first push. A new project documents only what exists.
 - `docs/test-strategy.md` sets test layers by where bugs surface, plus parallel-safe tests, affected-only pull request runs, and a full run on the default branch.
 - `code-review` absorbs `code-simplification` and `definition-of-done-review`; the conductor holds all stage procedure in one file.
 - `code-review` and `security-review` are rewritten as kit-owned skills and no longer carry upstream notices.
