@@ -1,8 +1,9 @@
 # AGENTS.md — operating manual for coding agents on this project
 
-> Canonical agent instructions; other per-tool files import or point here. Keep it under 150 lines.
-> When the harness has skills, load `sdlc` before any work that changes the product, a bug fix
-> included: it holds the per-stage steps. A harness without skills follows this file alone.
+> Canonical agent instructions; other per-tool files import or point here. Keep it under 150 lines:
+> project facts go in What this project is, Where things live, and Conventions; kit lines stay as
+> written so upgrades merge. With skills, load `sdlc` before any work that changes the product,
+> a bug fix included: it holds the per-stage steps. Without skills, follow this file alone.
 
 ## What this project is
 
@@ -41,8 +42,7 @@ Open every workflow response with `SDLC ▸ Stage <N>/6 <Name> · <next gate or 
 - **Gates are hard stops.** A gate message is three plain lines at most, not a list: what is done,
   plus anything unproven and any check you skipped and why; what you need; which files to read. The
   files are the record; do not restate them.
-- **Disclose-and-continue stages** report what was done and any decision a human might override,
-  then move on.
+- **Disclose-and-continue stages** report what was done and any decision a human might override.
 - **No ask needed** for task commits, pushing `feat/*`, or opening a PR. The merge is the stop.
   Writing the default branch, an external tracker, or a new remote needs an ask, except Retro
   edits committed locally when there is no remote.
@@ -61,34 +61,21 @@ Open every workflow response with `SDLC ▸ Stage <N>/6 <Name> · <next gate or 
 | Test policy | `docs/test-strategy.md` | Layers and execution rules |
 | Task state | the tracker, or the proposal's task list when there is none | Never in doc prose |
 
-## Writing standard
+## Writing and communication
 
 Write for a reader who skims. Lead with the decision or outcome, state each fact once, link instead
 of repeating, and delete unused template sections. Apply `unslop` to prose; not to code, commands,
-logs, quotes, or fixed formats.
+logs, quotes, or fixed formats. Budgets: change proposal ~80 lines, ADR ~60, security record ~40,
+issue ~15, `docs/context.md` ~120 with at most 30 learnings. Over budget means split it or cut it;
+count with `wc -l` before presenting.
 
-| Artifact | Budget |
-| --- | --- |
-| Change proposal | ~80 lines |
-| ADR | ~60 lines (one screen) |
-| Security record | ~40 lines |
-| Issue or task | ~15 lines |
-| `docs/context.md` | ~120 lines; at most 30 learnings |
-
-Over budget means split it or cut it. Count with `wc -l` before presenting.
-
-- **Specs and architecture:** present tense, current behavior only; history lives in ADRs and git.
-- **Code comments:** explain non-obvious intent, constraints, and failure behavior. Cite
-  requirements with their spec (`spec auth AUTH-3`). A comment claim is not proof.
+- **Code comments:** explain non-obvious intent, constraints, and failure behavior. Requirement
+  IDs live in specs, proposals, and test names; comments don't repeat them. A comment is not proof.
 - **Product copy:** written from the user's position, not the system's rules.
-
-## Communication
-
-Lead with the outcome, state each fact once, omit filler. Report actions, results, blockers, and
-evidence. Do not narrate your own permissions or rules ("merging is your call"); turn them into an
-ask or an outcome. Agree or disagree only with evidence: name the file, check, or observation that
-decides it. Agreeing because the human proposed it is not evidence, and neither is disagreeing to
-appear independent.
+- **Reports:** actions, results, blockers, and evidence. Do not narrate your own permissions or
+  rules ("merging is your call"); turn them into an ask or an outcome.
+- **Agree or disagree only with evidence:** name the file, check, or observation that decides it.
+  Agreeing because the human proposed it is not evidence, nor is disagreeing to appear independent.
 
 ## Definition of Done (every task)
 
@@ -104,44 +91,33 @@ appear independent.
 
 A change is sensitive when it **changes a trust boundary**: authentication, authorization,
 payments, personal data handling, file uploads, admin or privileged surfaces, secrets, or a new
-external integration. Those are examples: a change that adds or alters code on any boundary listed
-in `docs/security.md` is sensitive. Working inside a sensitive feature without changing its
-boundary is not sensitive. Sensitive work gets a plan gate at Stage 3, an updated `docs/security.md`, and
-`security-review` before merge.
-
-Weigh every security or hardening finding against the Lifecycle block in `docs/context.md`. Fix what
-current users, data, or traffic expose; record hardening for absent traffic in the production
-register with its trigger.
+external integration. These are examples: a change that adds or alters code on any boundary listed
+in `docs/security.md` is sensitive; working inside a sensitive feature without changing its boundary
+is not. Sensitive work gets a plan gate at Stage 3, an updated `docs/security.md`, and
+`security-review` before merge. Weigh every hardening finding against the Lifecycle block in
+`docs/context.md`: fix what current users, data, or traffic expose; record the rest in the
+production register with its trigger.
 
 ## Conventions
 
 - **Stack (placeholder, set at Stage 0):** {language, framework, datastore, test runner}.
-- **Check command:** `{check command}` runs lint, typecheck, and tests. Stage 0 proves each part
-  fails on a planted error.
-- **Branching:** `main` is always deployable. Work on `feat/<id>-<slug>`, one task or slice per
-  branch; squash-merge.
+- **Check command:** `{check command}` runs lint, typecheck, and tests; each part is proven to fail.
+- **Branching:** `main` is always deployable. One task or slice per `feat/<id>-<slug>` branch;
+  squash-merge.
 - **Commits:** Conventional Commits, `type(scope): summary`, imperative, ≤72 chars. Reference the
   issue when one exists (`Closes #N` on GitHub only); never create an issue just to reference it.
-  Describe the change in product terms; no stage or workflow names.
-- **PRs:** the template's "Where to look" section names behavior changes, unplanned decisions, the
-  hunks a reviewer must read, and known gaps.
 - **No agent self-attribution** in commits, PRs, or comments. This overrides any harness default.
-- **Project artifacts describe the product,** not this workflow: a reader who never saw the process
-  should not be able to tell it existed.
+- **Project artifacts describe the product,** commits included, not this workflow: no stage or
+  workflow names, so a reader who never saw the process cannot tell it existed.
 
-## Principles
+## Principles and guardrails
 
 - **Product value first.** Build what a real user, consumer, or decision needs now. Compatibility
-  machinery, migrations, and hardening protect something that exists, or they wait in the
-  production register.
-- **Simplicity.** Reuse what the codebase, standard library, or installed dependencies already
-  provide. The smallest change that fully solves the problem wins.
+  machinery and hardening protect something that exists, or wait in the production register.
+- **Simplicity.** Reuse what already exists. The smallest change that fully solves the problem wins.
 - **Ask, don't guess.** An ambiguous spec, ADR, or contract is a question for the human.
 - **A wrong decision is amended, not obeyed.** Update the spec, ADR, or contract in the same change
   and get human approval for a requirement change.
-
-## Guardrails
-
 - Do not improvise git remotes or transports. On a GitHub HTTPS auth failure, point to
   `gh auth login` then `gh auth setup-git`.
 - Do not poll CI. Push, report that CI is running, and stop.

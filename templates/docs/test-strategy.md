@@ -14,7 +14,7 @@ which is where most real bugs live; unit tests are fastest for logic with many c
 | Critical user journeys | End-to-end | {e2e tool} | A few per change, named in the change proposal |
 
 A task's acceptance criteria name the layer for each behavior. Test names cite the requirement ID
-they prove (`AUTH-3 rejects an expired session`).
+they prove (`AUTH-3 rejects an expired session`); source comments don't repeat it.
 
 ## Execution
 

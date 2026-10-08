@@ -75,8 +75,8 @@ two in step.
   a snapshot only when its behavior reliably conflicts with this repository's needs.
 - When a kit-owned skill or template changes, update its manifest, summaries, installation guidance,
   and focused validation as applicable.
-- Keep `templates/AGENTS.md` at or below 150 lines and keep `templates/CLAUDE.md` as a one-line
-  pointer.
+- Keep `templates/AGENTS.md` at or below 125 lines, leaving 25 of the filled file's 150 for project
+  facts, and keep `templates/CLAUDE.md` as a one-line pointer.
 - Use Conventional Commits when the maintainer requests a commit: `type(scope): summary`,
   imperative, at most 72 characters. Reference the relevant issue when one exists.
 

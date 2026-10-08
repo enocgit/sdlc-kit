@@ -24,7 +24,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - Living specs (`docs/specs/`) state current behavior with requirement IDs that tests cite; change proposals (`docs/changes/`) replace feature PRDs, amendment PRDs, and briefs.
 - Artifacts have line budgets. ADRs fit one screen; security records are a findings-and-resolutions table; `docs/security.md` is a trust-boundary table.
 - Sensitive now means a change to a trust boundary, including any boundary listed in the project's `docs/security.md`, and review findings are weighed against the project's Lifecycle: hardening for absent traffic goes to the production register.
-- Stage 0 proves each part of the check command fails on its own planted error, one per run; Retro reads the first CI run's log to confirm each part ran. A new project documents only what exists, and review rejects workflow terms in product artifacts.
+- Stage 0 proves each part of the check command fails on its own planted error, one per run, through the check or the sub-command it chains; Retro reads the first CI run's log to confirm each part ran. The check covers all code, tests included: existing failures are fixed or reported, never excluded, and a check that fails on a clean tree is reported rather than retried. Adopting an existing codebase changes its CI to run the check. A new project documents only what exists, and review rejects workflow terms in product artifacts.
+- `templates/AGENTS.md` fits in 125 lines, leaving 25 of the 150-line budget for project facts. Adopters keep its lines as written so upgrades merge, and put project facts in the project sections.
+- Requirement IDs live in specs, proposals, and test names; code comments no longer repeat them.
 - `docs/test-strategy.md` sets test layers by where bugs surface, plus parallel-safe tests, affected-only pull request runs, and a full run on the default branch.
 - `code-review` absorbs `code-simplification` and `definition-of-done-review`; the conductor holds all stage procedure in one file.
 - `code-review` and `security-review` are rewritten as kit-owned skills and no longer carry upstream notices.

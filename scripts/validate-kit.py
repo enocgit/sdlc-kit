@@ -325,8 +325,8 @@ class Validator:
             if missing:
                 raise CheckError(f"{name} is missing operative rules: {missing}")
         lines = len((self.kit / "templates/AGENTS.md").read_text(encoding="utf-8").splitlines())
-        if lines > 150:
-            raise CheckError(f"templates/AGENTS.md is {lines} lines; the budget is 150")
+        if lines > 125:
+            raise CheckError(f"templates/AGENTS.md is {lines} lines; the budget is 125")
 
     def smoke(self) -> None:
         with Fixture(self.kit) as fx:

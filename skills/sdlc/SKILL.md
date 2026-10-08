@@ -50,12 +50,16 @@ grep -rsniE 'stage [0-6]|solo developer' docs src test .github --exclude=TEMPLAT
 - **Existing codebase:** reconstruct the same set read-only from the code. Write specs for the
   areas that exist, backfill ADRs only for hard-to-reverse choices already made, and fold any
   existing PRDs into specs. `improve-codebase-architecture` can supply the reading heuristics.
-- **Prove the checks.** Plant one type error, run `{check command}`, see it fail at the typecheck,
-  and revert; repeat for one failing test and one lint violation. One plant per run: a chained
-  command stops at its first failure, so a plant must trip only its own part: if an earlier part
-  fails first, change the plant. Only the check command's output counts, not editor or harness
-  diagnostics. A check that cannot fail is not a check. CI runs the same command; its first run is
-  checked at Retro.
+  Keep the kit's lines in `AGENTS.md` as written; project facts go in its project sections. Change
+  the existing CI to run the check command, or every part it runs, in the foundation change.
+- **Prove the checks.** The check covers all the code, tests included. Fix existing failures or
+  report them at the gate; excluding code to get a part green is a skipped check. Plant one type
+  error, run `{check command}`, see it fail at the typecheck, and revert; repeat for one failing
+  test and one lint violation. One plant per run, tripping only its own part. When the command
+  chains named sub-commands (`check:api`), a plant may run through the one that covers it; editor
+  or harness diagnostics never count. A check that cannot fail is not a check. A check that fails
+  on a clean tree is reported at the gate, not retried until it passes. CI runs the same command;
+  its first run is checked at Retro.
 
 **Gate: approve foundation.** Commit nothing before approval; then land it per
 `references/rules.md` → Landing.
