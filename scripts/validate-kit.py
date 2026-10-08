@@ -746,8 +746,32 @@ class Validator:
             conflict = target / "AGENTS.md.sdlc-conflict"
             if "<<<<<<<" not in conflict.read_text():
                 raise CheckError("conflict upgrade wrote no resolution copy")
-            if "AGENTS.md" not in result.stdout or "conflict" not in result.stdout:
-                raise CheckError("upgrade report did not record the conflict")
+            if "AGENTS.md" not in result.stdout or "1 region(s)" not in result.stdout:
+                raise CheckError("upgrade report did not record the conflict and its regions")
+
+    def upgrade_ignores_reworded_placeholders(self) -> None:
+        """Rewording a placeholder the adopter filled must not hold back other kit changes."""
+        with Fixture(self.kit) as fx:
+            target = fx.target()
+            expect_ok(fx.install(target), "install before placeholder upgrade")
+            placeholder = "{One paragraph: the product and its users.}"
+            adopter_agents = target / "AGENTS.md"
+            text = adopter_agents.read_text()
+            if placeholder not in text:
+                raise CheckError("templates/AGENTS.md no longer has the project placeholder")
+            adopter_agents.write_text(text.replace(placeholder, "Our product helps contributors."))
+            kit = fx.kit_copy()
+            kit_agents = kit / "templates/AGENTS.md"
+            lines = kit_agents.read_text().replace(placeholder, "{One paragraph: what it does.}")
+            kit_agents.write_text(lines.replace("## Where things live",
+                                                "Kit v2 rule.\n\n## Where things live", 1))
+            result = fx.install(target, upgrade=True, kit=kit)
+            expect_ok(result, "placeholder upgrade")
+            merged = adopter_agents.read_text()
+            if "Our product helps contributors." not in merged or "Kit v2 rule." not in merged:
+                raise CheckError("placeholder rewording blocked the merge of other kit changes")
+            if (target / "AGENTS.md.sdlc-conflict").exists():
+                raise CheckError("placeholder rewording produced a conflict")
 
     def upgrade_class_routing(self) -> None:
         """Instance templates and pinned snapshots are never merged.
@@ -1032,6 +1056,7 @@ class Validator:
                   ("upgrade without a manifest is conservative", self.upgrade_without_manifest),
                   ("upgrade merges disjoint edits in living files", self.upgrade_merges_disjoint_edits),
                   ("upgrade conflicts preserve the adopter file", self.upgrade_conflict_preserves_adopter),
+                  ("upgrade ignores reworded placeholders", self.upgrade_ignores_reworded_placeholders),
                   ("upgrade routes instance and pinned classes without merging", self.upgrade_class_routing),
                   ("consecutive upgrades preserve adopter content", self.upgrade_second_run_preserves_adopter),
                   ("adopted files are never written, merged, or re-added", self.upgrade_adopted_files),

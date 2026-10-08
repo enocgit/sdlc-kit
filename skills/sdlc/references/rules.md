@@ -15,6 +15,8 @@ supports, not on whether a remote exists.
   - no remote → commit to the local default branch;
   - remote, default branch unprotected → commit and push, under one approval;
   - remote, default branch protected → `plan/{NNNN}-{slug}` → PR → the human merges.
+- **Retro** has no gate: with no remote, commit its edits to the local default branch without an
+  ask.
 
 **Code** (Stage 4 → 5):
 
@@ -22,9 +24,9 @@ supports, not on whether a remote exists.
 - Remote without PRs → push the branch to start CI; once green, the human merges `feat/*` directly.
 - No remote → one combined ask: "Approve commit and merge to the local default branch?" The human
   still owns the decision; execute only after approval.
-- No CI workflow → CI is N/A. A configured CI or PR workflow that is unreachable (auth, network,
-  quota) is a blocker: surface the fix and stop. If the human merges over it, the PR says the gate
-  did not run.
+- No CI workflow, or no remote for it to run on → CI is N/A; say so once, in the merge ask.
+- A configured CI or PR workflow that is unreachable (auth, network, quota) is a blocker: surface
+  the fix and stop. If the human merges over it, the PR says the gate did not run.
 
 Before reporting a landing done, check every artifact the ask named is in the commit.
 

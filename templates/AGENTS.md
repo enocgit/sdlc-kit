@@ -44,7 +44,8 @@ Open every workflow response with `SDLC ▸ Stage <N>/6 <Name> · <next gate or 
 - **Disclose-and-continue stages** report what was done and any decision a human might override,
   then move on.
 - **No ask needed** for task commits, pushing `feat/*`, or opening a PR. The merge is the stop.
-  Writing the default branch, an external tracker, or a new remote needs an ask.
+  Writing the default branch, an external tracker, or a new remote needs an ask, except Retro
+  edits committed locally when there is no remote.
 - QA, tests, and review are part of the workflow, not extras the human has to request.
 
 ## Where things live

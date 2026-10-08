@@ -88,19 +88,22 @@ else runs serially. Disclose the breakdown and continue.
 
 ## Stage 3 — Build
 
-1. Start from a clean, up-to-date default branch and create `feat/{id}-{slug}`. Never force a
-   checkout or overwrite uncommitted work; stop and ask instead. Run declared parallel tasks in
-   separate worktrees when the harness supports them.
+1. Each task gets its own branch and PR: start from a clean, up-to-date default branch and create
+   `feat/{id}-{slug}`. Never force a checkout or overwrite uncommitted work; stop and ask instead.
+   Run declared parallel tasks in separate worktrees when the harness supports them.
 2. Load the proposal, the specs it touches, the relevant ADRs, and any frozen contract.
 3. Disclose a short plan. Stop for approval only when the task is sensitive (`AGENTS.md` →
-   Sensitive changes) or deviates from the approved decomposition.
+   Sensitive changes) or deviates from the approved decomposition. That stop names only what the
+   task adds beyond the approved plan (a boundary, control, dependency, or file), or says it adds
+   nothing.
 4. Test first. For each behavior, write the test at the assigned layer, citing its requirement ID,
    watch it fail for the right reason, then implement. Bug fixes use `diagnosing-bugs`: reproduce
    first, fix at the root cause.
 5. UI work: use `frontend-design`, and exercise the change in a real browser with the harness's
    browser tool, or `webapp-testing` when the harness has none. Backend work: verify at the API or integration level.
 6. Update the spec, architecture, and contract index for the behavior this task ships, in the same
-   commit. Run the check command for the touched packages; CI is the merge gate.
+   commit. Run the check command for the touched packages; CI is the merge gate. A part added to
+   the check command counts only after it fails on a planted error, as at Stage 0.
 7. Commit the task. Bug fixes and chores with no plan still get a test and a reviewer.
 
 ## Stage 4 — Review
@@ -110,12 +113,14 @@ This skill authorizes spawning that reviewer. Give it the diff against the targe
 proposal, the touched specs, and any contract: raw artifacts, never your summary of them.
 
 - `code-review` on every change.
-- `security-review` when the change is sensitive; it writes the security record.
-- Fix required findings as follow-up commits. Re-review only fixes that change behavior.
+- `security-review` when the change is sensitive, by the same reviewer; it writes the security
+  record. A reviewer that cannot write files returns the record, and you commit it unchanged.
+- Fix required findings as follow-up commits. Re-review only fixes that change behavior: send the
+  regenerated diff and the new commits, never your account of the fixes.
 - Weigh hardening findings against the Lifecycle block; defer what absent traffic would need to the
   production register.
-- If a third round still finds required changes, stop and ask the human whether the design needs
-  another look.
+- If a fifth round still finds required changes, stop and ask the human whether the design needs
+  another look. Ask again after each later round that does.
 
 Then push the branch and open the PR (no ask needed). Disclose the review outcome.
 
@@ -143,5 +148,5 @@ After the merge, switch to the synced default branch.
    features into `AGENTS.md`, `docs/test-strategy.md`, or an ADR. Keep at most 30.
 3. Land any edits per `references/rules.md` → Landing. An empty retro lands nothing.
 
-Next feature: return to Stage 1. After a large change, offer an `improve-codebase-architecture`
-pass; its findings enter as a new change proposal.
+Next task: return to Stage 3. Next feature: return to Stage 1. After a large change, offer an
+`improve-codebase-architecture` pass; its findings enter as a new change proposal.

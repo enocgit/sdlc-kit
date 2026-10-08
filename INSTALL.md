@@ -128,7 +128,9 @@ Upgrade semantics:
   published GitHub templates) that you edited is **three-way merged** with the new version
   against that base: disjoint edits apply cleanly (`M` lines — review the hunks); overlapping
   edits keep your copy untouched and write a conflict-marked resolution file next to it, named
-  `<file>.sdlc-conflict` (`C` lines) for you to resolve.
+  `<file>.sdlc-conflict` (`C` lines). That file already holds every non-conflicting kit change, so
+  resolve its marked regions and move it over your copy; deleting it drops those changes. A kit
+  change that only rewords a placeholder line you filled is ignored rather than conflicting.
 - A filled template instance (`docs/specs/`, `docs/changes/`, `docs/adr/`, `docs/contracts/`,
   `docs/architecture.md`, `docs/security.md`) is adopter-owned once filled: kit template drift is never merged into
   it. It is kept and reported (`!` lines).

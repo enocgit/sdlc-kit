@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import difflib
 import errno
 import fcntl
 import hashlib
@@ -458,6 +459,31 @@ def write_installed_bytes(root: Path, destination: Path, content: bytes) -> None
     fsync_directory(destination.parent)
 
 
+PLACEHOLDER = re.compile(r"\{[A-Za-z][^}]*\}")
+
+
+def is_placeholder_line(line: str) -> bool:
+    """A line that holds only placeholders and markup, no rule text."""
+    if not PLACEHOLDER.search(line):
+        return False
+    return not any(character.isalnum() for character in PLACEHOLDER.sub("", line))
+
+
+def without_placeholder_rewording(base: Path, other: Path) -> bytes:
+    """The kit's new version with placeholder-only rewordings reverted to base."""
+    base_lines = base.read_text(encoding="utf-8").splitlines(keepends=True)
+    other_lines = other.read_text(encoding="utf-8").splitlines(keepends=True)
+    result: list[str] = []
+    matcher = difflib.SequenceMatcher(None, base_lines, other_lines, autojunk=False)
+    for tag, base_start, base_end, other_start, other_end in matcher.get_opcodes():
+        old, new = base_lines[base_start:base_end], other_lines[other_start:other_end]
+        if tag == "replace" and all(map(is_placeholder_line, old + new)):
+            result.extend(old)
+        else:
+            result.extend(new)
+    return "".join(result).encode("utf-8")
+
+
 def three_way_merge(current: Path, base: Path, other: Path) -> tuple[bytes | None, bool]:
     """Merge the kit's new version with adopter edits via git merge-file.
 
@@ -466,15 +492,24 @@ def three_way_merge(current: Path, base: Path, other: Path) -> tuple[bytes | Non
     or (None, False) when the merge cannot be attempted — the caller then
     keeps the adopter file and reports a hand-merge, exactly as before this
     mechanism existed.
+
+    A kit change that only rewords placeholder lines is dropped first: the
+    adopter has usually filled those lines, so the rewording would conflict
+    and hold back every other kit change in the file.
     """
+    staged_other = base.parent / staging_file_name()
     try:
+        staged_other.write_bytes(without_placeholder_rewording(base, other))
         result = subprocess.run(
             ["git", "merge-file", "-p", "-L", "your copy", "-L", "installed base",
-             "-L", "new kit version", str(current), str(base), str(other)],
+             "-L", "new kit version", str(current), str(base), str(staged_other)],
             capture_output=True, check=False,
         )
-    except OSError:
+    except (OSError, UnicodeDecodeError):
         return None, False
+    finally:
+        with contextlib.suppress(OSError):
+            staged_other.unlink()
     if result.returncode < 0 or result.returncode > 127:
         return None, False
     return result.stdout, result.returncode != 0
@@ -645,6 +680,7 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
                                      "deleted": [], "adopted": []}
     adopt_set = {item.strip() for item in adopt if item.strip()}
     kept_detail: dict[str, str] = {}
+    conflict_regions: dict[str, int] = {}
     plan: list[tuple[str, Path, Path]] = []
     merge_writes: list[tuple[str, Path, bytes]] = []
     deletions: list[tuple[str, Path]] = []
@@ -730,6 +766,7 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
                 continue
             if merged is not None:
                 actions["conflict"].append(rel)
+                conflict_regions[rel] = merged.count(b"<<<<<<< your copy")
                 conflict_writes.append((kind, destination, merged))
                 new_entries[kind][rel] = entry_dict
                 continue
@@ -802,7 +839,8 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
     for rel in actions["merged"]:
         print(f"  M {rel} (merged — review the hunks)", file=stream)
     for rel in actions["conflict"]:
-        print(f"  C {rel} (conflict — your copy kept; resolution at {rel}.sdlc-conflict)", file=stream)
+        print(f"  C {rel} (conflict — your copy kept; {rel}.sdlc-conflict has every kit change "
+              f"merged, with {conflict_regions.get(rel, 0)} region(s) marked to resolve)", file=stream)
     for rel in actions["modified"]:
         print(f"  ! kept, adopter-modified{kept_detail.get(rel, '')}: {rel}", file=stream)
     for rel in actions["deleted"]:
