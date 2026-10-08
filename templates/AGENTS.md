@@ -1,8 +1,8 @@
 # AGENTS.md — operating manual for coding agents on this project
 
 > Canonical agent instructions; other per-tool files import or point here. Keep it under 150 lines.
-> This file alone is enough to run the workflow. The `sdlc` skill, when installed, adds per-stage
-> detail; a harness without skills follows this file.
+> When the harness has skills, load `sdlc` before any work that changes the product, a bug fix
+> included: it holds the per-stage steps. A harness without skills follows this file alone.
 
 ## What this project is
 

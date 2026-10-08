@@ -98,7 +98,8 @@ else runs serially. Disclose the breakdown and continue.
 3. Disclose a short plan. Stop for approval only when the task is sensitive (`AGENTS.md` →
    Sensitive changes) or deviates from the approved decomposition. That stop names only what the
    task adds beyond the approved plan (a boundary, control, dependency, or file), or says it adds
-   nothing.
+   nothing. A bug fix with no proposal states the report's input and what the user must get once
+   it is fixed; that is its real-world check. When the report reads more than one way, ask first.
 4. Test first. For each behavior, write the test at the assigned layer, citing its requirement ID,
    watch it fail for the right reason, then implement. Bug fixes use `diagnosing-bugs`: reproduce
    first, fix at the root cause.
