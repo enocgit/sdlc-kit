@@ -109,8 +109,9 @@ else runs serially. Disclose the breakdown and continue.
 ## Stage 4 — Review
 
 Review in a context that did not write the change: a fresh subagent, a separate session, or a human.
-This skill authorizes spawning that reviewer. Give it the diff against the target branch, the
-proposal, the touched specs, and any contract: raw artifacts, never your summary of them.
+This skill authorizes spawning that reviewer. Tell it which skills to load by name, then give it
+the diff against the target branch, the proposal, the touched specs, and any contract: raw
+artifacts, never your summary of them.
 
 - `code-review` on every change.
 - `security-review` when the change is sensitive, by the same reviewer; it writes the security
