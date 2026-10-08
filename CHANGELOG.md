@@ -28,6 +28,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - `code-review` and `security-review` are rewritten as kit-owned skills and no longer carry upstream notices.
 - The PR template adds a "Where to look" section and a criterion-to-test proof table. The CI template is stack-neutral and fails until the project sets its check command.
 - Each task gets its own branch and PR; after it lands, the next task returns to Stage 3. A sensitive task's Stage 3 stop names only what it adds beyond the approved plan.
+- The reviewer, not the author, judges sensitivity, and a finding or fix that changes a listed security control makes the change sensitive.
 - Stage 4 names the review skills for the reviewer to load and runs `security-review` in the same fresh context as `code-review`, and re-reviews get the new diff and commits, not the author's account. The human is asked about the design after a fifth blocked round.
 - With no remote, CI is reported once as not run, and Retro edits commit to the local default branch without an ask. A part added to the check command must fail on a planted error before it counts.
 - Nothing lands before its gate's approval. Gate messages are three plain lines, not a list; they name anything unproven and any check skipped, and do not restate the files. Stage 0 ends with two exact scans for leftover placeholders and workflow terms.

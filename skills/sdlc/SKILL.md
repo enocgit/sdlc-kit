@@ -118,11 +118,13 @@ else runs serially. Disclose the breakdown and continue.
 Review in a context that did not write the change: a fresh subagent, a separate session, or a human.
 This skill authorizes spawning that reviewer. Tell it which skills to load by name, then give it
 the diff against the target branch, the proposal, the touched specs, any contract, and the
-real-world check output: raw artifacts, never your summary of them.
+real-world check output: raw artifacts, never your summary of them. Do not tell it whether the
+change is sensitive; it checks the diff against `docs/security.md` itself.
 
 - `code-review` on every change.
 - `security-review` when the change is sensitive, by the same reviewer; it writes the security
-  record. A reviewer that cannot write files returns the record, and you commit it unchanged.
+  record. A reviewer that cannot write files returns the record, and you commit it unchanged. A
+  finding or fix that changes a control listed in `docs/security.md` makes the change sensitive.
 - Fix required findings as follow-up commits. Re-review only fixes that change behavior: send the
   regenerated diff and the new commits, never your account of the fixes.
 - Weigh hardening findings against the Lifecycle block; defer what absent traffic would need to the
