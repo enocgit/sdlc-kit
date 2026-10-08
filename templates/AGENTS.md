@@ -92,7 +92,7 @@ appear independent.
 
 ## Definition of Done (every task)
 
-- [ ] Acceptance criteria met, each proven by a named test or observation
+- [ ] Acceptance criteria met, each proven by a named test or observation; real-world check met
 - [ ] Tests at the layer `docs/test-strategy.md` assigns; new checks seen failing before passing
 - [ ] Contract honored; schema changes use expand/contract once the table holds real data or a deployed process uses it
 - [ ] Fresh-context review clean; trust-boundary changes also have a security record

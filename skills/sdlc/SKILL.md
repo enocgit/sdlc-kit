@@ -65,8 +65,11 @@ grep -rsniE 'stage [0-6]|solo developer' docs src test .github --exclude=TEMPLAT
 1. Interview with `grilling` until no open question remains: one round at a time, each question
    with your recommended answer. No code.
 2. Write `docs/changes/NNNN-{slug}.md` from its template: why, the spec delta (requirements added,
-   changed, or removed, with IDs), acceptance criteria, approach, contract impact, and risks. Every
-   added or changed requirement has at least one criterion, with its test layer. Stay within budget.
+   changed, or removed, with IDs), acceptance criteria, the real-world check, approach, contract
+   impact, and risks. Every added or changed requirement has at least one criterion, with its test
+   layer. The human names or approves the real-world check's input and expectation in the
+   interview: criteria prove the behavior was built right; the real-world check proves it is worth
+   having. Stay within budget.
 3. Write an ADR only for a choice that is hard to reverse or constrains later work.
 4. Freeze a contract only when `docs/context.md` lists an outside consumer that cannot change in
    the same PR. Interfaces used only inside this repo stay unfrozen and covered by tests.
@@ -101,17 +104,20 @@ else runs serially. Disclose the breakdown and continue.
    first, fix at the root cause.
 5. UI work: use `frontend-design`, and exercise the change in a real browser with the harness's
    browser tool, or `webapp-testing` when the harness has none. Backend work: verify at the API or integration level.
-6. Update the spec, architecture, and contract index for the behavior this task ships, in the same
+6. When this task completes behavior the real-world check covers, run the check on its input and
+   use the output as its user would: open it where it lands, follow its links, read it against the
+   expectation. A miss is a bug in this task; add a test for the gap it exposed.
+7. Update the spec, architecture, and contract index for the behavior this task ships, in the same
    commit. Run the check command for the touched packages; CI is the merge gate. A part added to
    the check command counts only after it fails on a planted error, as at Stage 0.
-7. Commit the task. Bug fixes and chores with no plan still get a test and a reviewer.
+8. Commit the task. Bug fixes and chores with no plan still get a test and a reviewer.
 
 ## Stage 4 — Review
 
 Review in a context that did not write the change: a fresh subagent, a separate session, or a human.
 This skill authorizes spawning that reviewer. Tell it which skills to load by name, then give it
-the diff against the target branch, the proposal, the touched specs, and any contract: raw
-artifacts, never your summary of them.
+the diff against the target branch, the proposal, the touched specs, any contract, and the
+real-world check output: raw artifacts, never your summary of them.
 
 - `code-review` on every change.
 - `security-review` when the change is sensitive, by the same reviewer; it writes the security
@@ -129,7 +135,8 @@ Then push the branch and open the PR (no ask needed). Disclose the review outcom
 
 Fill the PR template, including "Where to look". Use `Closes #N` only on GitHub and only for an
 existing issue. Report in one line (PR link, CI running) and stop; do not poll CI. The human merges.
-Without a PR workflow, follow `references/rules.md` → Landing.
+Without a PR workflow, follow `references/rules.md` → Landing; the merge ask's files to read include
+the real-world check output.
 
 `SDLC ▸ Stage 5/6 Land · next gate: merge when CI is green`
 

@@ -19,5 +19,6 @@
 | --- | --- |
 | {ID} | {test name or observation} |
 
+- **Real-world check:** <!-- the input, where its output is, and how it met the expectation; or "none" -->
 - **Review:** <!-- who reviewed in fresh context, rounds, verdict; security record link if sensitive -->
 - **CI:** <!-- running / green / not configured -->

@@ -44,6 +44,9 @@ Read the Definition of Done in the project's `AGENTS.md` and check the change ag
 list. Then:
 
 - **Acceptance criteria:** map each one to the test or observation that proves it.
+- **Real-world check:** read the raw output from the proposal's real-world input as its user would
+  and judge it against the stated expectation. A miss, or a missing run, is a required finding; the
+  author's verdict on the output does not count.
 - **Checks can fail:** a new test was seen failing first; a new or changed check command fails on a
   planted error.
 - **Docs match the code:** specs, architecture, and contract index describe the shipped behavior.

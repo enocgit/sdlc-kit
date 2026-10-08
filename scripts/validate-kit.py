@@ -308,6 +308,7 @@ class Validator:
                 "**Gate: approve plan.**",
                 "**Prove the checks.**",
                 "Test first.",
+                "real-world check covers, run the check on its input",
                 "Review in a context that did not write the change",
                 "do not poll CI",
                 "fix the bug instead",

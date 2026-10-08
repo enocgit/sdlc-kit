@@ -17,6 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 - **Breaking: workflow redesign.** Seven stages instead of nine (Foundation, Plan, Decompose, Build, Review, Land, Retro) with three hard gates plus a conditional one at Build. `AGENTS.md` now carries the gates and seven no-compromise rules on its own, so any harness that reads it runs the workflow.
 - Every added or changed requirement in a change proposal has at least one acceptance criterion with its test layer.
+- Change proposals carry a real-world check: a realistic input and what its user must get from it, agreed in planning. The task that completes the behavior runs it and uses the output as its user would; the reviewer judges that raw output, and a miss is a required finding. Test data must carry the variation real inputs have.
 - Living specs (`docs/specs/`) state current behavior with requirement IDs that tests cite; change proposals (`docs/changes/`) replace feature PRDs, amendment PRDs, and briefs.
 - Artifacts have line budgets. ADRs fit one screen; security records are a findings-and-resolutions table; `docs/security.md` is a trust-boundary table.
 - Sensitive now means a change to a trust boundary, including any boundary listed in the project's `docs/security.md`, and review findings are weighed against the project's Lifecycle: hardening for absent traffic goes to the production register.

@@ -24,8 +24,10 @@ recommended answer, and settles partial payments, failed callbacks, and refunds.
 
 The agent writes `docs/changes/0001-rent-payment.md` (62 lines): the spec delta adds `PAY-1` to
 `PAY-4`, five acceptance criteria, the provider ADR, and the frozen `api/openapi.yaml` slice the
-mobile client needs. Payments move a trust boundary, so the threat delta is in the proposal and
-`security-review` runs on it before the gate.
+mobile client needs. Its real-world check, agreed in the interview: in the provider's sandbox, a
+tenant pays a partial month's rent from the payment screen and sees the remaining balance. Payments
+move a trust boundary, so the threat delta is in the proposal and `security-review` runs on it
+before the gate.
 
 **Gate:** approve the plan. The team shape lands it on `main` before any branch is cut.
 
@@ -38,18 +40,19 @@ requirement IDs and test layers. The agent discloses the order and continues.
 ## 3. Build
 
 For the webhook task the agent branches `feat/12-payment-webhook`. Because the task is sensitive, it
-stops for approval of its short plan. It writes `PAY-3 rejects an unsigned webhook` as an
-integration test against the test database, sees it fail, and implements the handler. It moves
-`PAY-3` into `docs/specs/payments.md` and updates the webhook row in `docs/security.md` in the same
-commit.
+stops for approval of what its plan adds beyond the approved proposal: here, nothing. It writes
+`PAY-3 rejects an unsigned webhook` as an integration test against the test database, sees it fail,
+and implements the handler. It moves `PAY-3` into `docs/specs/payments.md` and updates the webhook
+row in `docs/security.md` in the same commit. The real-world check runs later, with the
+payment-screen task that completes the flow.
 
 ## 4. Review
 
-A fresh subagent receives the diff, the proposal, the payments spec, and the contract. `code-review`
-asks for one change: the handler retries on every error, including a bad signature.
-`security-review` records two findings in a 24-line record. It fixes one; the other, rate limiting the
-webhook endpoint, goes to the production register until there is production traffic. After the fix,
-a second round approves.
+A fresh subagent loads `code-review` and `security-review` and receives the diff, the proposal, the
+payments spec, and the contract. `code-review` asks for one change: the handler retries on every
+error, including a bad signature. `security-review` records two findings in a 24-line record. It
+fixes one; the other, rate limiting the webhook endpoint, goes to the production register until
+there is production traffic. After the fix, a second round approves.
 
 ## 5. Land
 

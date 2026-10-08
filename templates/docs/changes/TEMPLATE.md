@@ -23,6 +23,15 @@
 
 - [ ] {ID}: {observable outcome} ({unit | integration | end-to-end})
 
+## Real-world check
+
+<!-- One or two realistic inputs and what their user must get from each, in the user's words: a
+     real page flow, request, caller, data sample, repository, or query. Point to the input (URL,
+     command, path); never commit private data. With no real data yet, use the closest public
+     sample. A change no user can see writes "none: no user-visible change". -->
+
+- {realistic input} → {what the user must see or get}
+
 ## Approach
 
 {The shape of the solution in a few lines. Link ADRs for hard-to-reverse choices.}

@@ -21,6 +21,8 @@ they prove (`AUTH-3 rejects an expired session`).
 - Every new test is seen failing for the right reason before it passes.
 - Tests are safe to run in parallel: each worker gets its own database or schema.
 - Tests are deterministic: no uncontrolled network, time, or randomness.
+- Test data carries the variation real inputs have (several users, empty and oversized values,
+  messy formatting), not only the minimal case. A gap the real-world check finds becomes a test.
 - Pull requests run the packages a change affects; the push to the default branch runs everything.
 - No run repeats the same work: one workflow per check, and a new push cancels the PR's older run.
 - One test runner per stack unless an ADR says otherwise.
