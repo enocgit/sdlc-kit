@@ -3,7 +3,8 @@
 # existing file. Merge-aware: copies file-by-file, so an existing directory (e.g. docs/adr/)
 # does not block missing files inside it from being added.
 #
-# Usage:   ./install.sh [--dry-run] [--upgrade] [TARGET_DIR]   (TARGET_DIR default: current directory)
+# Usage:   ./install.sh [--dry-run] [--upgrade [--adopt FILE]... [--resolved FILE]...] [TARGET_DIR]
+#          (TARGET_DIR default: current directory)
 # Env:     SKILLS_DIR=path   where custom skills go (default: TARGET/.agents/skills)
 #
 # --upgrade applies kit updates to a previous manifest-based install: files the installer
@@ -32,6 +33,7 @@ UPGRADE=0
 TARGET_ARG="."
 TARGET_SET=0
 ADOPT_ARGS=()
+RESOLVED_ARGS=()
 args=("$@")
 i=0
 while [ "$i" -lt "${#args[@]}" ]; do
@@ -47,8 +49,16 @@ while [ "$i" -lt "${#args[@]}" ]; do
     fi
     ADOPT_ARGS+=("${args[$i]}")
     ;;
+  --resolved)
+    i=$((i + 1))
+    if [ "$i" -ge "${#args[@]}" ]; then
+      echo "--resolved requires a file path relative to the install root" >&2
+      exit 2
+    fi
+    RESOLVED_ARGS+=("${args[$i]}")
+    ;;
   -h | --help)
-    echo "Usage: ./install.sh [--dry-run] [--upgrade [--adopt FILE]]... [TARGET_DIR]"
+    echo "Usage: ./install.sh [--dry-run] [--upgrade [--adopt FILE]... [--resolved FILE]...] [TARGET_DIR]"
     exit 0
     ;;
   -*)
@@ -69,6 +79,10 @@ done
 
 if [ "${#ADOPT_ARGS[@]}" -gt 0 ] && [ "$UPGRADE" -eq 0 ]; then
   echo "--adopt requires --upgrade" >&2
+  exit 2
+fi
+if [ "${#RESOLVED_ARGS[@]}" -gt 0 ] && [ "$UPGRADE" -eq 0 ]; then
+  echo "--resolved requires --upgrade" >&2
   exit 2
 fi
 
@@ -439,6 +453,9 @@ if [ "$UPGRADE" -eq 1 ]; then
   [ "$DRY" -eq 1 ] && UPGRADE_ARGS+=(--dry-run)
   for adopted in "${ADOPT_ARGS[@]}"; do
     UPGRADE_ARGS+=(--adopt "$adopted")
+  done
+  for resolved in "${RESOLVED_ARGS[@]}"; do
+    UPGRADE_ARGS+=(--resolved "$resolved")
   done
   exec python3 "$SAFE_INSTALL" "${UPGRADE_ARGS[@]}"
 fi

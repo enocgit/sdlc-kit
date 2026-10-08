@@ -129,8 +129,9 @@ Upgrade semantics:
   against that base: disjoint edits apply cleanly (`M` lines — review the hunks); overlapping
   edits keep your copy untouched and write a conflict-marked resolution file next to it, named
   `<file>.sdlc-conflict` (`C` lines). That file already holds every non-conflicting kit change, so
-  resolve its marked regions and move it over your copy; deleting it drops those changes. A kit
-  change that only rewords a placeholder line you filled is ignored rather than conflicting.
+  resolve its marked regions and move it over your copy; deleting it drops those changes. Then
+  mark it resolved (below) so the next upgrade merges from the new version. A kit change that only
+  rewords a placeholder line you filled is ignored rather than conflicting.
 - A filled template instance (`docs/specs/`, `docs/changes/`, `docs/adr/`, `docs/contracts/`,
   `docs/architecture.md`, `docs/security.md`) is adopter-owned once filled: kit template drift is never merged into
   it. It is kept and reported (`!` lines).
@@ -149,7 +150,9 @@ Upgrade semantics:
   directory that leaves empty. An edited, adopted, or untracked file removed upstream stays on disk
   and is reported (`!` lines).
 - The version marker and `.sdlc-kit-manifest.json` update to the new release. The obsolete
-  `.sdlc-kit-base/` directory, if a version-2 install created one, is removed.
+  `.sdlc-kit-base/` directory, if a version-2 install created one, is removed, and so is any
+  `.sdlc-vendor/` metadata older installers left in skill directories, with directories that leaves
+  empty.
 
 Merges are textual: a clean merge can still read oddly where an edit removed a rule the new
 version rewrites. The `M` lines are the short list to eyeball, not a rubber stamp.
@@ -177,6 +180,19 @@ SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh --upgrade --adopt docs/context.md --ad
 
 An adopted path is never written, merged, or re-added again (`A` lines; present files report when
 the kit template changed upstream). A plain install re-adds missing adopted files.
+
+#### Marking a hand merge resolved (`--resolved`)
+
+After you resolve a conflict, or rework an adopted file to the current template, tell the
+installer the file now matches this kit version:
+
+```bash
+SKILLS_DIR="$SKILLS_DIR_ABS" ./install.sh --upgrade --resolved AGENTS.md --resolved docs/context.md "$TARGET"
+```
+
+The file is kept as it is (`R` lines); its base moves to the current kit version, any adoption
+ends, and its `.sdlc-conflict` file is removed. Later upgrades merge only what changes after this
+version. A file that still holds conflict markers is refused.
 
 If the runtime does not read `AGENTS.md`, point its instruction file to it:
 

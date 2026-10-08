@@ -644,7 +644,8 @@ def kit_skill_source(kit: Path, rel: str) -> Path:
 
 
 def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
-                dry_run: bool, stream: TextIO, adopt: Sequence[str] = ()) -> int:
+                dry_run: bool, stream: TextIO, adopt: Sequence[str] = (),
+                resolved: Sequence[str] = ()) -> int:
     """Content-anchored upgrade against the recorded install manifest.
 
     Each manifest entry carries the base content the kit last laid down. A
@@ -659,6 +660,11 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
     Adopted paths (--adopt) transfer ownership to the adopter: the kit never
     writes, merges, or re-adds them. A present adopted file is reported only
     when the kit template changed upstream; an absent one is silent.
+
+    Resolved paths (--resolved) were merged by hand against this kit version:
+    the file is kept as it is, its base re-anchors on the new kit version, any
+    adoption ends, and its conflict file is removed, so the next upgrade merges
+    from here instead of conflicting again.
     """
     manifest_path = target / KIT_MANIFEST_MARKER
     if not manifest_path.exists():
@@ -677,8 +683,13 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
 
     actions: dict[str, list[str]] = {"add": [], "update": [], "current": [], "merged": [],
                                      "conflict": [], "modified": [], "removed": [],
-                                     "deleted": [], "adopted": []}
+                                     "deleted": [], "adopted": [], "resolved": [], "legacy": []}
     adopt_set = {item.strip() for item in adopt if item.strip()}
+    resolved_set = {item.strip() for item in resolved if item.strip()}
+    resolved_paths: list[Path] = []
+    if adopt_set & resolved_set:
+        raise InstallError("a path cannot be both --adopt and --resolved: "
+                           + ", ".join(sorted(adopt_set & resolved_set)))
     kept_detail: dict[str, str] = {}
     conflict_regions: dict[str, int] = {}
     plan: list[tuple[str, Path, Path]] = []
@@ -701,6 +712,15 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
         installed_bytes: bytes | None = None
         if destination.is_file() and not destination.is_symlink():
             installed_bytes = destination.read_bytes()
+        if rel in resolved_set:
+            if installed_bytes is None:
+                raise InstallError(f"--resolved file does not exist: {rel}")
+            if b"<<<<<<< your copy" in installed_bytes or b">>>>>>> new kit version" in installed_bytes:
+                raise InstallError(f"--resolved file still has conflict markers: {rel}")
+            actions["resolved"].append(rel)
+            resolved_paths.append(destination)
+            new_entries[kind][rel] = {"class": klass, "base": new_text}
+            continue
         if rel in adopt_set or (isinstance(entry, dict) and entry.get("adopted")):
             newly_adopted = rel in adopt_set
             if installed_bytes is None:
@@ -817,21 +837,36 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
                                       else " (no installed-base anchor)")
             actions["removed"].append(label)
 
-    unknown = sorted(adopt_set - (seen["target"] | seen["skills"]))
+    unknown = sorted((adopt_set | resolved_set) - (seen["target"] | seen["skills"]))
     if unknown:
         raise InstallError(
-            "--adopt target is not part of the kit payload: " + ", ".join(unknown))
+            "--adopt or --resolved target is not part of the kit payload: " + ", ".join(unknown))
+
+    # Older installers wrote .sdlc-vendor/ metadata into skill directories
+    # without recording it in the manifest. The name is the kit's own, so any
+    # copy under the skills root is legacy kit output.
+    legacy_vendor: list[Path] = []
+    if skills_dir.is_dir():
+        for skill in sorted(skills_dir.iterdir()):
+            metadata = skill / ".sdlc-vendor"
+            if (not skill.is_symlink() and skill.is_dir() and metadata.is_dir()
+                    and not metadata.is_symlink()):
+                legacy_vendor.append(metadata)
+                actions["legacy"].append(f"{skill.name}/.sdlc-vendor/")
 
     label = "DRY RUN — no files will be written" if dry_run else "Upgrade"
     print(f"{label}: {len(actions['update'])} updated, {len(actions['add'])} added, "
           f"{len(actions['current'])} current, {len(actions['merged'])} merged, "
           f"{len(actions['conflict'])} conflicts, {len(actions['modified'])} kept "
           f"(adopter-modified), {len(actions['adopted'])} adopted, "
+          f"{len(actions['resolved'])} resolved, "
           f"{len(actions['deleted'])} deleted and {len(actions['removed'])} kept of those "
           f"removed upstream", file=stream)
     for rel in actions["adopted"]:
         print(f"  A {rel}{kept_detail.get(rel, ' (adopted — kit will not write this path)')}",
               file=stream)
+    for rel in actions["resolved"]:
+        print(f"  R {rel} (resolved — kit manages it again from this version)", file=stream)
     for rel in actions["add"]:
         print(f"  + {rel}", file=stream)
     for rel in actions["update"]:
@@ -847,6 +882,8 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
         print(f"  - {rel} (removed upstream, untouched)", file=stream)
     for rel in actions["removed"]:
         print(f"  ! left in place, removed upstream{kept_detail.get(rel, '')}: {rel}", file=stream)
+    for rel in actions["legacy"]:
+        print(f"  - {rel} (legacy kit metadata)", file=stream)
     if dry_run:
         return 0
 
@@ -871,6 +908,15 @@ def run_upgrade(kit: Path, target: Path, skills_dir: Path, kit_version: str,
     for kind, destination, content in conflict_writes:
         write_installed_bytes(target if kind == "target" else skills_dir,
                               conflict_sibling(destination), content)
+    for destination in resolved_paths:
+        with contextlib.suppress(OSError):
+            conflict_sibling(destination).unlink()
+    for metadata in legacy_vendor:
+        try:
+            shutil.rmtree(metadata)
+        except OSError as error:
+            raise InstallError(f"could not remove legacy metadata {metadata}: {error}") from error
+        remove_empty_parents(skills_dir, metadata.parent)
     for kind, destination in deletions:
         root = target if kind == "target" else skills_dir
         contained_parent(root, destination)
@@ -1064,8 +1110,9 @@ def command_upgrade(arguments: argparse.Namespace) -> None:
     skills_dir = open_verified_root(Path(arguments.skills_dir), create=True)
     version = arguments.kit_version or kit_version_of(kit)
     adopt = tuple(arguments.adopt or ())
+    resolved = tuple(arguments.resolved or ())
     raise SystemExit(run_upgrade(kit, target, skills_dir, version, arguments.dry_run,
-                                 sys.stdout, adopt=adopt))
+                                 sys.stdout, adopt=adopt, resolved=resolved))
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1120,6 +1167,11 @@ def build_parser() -> argparse.ArgumentParser:
                                 metavar="FILE",
                                 help="mark a kit payload path adopter-owned: never "
                                      "written, merged, or re-added by later upgrades")
+    upgrade_parser.add_argument("--resolved", action="append", default=[],
+                                metavar="FILE",
+                                help="FILE was merged by hand against this kit version: keep "
+                                     "it, re-anchor its base, end any adoption, and remove "
+                                     "its conflict file")
     upgrade_parser.set_defaults(handler=command_upgrade)
     return parser
 

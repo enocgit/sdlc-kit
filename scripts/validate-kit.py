@@ -168,7 +168,8 @@ class Fixture:
     def install(self, target: Path, *, dry_run: bool = False,
                 env: dict[str, str] | None = None, umask: int | None = None,
                 kit: Path | None = None, upgrade: bool = False,
-                adopt: Sequence[str] = ()) -> subprocess.CompletedProcess[str]:
+                adopt: Sequence[str] = (),
+                resolved: Sequence[str] = ()) -> subprocess.CompletedProcess[str]:
         source_kit = kit or self.kit
         args = ["bash", str(source_kit / "install.sh")]
         if dry_run:
@@ -177,6 +178,8 @@ class Fixture:
             args.append("--upgrade")
         for rel in adopt:
             args.extend(["--adopt", rel])
+        for rel in resolved:
+            args.extend(["--resolved", rel])
         args.append(str(target))
         return run(args, cwd=source_kit, env=env, umask=umask, timeout=300)
 
@@ -776,6 +779,63 @@ class Validator:
             if (target / "AGENTS.md.sdlc-conflict").exists():
                 raise CheckError("placeholder rewording produced a conflict")
 
+    def upgrade_resolved_reanchors(self) -> None:
+        """A hand-resolved conflict, or a reconciled adopted file, is managed again."""
+        with Fixture(self.kit) as fx:
+            target = fx.target()
+            expect_ok(fx.install(target), "install before resolved upgrade")
+            kit = fx.kit_copy()
+            kit_agents = kit / "templates/AGENTS.md"
+            kit_agents.write_text(kit_agents.read_text() + "\nKit rewrites the closing line.\n")
+            adopter_agents = target / "AGENTS.md"
+            adopter_text = adopter_agents.read_text() + "\nAdopter rewrites the closing line.\n"
+            adopter_agents.write_text(adopter_text)
+            expect_ok(fx.install(target, upgrade=True, kit=kit), "conflict before resolution")
+            conflict = target / "AGENTS.md.sdlc-conflict"
+            adopter_agents.write_text(conflict.read_text())
+            marked = fx.install(target, upgrade=True, kit=kit, resolved=["AGENTS.md"])
+            if marked.returncode == 0:
+                raise CheckError("--resolved accepted a file that still has conflict markers")
+            adopter_agents.write_text(adopter_text + "Kit rewrites the closing line.\n")
+            expect_ok(fx.install(target, upgrade=True, kit=kit, adopt=["docs/context.md"]),
+                      "adopt before resolution")
+            result = fx.install(target, upgrade=True, kit=kit,
+                                resolved=["AGENTS.md", "docs/context.md"])
+            expect_ok(result, "resolved upgrade")
+            if conflict.exists():
+                raise CheckError("--resolved left the conflict file behind")
+            manifest = json.loads((target / ".sdlc-kit-manifest.json").read_text())
+            for rel, source in (("AGENTS.md", kit_agents),
+                                ("docs/context.md", kit / "templates/docs/context.md")):
+                entry = manifest["target"][rel]
+                if entry.get("adopted") or entry.get("base") != source.read_text():
+                    raise CheckError(f"--resolved did not re-anchor {rel} on the new kit version")
+            if "Adopter rewrites the closing line." not in adopter_agents.read_text():
+                raise CheckError("--resolved changed the resolved file")
+            again = fx.install(target, upgrade=True, kit=kit)
+            expect_ok(again, "upgrade after resolution")
+            if "C AGENTS.md" in again.stdout or conflict.exists():
+                raise CheckError("a resolved file conflicted again on the next upgrade")
+
+    def upgrade_removes_legacy_vendor_metadata(self) -> None:
+        """Older installers left .sdlc-vendor/ metadata the manifest never tracked."""
+        with Fixture(self.kit) as fx:
+            target = fx.target()
+            expect_ok(fx.install(target), "install before legacy cleanup")
+            skills = target / ".agents/skills"
+            for name in ("grilling", "retired-skill"):
+                legacy = skills / name / ".sdlc-vendor"
+                legacy.mkdir(parents=True)
+                (legacy / "provenance.json").write_text("{}\n")
+            own = skills / "team-skill"
+            own.mkdir()
+            (own / "SKILL.md").write_text("team skill\n")
+            expect_ok(fx.install(target, upgrade=True), "legacy cleanup upgrade")
+            if (skills / "grilling/.sdlc-vendor").exists() or (skills / "retired-skill").exists():
+                raise CheckError("upgrade left legacy .sdlc-vendor metadata or its empty directory")
+            if not (skills / "grilling/SKILL.md").is_file() or not (own / "SKILL.md").is_file():
+                raise CheckError("legacy cleanup removed a skill file")
+
     def upgrade_class_routing(self) -> None:
         """Instance templates and pinned snapshots are never merged.
 
@@ -1060,6 +1120,8 @@ class Validator:
                   ("upgrade merges disjoint edits in living files", self.upgrade_merges_disjoint_edits),
                   ("upgrade conflicts preserve the adopter file", self.upgrade_conflict_preserves_adopter),
                   ("upgrade ignores reworded placeholders", self.upgrade_ignores_reworded_placeholders),
+                  ("upgrade re-anchors files marked resolved", self.upgrade_resolved_reanchors),
+                  ("upgrade removes legacy vendor metadata", self.upgrade_removes_legacy_vendor_metadata),
                   ("upgrade routes instance and pinned classes without merging", self.upgrade_class_routing),
                   ("consecutive upgrades preserve adopter content", self.upgrade_second_run_preserves_adopter),
                   ("adopted files are never written, merged, or re-added", self.upgrade_adopted_files),

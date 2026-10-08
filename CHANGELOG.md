@@ -9,6 +9,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 ### Added
 
 - `install.sh --upgrade --adopt FILE`: mark a kit payload path adopter-owned — the kit never writes, merges, or re-adds it.
+- `install.sh --upgrade --resolved FILE`: after a hand merge, keep the file, re-anchor it on the current kit version, end any adoption, and remove its conflict file, so later upgrades merge instead of conflicting again.
+- `--upgrade` removes `.sdlc-vendor/` metadata that older installers left in skill directories, and directories that leaves empty.
 - `--upgrade` never replaces or deletes an installed CI workflow; template changes are reported. The new CI template fails until a project sets its check command, so existing pipelines keep running.
 - `--upgrade` deletes files the kit no longer ships when the adopter never edited them, and directories that leaves empty. Edited, adopted, and untracked files stay and are reported.
 - `--upgrade` ignores kit rewordings of placeholder lines, so a filled placeholder no longer turns every other change in the file into a conflict. A conflict report names how many regions need resolving; the `.sdlc-conflict` file already holds every other kit change.
