@@ -310,6 +310,7 @@ class Validator:
             "skills/sdlc/SKILL.md": (
                 "**Gate: approve foundation.**",
                 "**Gate: approve plan.**",
+                "The gate message quotes the real-world check",
                 "**Prove the checks.**",
                 "Test first.",
                 "that is its real-world check",
@@ -317,6 +318,9 @@ class Validator:
                 "Review in a context that did not write the change",
                 "do not poll CI",
                 "fix the bug instead",
+            ),
+            "skills/code-review/SKILL.md": (
+                "A check that cannot run as approved is not a",
             ),
         }
         for name, needles in required.items():

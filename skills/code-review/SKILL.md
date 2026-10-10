@@ -45,8 +45,10 @@ list. Then:
 
 - **Acceptance criteria:** map each one to the test or observation that proves it.
 - **Real-world check:** read the raw output from the proposal's real-world input as its user would
-  and judge it against the stated expectation. A miss, or a missing run, is a required finding; the
-  author's verdict on the output does not count.
+  and judge it against the stated expectation. A miss is a required finding, and so is a missing run
+  of a check that could run as the proposal states it. A check that cannot run as approved is not a
+  finding: confirm the PR says why, and leave the call to the human at the merge. The author's
+  verdict on the output does not count.
 - **Checks can fail:** a new test was seen failing first; a new or changed check command fails on a
   planted error.
 - **Docs match the code:** specs, architecture, and contract index describe the shipped behavior.

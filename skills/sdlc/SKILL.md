@@ -80,7 +80,8 @@ grep -rsniE 'stage [0-6]|solo developer' docs src test .github --exclude=TEMPLAT
 5. When the plan changes a trust boundary, put the threat delta in the proposal and run
    `security-review` on the proposal before the gate.
 
-**Gate: approve plan.** Landing follows team shape (`references/rules.md` → Landing).
+**Gate: approve plan.** The gate message quotes the real-world check, input → expectation, so the
+human approves it with the plan. Landing follows team shape (`references/rules.md` → Landing).
 
 ## Stage 2 — Decompose
 
@@ -111,7 +112,9 @@ else runs serially. Disclose the breakdown and continue.
    browser tool, or `webapp-testing` when the harness has none. Backend work: verify at the API or integration level.
 6. When this task completes behavior the real-world check covers, run the check on its input and
    use the output as its user would: open it where it lands, follow its links, read it against the
-   expectation. A miss is a bug in this task; add a test for the gap it exposed.
+   expectation. A miss is a bug in this task; add a test for the gap it exposed. A check that
+   cannot run as approved is not swapped for another input or environment on your own: the PR says
+   why, and the human decides at the merge.
 7. Update the spec, architecture, and contract index for the behavior this task ships, in the same
    commit. Run the check command for the touched packages; CI is the merge gate. A part added to
    the check command counts only after it fails on a planted error, as at Stage 0.
