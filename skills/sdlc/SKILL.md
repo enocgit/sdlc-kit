@@ -136,7 +136,7 @@ change is sensitive; it checks the diff against `docs/security.md` itself.
   regenerated diff and the new commits, never your account of the fixes.
 - Weigh hardening findings against the Lifecycle block; defer what absent traffic would need to the
   production register.
-- If a fifth round still finds required changes, stop and ask the human whether the design needs
+- If a third round still finds required changes, stop and ask the human whether the design needs
   another look. Ask again after each later round that does.
 
 Then push the branch and open the PR (no ask needed). Disclose the review outcome.

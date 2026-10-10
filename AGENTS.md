@@ -71,6 +71,8 @@ two in step.
 ## Editing policy
 
 - Prefer a small direct change over a new abstraction or compatibility layer.
+- A new adopter-facing rule replaces or deletes an existing one, or waits until the failure it
+  prevents shows up in a second project. One transcript is a reason to watch, not to add a rule.
 - Preserve upstream snapshots where a narrow routing or integration rule is enough. Adapt or replace
   a snapshot only when its behavior reliably conflicts with this repository's needs.
 - When a kit-owned skill or template changes, update its manifest, summaries, installation guidance,
