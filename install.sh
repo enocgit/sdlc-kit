@@ -464,7 +464,7 @@ fi
 copy_file "$KIT/templates/AGENTS.md" "$TARGET/AGENTS.md"
 copy_file "$KIT/templates/CLAUDE.md" "$TARGET/CLAUDE.md"
 
-# Skills manifest — installed skills (conductor fallbacks) reference it, so it ships too
+# Skills manifest — it records where AGENTS.md uses each installed skill, so it ships too
 copy_file "$KIT/required-skills.yml" "$TARGET/required-skills.yml"
 
 # Project templates merge file-by-file. Skills install as complete directories so an existing local
@@ -510,4 +510,4 @@ if [ "$SKIPPED" -gt 0 ]; then
   done
 fi
 echo
-echo "Next: ask your agent to \"start the sdlc\"."
+echo "Next: ask your agent to run \"bootstrap\"."

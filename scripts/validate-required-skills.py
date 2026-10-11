@@ -14,9 +14,10 @@ NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SOURCE_RE = re.compile(
     r"^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?/[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$"
 )
-STAGE_TOKEN_RE = re.compile(r"^[0-6]$")
+USE_TOKENS = {"setup", "plan", "build", "review"}
+USE_ALONE = {"manual", "communication"}
 KINDS = {"local", "vendored"}
-ENTRY_KEYS = {"name", "kind", "sourcePath", "source", "stage", "note"}
+ENTRY_KEYS = {"name", "kind", "sourcePath", "source", "use", "note"}
 
 
 def fail(message: str) -> NoReturn:
@@ -91,21 +92,16 @@ def validate_source_path(entry: dict[str, Any], name: str, kind: str) -> None:
         fail(f"{name}: sourcePath must be {expected_root}/{name}")
 
 
-def validate_stage(entry: dict[str, Any], name: str, kind: str) -> None:
-    stage = entry.get("stage")
-    if isinstance(stage, bool) or not isinstance(stage, (int, str)):
-        fail(f"{name}: stage must be an integer or supported stage string")
-    if isinstance(stage, int):
-        if not 0 <= stage <= 6:
-            fail(f"{name}: stage integer must be between 0 and 6")
-        return
-
-    value = stage.strip()
-    if kind == "local" and value in {"conductor", "communication", "manual"}:
+def validate_use(entry: dict[str, Any], name: str, kind: str) -> None:
+    use = entry.get("use")
+    if not isinstance(use, str) or not use.strip():
+        fail(f"{name}: use must be a non-empty string")
+    value = use.strip()
+    if kind == "local" and value in USE_ALONE:
         return
     tokens = [token.strip() for token in value.split(",")]
-    if not tokens or any(not token or not STAGE_TOKEN_RE.fullmatch(token) for token in tokens):
-        fail(f"{name}: stage must use 0-6, a comma-separated list, conductor, communication, or manual")
+    if any(token not in USE_TOKENS for token in tokens):
+        fail(f"{name}: use must be a comma-separated list of setup, plan, build, review, or manual or communication alone")
 
 
 def validate_entry(entry: Any, names: set[str]) -> None:
@@ -127,7 +123,7 @@ def validate_entry(entry: Any, names: set[str]) -> None:
     kind = require_nonempty_string(entry, "kind", name)
     if kind not in KINDS:
         fail(f"{name}: unsupported kind: {kind}")
-    validate_stage(entry, name, kind)
+    validate_use(entry, name, kind)
 
     for field in ("note",):
         if field in entry:
@@ -146,7 +142,7 @@ def validate_entry(entry: Any, names: set[str]) -> None:
         fail(f"{name}: {kind} entries must not define source")
     for field in ("fallback",):
         if field in entry:
-            fail(f"{name}: entries must not define {field} — routing and stage references own fallback behavior")
+            fail(f"{name}: entries must not define {field} — routing in AGENTS.md owns fallback behavior")
 
 
 def validate_manifest(data: Any) -> None:

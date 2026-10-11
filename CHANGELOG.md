@@ -17,37 +17,37 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 
 ### Changed
 
-- **Breaking: workflow redesign.** Seven stages instead of nine (Foundation, Plan, Decompose, Build, Review, Land, Retro) with three hard gates plus a conditional one at Build. `AGENTS.md` now carries the gates and seven no-compromise rules on its own, so any harness that reads it runs the workflow.
+- **Breaking: workflow redesign.** The nine stages and the `sdlc` conductor skill are gone. `AGENTS.md` carries the seven no-compromise rules, two gates (approve plan; the human merges), how a change moves from plan to merge, and the review order, so any harness that reads it runs the workflow. Bug fixes and chores skip planning. `bootstrap` sets a project up once.
+- Review runs before the PR in a context that did not write the change, first available: a subagent or another agent CLI on a different model, a same-model subagent, then the human. The reviewer gets raw artifacts, judges sensitivity itself, and re-reviews the new diff; the human is asked about the design after a third blocked round; the PR names the reviewer, its model, and the verdict. A review bot adds to this review and never replaces it.
+- `code-review` confirms library behavior in the installed source, and treats a missing artifact as a note for the PR rather than a block, except for the smoke check.
+- Change proposals carry a smoke check on realistic input: what its user must get from it, approved with the plan, whose gate message quotes it. The slice that completes the behavior runs it and uses the output as its user would; the reviewer judges that raw output, and a miss is a required finding. A check that cannot run as approved is explained in the PR and left to the human at the merge. Test data must carry the variation real inputs have.
 - Every added or changed requirement in a change proposal has at least one acceptance criterion with its test layer.
-- `AGENTS.md` tells agents to load the `sdlc` skill before any product change, bug fixes included; a bug fix states the report's input and the expected result as its real-world check, and asks when the report is ambiguous.
-- Change proposals carry a real-world check: a realistic input and what its user must get from it, agreed in planning: the plan gate message quotes it, so the human approves it with the plan. The task that completes the behavior runs it and uses the output as its user would; the reviewer judges that raw output, and a miss is a required finding. A check that cannot run as approved is explained in the PR and left to the human at the merge, not swapped for another input or environment. Test data must carry the variation real inputs have.
+- A change too big for one review lists its slices in the proposal; with a tracker, plan approval covers creating one issue per slice. Each slice gets its own branch and PR. Projects without a tracker keep slices in the proposal instead of `docs/progress.md`.
 - Living specs (`docs/specs/`) state current behavior with requirement IDs that tests cite; change proposals (`docs/changes/`) replace feature PRDs, amendment PRDs, and briefs.
-- Artifacts have line budgets. ADRs fit one screen; security records are a findings-and-resolutions table; `docs/security.md` is a trust-boundary table.
-- Sensitive now means a change to a trust boundary, including any boundary listed in the project's `docs/security.md`, and review findings are weighed against the project's Lifecycle: hardening for absent traffic goes to the production register.
-- Stage 0 proves each part of the check command fails on its own planted error, one per run, through the check or the sub-command it chains; Retro reads the first CI run's log to confirm each part ran. The check covers all code, tests included: existing failures are fixed or reported, never excluded, and a check that fails on a clean tree is reported rather than retried. Adopting an existing codebase changes its CI to run the check. A new project documents only what exists, and review rejects workflow terms in product artifacts.
+- **Breaking:** `docs/security.md` is now `docs/threat-model.md`: a trust-boundary table plus the index of security records in `docs/security/records/`. Security records are a findings-and-resolutions table; ADRs fit one screen.
+- Sensitive means a change to a trust boundary, including any boundary listed in the project's `docs/threat-model.md`, and review findings are weighed against the project's Lifecycle: hardening for absent traffic goes to the production register.
+- `bootstrap` proves each part of the check command fails on its own planted error, one per run, and the first CI run's log confirms each part ran. The check covers all code, tests included: existing failures are fixed or reported, never excluded. It ends with two exact scans for leftover placeholders and workflow terms, and nothing lands before the foundation is approved. Adopting an existing codebase changes its CI to run the check.
 - `templates/AGENTS.md` fits in 125 lines, leaving 25 of the 150-line budget for project facts. Adopters keep its lines as written so upgrades merge, and put project facts in the project sections.
 - Requirement IDs live in specs, proposals, and test names; code comments no longer repeat them.
 - `docs/test-strategy.md` sets test layers by where bugs surface, plus parallel-safe tests, affected-only pull request runs, and a full run on the default branch.
-- `code-review` absorbs `code-simplification` and `definition-of-done-review`; the conductor holds all stage procedure in one file.
-- `code-review` and `security-review` are rewritten as kit-owned skills and no longer carry upstream notices.
+- `code-review` absorbs `code-simplification` and `definition-of-done-review`. `code-review` and `security-review` are rewritten as kit-owned skills and no longer carry upstream notices.
 - The PR template adds a "Where to look" section and a criterion-to-test proof table. The CI template is stack-neutral and fails until the project sets its check command.
-- Each task gets its own branch and PR; after it lands, the next task returns to Stage 3. A sensitive task's Stage 3 stop names only what it adds beyond the approved plan.
-- The reviewer, not the author, judges sensitivity, and a finding or fix that changes a listed security control makes the change sensitive.
-- Stage 4 names the review skills for the reviewer to load and runs `security-review` in the same fresh context as `code-review`, and re-reviews get the new diff and commits, not the author's account. The human is asked about the design after a third blocked round.
-- With no remote, CI is reported once as not run, and Retro edits commit to the local default branch without an ask. A part added to the check command must fail on a planted error before it counts.
-- Nothing lands before its gate's approval. Gate messages are three plain lines, not a list; they name anything unproven and any check skipped, and do not restate the files. Stage 0 ends with two exact scans for leftover placeholders and workflow terms.
-- Lifecycle records team shape: solo projects land the proposal with the first task's PR; team projects land it on `main` first.
-- Projects without an external tracker keep tasks in the change proposal instead of `docs/progress.md`.
+- Lifecycle records team shape: solo projects land the proposal with the first slice's PR; team projects land it on `main` first.
+- `required-skills.yml` records where `AGENTS.md` uses each skill (`use: setup | plan | build | review`) instead of a stage number.
 
 ### Removed
 
-- Skills: `brainstorming`, `to-spec`, `documentation-and-adrs`, `writing-plans`, `feature-start`, `project-status`, `ponytail`, `webapp-testing`, `code-simplification`, `definition-of-done-review`.
-- Templates: `docs/prd/`, `docs/briefs/`, `docs/progress.md`, `docs/adr/0001-record-architecture-decisions.md`.
+- Skills: `sdlc` (the conductor), `diagnosing-bugs`, `improve-codebase-architecture`, `brainstorming`, `to-spec`, `documentation-and-adrs`, `writing-plans`, `feature-start`, `project-status`, `ponytail`, `webapp-testing`, `code-simplification`, `definition-of-done-review`.
+- Templates: `docs/contracts/README.md` (create the index when the first contract is frozen), the epic issue template, `docs/prd/`, `docs/briefs/`, `docs/progress.md`, `docs/adr/0001-record-architecture-decisions.md`.
+- Stage banners, the decompose and retro stages, gate-message formats outside bootstrap, artifact line budgets, and parallel task groups.
 - Hash-bound review identities, per-check private worktrees, and the per-file security coverage ledger.
+- `CHEATSHEET.md`: `AGENTS.md` is the summary.
 
-Upgrading: `--upgrade` deletes the removed skills and untouched templates. Filled PRDs, briefs, and `docs/progress.md` stay; fold them into `docs/specs/` and change proposals at the next Stage 0 adoption pass. If a removed skill directory remains (`!` lines), you edited it: delete it so agents do not load stale nine-stage instructions.
+Upgrading:
 
-- Landings verify the named artifacts were committed; reviewers get raw artifacts, not implementer narratives.
+1. Rename first: `git mv docs/security.md docs/threat-model.md`, and update links to it. Without this, the upgrade adds an empty `docs/threat-model.md` beside your filled `docs/security.md`. After the rename, the upgrade reports `docs/threat-model.md` as kept and untracked; that is expected.
+2. Run `--upgrade`. It deletes the removed skills and untouched templates. A filled `docs/contracts/README.md`, PRDs, briefs, or `docs/progress.md` stay; fold the last three into `docs/specs/` and change proposals. If a removed skill directory remains (`!` lines), you edited it: delete it so agents do not load stale stage instructions.
+3. Resolve the `AGENTS.md` conflict, usually one region in Conventions where your filled lines meet changed kit lines, then mark it with `--resolved AGENTS.md`.
 
 ## [0.1.0] - 2026-10-03
 

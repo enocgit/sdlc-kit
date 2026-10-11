@@ -13,7 +13,7 @@ Review-only: findings go to the author; this pass does not edit code.
 
 ## Before you start
 
-- Read `docs/security.md`: its trust boundaries and controls are the baseline you check against.
+- Read `docs/threat-model.md`: its trust boundaries and controls are the baseline you check against.
 - Read the change: the diff against the target branch, including tests, docs, config, and lockfile
   changes; or, for a plan, the change proposal.
 - Note the exposure from `docs/context.md` → Lifecycle: who can reach this today, and with what data.
@@ -49,8 +49,9 @@ Rate each finding against current exposure, not worst case:
 ## Record
 
 Write `docs/security/records/YYYY-MM-DD-{slug}.md` (today's UTC date from the system clock), at most
-~40 lines, and add a row to the Records table in `docs/security.md`. Update the trust-boundary table
-there if a boundary moved.
+~40 lines, and add a row to the Records table in `docs/threat-model.md`. Update the trust-boundary
+table there if a boundary moved. A reviewer that cannot write files returns the record, and the
+author commits it unchanged.
 
 ```markdown
 # Security review: {change}

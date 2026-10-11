@@ -107,7 +107,8 @@ this marker is the one destination it updates when the value changes.
 
 Installs record what they published in `.sdlc-kit-manifest.json`.
 Upgrading is then one command — the installer replaces files it published that the adopter never
-edited, keeps adopter-modified files and reports them, and leaves files the new release removed:
+edited, keeps adopter-modified files and reports them, and deletes files the new release removed
+when you never edited them:
 
 ```bash
 # Preview what would change
@@ -124,7 +125,7 @@ Upgrade semantics:
   tree.
 - A file whose content still matches its base is an untouched kit copy → replaced with the new
   release's content.
-- A living file (the conductor, `AGENTS.md`, `docs/context.md`, `docs/test-strategy.md`, the
+- A living file (the kit's skills, `AGENTS.md`, `docs/context.md`, `docs/test-strategy.md`, the
   published GitHub templates) that you edited is **three-way merged** with the new version
   against that base: disjoint edits apply cleanly (`M` lines — review the hunks); overlapping
   edits keep your copy untouched and write a conflict-marked resolution file next to it, named
@@ -133,7 +134,7 @@ Upgrade semantics:
   mark it resolved (below) so the next upgrade merges from the new version. A kit change that only
   rewords a placeholder line you filled is ignored rather than conflicting.
 - A filled template instance (`docs/specs/`, `docs/changes/`, `docs/adr/`, `docs/contracts/`,
-  `docs/architecture.md`, `docs/security.md`) is adopter-owned once filled: kit template drift is never merged into
+  `docs/architecture.md`, `docs/threat-model.md`) is adopter-owned once filled: kit template drift is never merged into
   it. It is kept and reported (`!` lines).
 - A CI workflow (`.github/workflows/`) runs as installed, so an upgrade never replaces, merges, or
   deletes it, even unedited. A changed kit template is reported (`!` lines) for you to compare by
@@ -204,19 +205,17 @@ If the runtime does not read `AGENTS.md`, point its instruction file to it:
 
 The installer copies these skills to the configured `SKILLS_DIR`. It does not use a registry.
 
-| Skill | Upstream | Stage |
+| Skill | Upstream | Used |
 | --- | --- | --- |
-| `sdlc` | sdlc kit | Conductor for every stage |
-| `grilling` | mattpocock/skills (maintained adaptation) | 1 Plan |
-| `diagnosing-bugs` | mattpocock/skills (maintained adaptation) | 3 Build, bug fixes |
-| `frontend-design` | anthropics/skills (pinned snapshot) | 3 Build, UI only |
-| `code-review` | sdlc kit | 4 Review |
-| `security-review` | sdlc kit | 1 Plan and 4 Review, trust-boundary changes |
+| `bootstrap` | sdlc kit | Once per project: foundation docs and a check proven to fail |
+| `grilling` | mattpocock/skills (maintained adaptation) | Planning, when a request leaves decisions open |
+| `frontend-design` | anthropics/skills (pinned snapshot) | Building UI |
+| `code-review` | sdlc kit | The reviewer, before every PR |
+| `security-review` | sdlc kit | Plan and review of trust-boundary changes |
 | `address-review` | sdlc kit | Manual: triage review comments on an open PR |
-| `improve-codebase-architecture` | mattpocock/skills (maintained adaptation) | Manual: architecture audit; reading heuristics when adopting |
 | `unslop` | Cursor pstack (maintained adaptation) | Applied to human-facing prose |
 
-Browser checks at Stage 3 use the harness's browser tool. If yours has none, install Anthropic's
+Browser checks while building use the harness's browser tool. If yours has none, install Anthropic's
 `webapp-testing` skill from [anthropics/skills](https://github.com/anthropics/skills); it needs
 Python and Playwright.
 
@@ -241,27 +240,27 @@ when a contributor adds a `CLAUDE.local.md` (which otherwise stops Claude Code r
 ### Additional skills
 
 The kit does not manage skills outside `required-skills.yml`. A project may add any skill; adding
-one does not make it a workflow stage.
+one does not make it part of the workflow.
 
 ## 3. Adapt the project
 
 ### Tracker
 
-GitHub Issues is the default. Projects without an external tracker keep tasks as a checklist in the
+GitHub Issues is the default. Projects without an external tracker keep slices as a checklist in the
 change proposal. `docs/context.md` → Lifecycle names the tracker; adopting one midway moves only the
-open proposals' unticked tasks into it. For Linear or Jira, replace these integration points:
+open proposals' unticked slices into it. For Linear or Jira, replace these integration points:
 
 | Responsibility | GitHub default | Replacement |
 | --- | --- | --- |
-| Create tasks | `gh issue create` (Stage 2) | Tracker API or CLI |
-| Complete tasks | `Closes #N` (`$SKILLS_DIR/sdlc/references/rules.md` → Tracker) | Native Git integration or a post-merge update |
+| Create slice issues | `gh issue create`, after plan approval | Tracker API or CLI |
+| Complete slices | `Closes #N` in the PR | Native Git integration or a post-merge update |
 | Name branches | `feat/{issue number}-{slug}` | Tracker key such as `ENG-123` |
 
 ### CI and tests
 
 Replace the placeholder step in `.github/workflows/ci.yml` with the project's toolchain setup and
 check command, keeping every action pinned to a commit SHA. The template fails until you do, so a
-missing check cannot pass silently. Stage 0 then proves each part of the check fails on a planted
+missing check cannot pass silently. `bootstrap` then proves each part of the check fails on a planted
 error.
 
 Set the test layers and tools in `docs/test-strategy.md`. Use the platform's end-to-end runner, such
@@ -269,5 +268,5 @@ as Playwright for web or Maestro for mobile.
 
 ## 4. Smoke test
 
-Ask the agent to start `sdlc`. A fresh installation should find `STATUS: TEMPLATE` markers, begin
-Stage 0, and stop at the foundation gate without starting a plan.
+Ask the agent to run `bootstrap`. A fresh installation should find `STATUS: TEMPLATE` markers,
+fill the foundation, and stop at the foundation gate without starting a plan.

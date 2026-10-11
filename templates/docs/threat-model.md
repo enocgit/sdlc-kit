@@ -1,6 +1,6 @@
-# Security
+# Threat model
 
-> STATUS: TEMPLATE — fill at Stage 0 and delete this marker.
+> STATUS: TEMPLATE — fill during bootstrap and delete this marker.
 > The current trust boundaries and how they are defended. Update it in the change that moves a
 > boundary. Review records live in `docs/security/records/`.
 

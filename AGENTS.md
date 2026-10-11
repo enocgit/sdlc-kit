@@ -12,7 +12,7 @@ repository ships the kit; it does not run the pipeline itself — governance liv
 
 ## Source of truth
 
-- `skills/` contains kit-owned skills and the conductor.
+- `skills/` contains kit-owned skills and maintained adaptations.
 - `vendor/skills/` contains the one unchanged third-party snapshot the kit does not maintain.
 - `vendor/skills.lock.json` records snapshot identity and licensing; `.agents/skills/` holds the
   kit's own pinned copy of its writing-standards skill.
@@ -90,9 +90,12 @@ two in step.
 
 ## Learnings
 
-- Agents read the router and skip referenced files, and harnesses without skills read only
-  `AGENTS.md`: keep stage procedure in `skills/sdlc/SKILL.md` and the gates in
-  `templates/AGENTS.md`; `scripts/validate-kit.py` asserts the operative ones.
+- Agents skip referenced files, and harnesses without skills read only `AGENTS.md`: keep the gates,
+  the review order, and the rules in `templates/AGENTS.md`; `scripts/validate-kit.py` asserts the
+  operative ones.
+- An A/B run on two tasks (2026-10-11) found a 37-line manual matched the full stage procedure on
+  code at a third of the cost; the procedure's one win was a fresh review on a different model,
+  which the short manual's one-line rule did not trigger. Add procedure only with evidence like it.
 - Measure real line counts before writing a size target into a plan; estimated baselines have been
   wrong before.
 - A runtime editor formatter can dirty committed files after the commit. Before binding review or

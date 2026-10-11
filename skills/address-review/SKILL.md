@@ -5,7 +5,7 @@ description: >
   Codex, Sourcery, …) — and addresses them. Reads every comment but acts only on the actionable
   ones, verifying and challenging each against the code, the frozen contract, and the ADRs to weed
   out false positives, then fixes what is real and refutes what isn't. Manually
-  invoked, standalone — not tied to a pipeline stage. Use when the user says "address the PR
+  invoked, standalone — not tied to a workflow step. Use when the user says "address the PR
   reviews", "go through CodeRabbit's comments", "handle the bugbot findings", "handle the codex
   findings" or "respond to the review".
 ---
@@ -19,13 +19,13 @@ is net-negative. So is answering comments that asked for nothing. The job of thi
 **select what's actionable, challenge it, then act** — fixing what's real, refuting what isn't
 (with rationale), and deferring what's out of scope.
 
-This is standalone and **manually invoked** — it isn't bound to a pipeline stage. But it inherits
+This is standalone and **manually invoked** — it isn't bound to a workflow step. But it inherits
 the kit's conventions: the frozen contract is authoritative, sensitive changes (`AGENTS.md` →
 Sensitive changes) get extra care, and comments cite the durable doc
 (spec, ADR, contract) rather than the workflow. Invoking this skill **is** the approval: fixing,
 committing, pushing the PR branch, and posting brief replies proceed without further asks. Only a
 decision reversal, a sensitive-area or contract change, an external issue creation, or a merge
-still gates — merge ownership follows `sdlc`'s landing rules.
+still gates — a human performs every merge (`AGENTS.md`).
 
 It is **not** a second `code-review`. `code-review` proactively audits your own diff before you
 push; this skill reactively triages what _reviewers_ already said on an open PR. If a comment
@@ -72,7 +72,7 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
      commits only — never force-push while review is open: it destroys the reviewer's inline
      comment anchors and the reviewed diff.
    - **Decision** → **STOP and gate.** Draft the reply, but the human decides the question; apply
-     the conductor's amending rules for the spec, ADR, and contract before any code change,
+     `AGENTS.md`'s amending rules for the spec, ADR, and contract before any code change,
      and record any deferral in the `docs/context.md` production register. A reply that reopens a
      decision is a decision ask, not a comment reply.
    - **False positive** → do **not** change code. Post a brief reply explaining why, citing the
@@ -102,10 +102,10 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
   clear, doc-backed rationale is a first-class outcome, not a failure to "address" it.
 - **Invoking the skill is the approval** for fixes, commits, pushes, and replies. Decision
   reversals, sensitive-area or contract changes, external issue creation, and merges still gate.
-- **The contract is frozen.** Contract changes follow the conductor's `Amending decisions`
-  rules; a change to a shipped contract with a deployed consumer needs a
+- **The contract is frozen.** Contract changes follow `AGENTS.md` → "A wrong decision is
+  amended, not obeyed"; a change to a shipped contract with a deployed consumer needs a
   versioning/deprecation ADR, not an inline edit.
 - **No force-push while review is open.** Follow-up commits only; a force-push destroys the
   reviewer's inline-comment anchors and the reviewed diff.
-- **Brief replies, citing docs, not stages.** Replies post unseen, so they stay short and cite the
+- **Brief replies, citing docs, not the workflow.** Replies post unseen, so they stay short and cite the
   durable doc (spec, ADR, contract), never the workflow.

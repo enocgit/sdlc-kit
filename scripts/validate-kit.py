@@ -289,9 +289,8 @@ class Validator:
         """The files agents actually read carry the operative workflow rules.
 
         A harness without skills reads only AGENTS.md, so the template manual
-        must carry the gates and the no-compromise rules; the conductor keeps
-        the per-stage procedure in one file because agents skip referenced
-        files.
+        must carry the gates, the review order, and the no-compromise rules;
+        the skills it names carry only what their reader needs.
         """
         required: dict[str, tuple[str, ...]] = {
             "templates/AGENTS.md": (
@@ -302,25 +301,28 @@ class Validator:
                 "5. Behavior ships with tests, and each check is proven able to fail.",
                 "6. The spec states what actually shipped.",
                 "7. No secrets in the repository, logs, or artifacts.",
-                "load `sdlc` before any work that changes the product",
-                "**Gate**: approve foundation",
-                "**Gate**: approve plan",
-                "**Gate**: the human merges",
-            ),
-            "skills/sdlc/SKILL.md": (
-                "**Gate: approve foundation.**",
-                "**Gate: approve plan.**",
-                "The gate message quotes the real-world check",
-                "**Prove the checks.**",
-                "Test first.",
-                "that is its real-world check",
-                "real-world check covers, run the check on its input",
-                "Review in a context that did not write the change",
+                "run `bootstrap` first",
+                "**Gate: approve plan.** Stop and quote the smoke check",
+                "No code before\n  approval, even when the task asks for a PR.",
+                "**Gate: the human merges.**",
+                "a failing test first",
+                "is not\n  swapped for another input on your own",
+                "Before opening the PR, get a review from a context that did not write the change",
+                "on\n   a different model",
+                "never\nyour summary",
+                "If a third round\nstill finds required changes",
+                "The PR names\nthe reviewer, its model, and the verdict.",
                 "do not poll CI",
-                "fix the bug instead",
+            ),
+            "skills/bootstrap/SKILL.md": (
+                "## Gate: approve foundation",
+                "## Prove the checks",
+                "Commit nothing before approval.",
             ),
             "skills/code-review/SKILL.md": (
                 "A check that cannot run as approved is not a",
+                "confirm it in the installed source",
+                "Missing evidence is a note, not a block.",
             ),
         }
         for name, needles in required.items():
@@ -391,7 +393,7 @@ class Validator:
             existing.write_text("keep\n")
             (target / "docs/adr").mkdir(parents=True)
             (target / "docs/adr/existing.md").write_text("keep this document\n")
-            existing_skill = target / ".agents/skills/sdlc/SKILL.md"
+            existing_skill = target / ".agents/skills/bootstrap/SKILL.md"
             existing_skill.parent.mkdir(parents=True)
             existing_skill.write_text("keep this skill\n")
             expect_ok(fx.install(target), "merge install")
@@ -633,7 +635,7 @@ class Validator:
             agents.write_text(agents.read_text() + "\nNew kit rule.\n")
             (kit / "templates/docs").joinpath("new-template.md").write_text("new payload\n")
             (kit / "templates/docs/test-strategy.md").unlink()
-            skill = kit / "skills/sdlc/SKILL.md"
+            skill = kit / "skills/bootstrap/SKILL.md"
             skill.write_text(skill.read_text() + "\nRouter update.\n")
             # Adopter-side edit of an installer-added file:
             context = target / "docs/context.md"
@@ -643,7 +645,7 @@ class Validator:
             report = upgrade_result.stdout
             if "New kit rule." not in (target / "AGENTS.md").read_text():
                 raise CheckError("upgrade did not update an untouched kit file")
-            if "Router update." not in (target / ".agents/skills/sdlc/SKILL.md").read_text():
+            if "Router update." not in (target / ".agents/skills/bootstrap/SKILL.md").read_text():
                 raise CheckError("upgrade did not update an untouched skill file")
             if not (target / "docs/new-template.md").is_file():
                 raise CheckError("upgrade did not add a new kit file")
@@ -978,8 +980,8 @@ class Validator:
         with Fixture(self.kit) as fx:
             target = fx.target()
             expect_ok(fx.install(target), "install before removal")
-            epic = ".github/ISSUE_TEMPLATE/epic.md"
-            expect_ok(fx.install(target, upgrade=True, adopt=(epic,)), "adopt before removal")
+            adopted = "docs/specs/TEMPLATE.md"
+            expect_ok(fx.install(target, upgrade=True, adopt=(adopted,)), "adopt before removal")
             skill_dir = target / ".agents/skills/address-review"
             (skill_dir / "notes.md").write_text("adopter notes\n")
             strategy = target / "docs/test-strategy.md"
@@ -987,8 +989,8 @@ class Validator:
             kit = fx.kit_copy()
             shutil.rmtree(kit / "skills/address-review")
             (kit / "templates/docs/test-strategy.md").unlink()
-            (kit / "templates/github/ISSUE_TEMPLATE/epic.md").unlink()
-            (kit / "templates/github/ISSUE_TEMPLATE/task.md").unlink()
+            (kit / "templates/docs/specs/TEMPLATE.md").unlink()
+            (kit / "templates/docs/specs/README.md").unlink()
 
             before = self._payload_hashes(target)
             dry = fx.install(target, upgrade=True, kit=kit, dry_run=True)
@@ -1004,15 +1006,15 @@ class Validator:
                 raise CheckError("upgrade left an untouched skill file removed upstream")
             if not (skill_dir / "notes.md").is_file():
                 raise CheckError("upgrade deleted an adopter-added file")
-            if (target / ".github/ISSUE_TEMPLATE/task.md").exists():
+            if (target / "docs/specs/README.md").exists():
                 raise CheckError("upgrade left an untouched template removed upstream")
-            if not (target / ".github/ISSUE_TEMPLATE").is_dir():
+            if not (target / "docs/specs").is_dir():
                 raise CheckError("upgrade removed a directory that still holds an adopted file")
-            if not (target / epic).is_file():
+            if not (target / adopted).is_file():
                 raise CheckError("upgrade deleted an adopted file removed upstream")
             if "Adopter layer." not in strategy.read_text():
                 raise CheckError("upgrade deleted an adopter-modified file removed upstream")
-            for needle in ("docs/test-strategy.md", epic):
+            for needle in ("docs/test-strategy.md", adopted):
                 if needle not in result.stdout:
                     raise CheckError(f"upgrade report did not mention kept file {needle}")
             try:
@@ -1043,10 +1045,10 @@ class Validator:
             moved = fx.root / "moved"
             original.rename(moved)
             kit = fx.kit_copy()
-            skill = kit / "skills/sdlc/SKILL.md"
+            skill = kit / "skills/bootstrap/SKILL.md"
             skill.write_text(skill.read_text() + "\nRouter update.\n")
             expect_ok(fx.install(moved, upgrade=True, kit=kit), "upgrade after move")
-            if "Router update." not in (moved / ".agents/skills/sdlc/SKILL.md").read_text():
+            if "Router update." not in (moved / ".agents/skills/bootstrap/SKILL.md").read_text():
                 raise CheckError("upgrade skipped skills in a moved checkout")
             manifest_path = moved / ".sdlc-kit-manifest.json"
             manifest = json.loads(manifest_path.read_text())
@@ -1054,7 +1056,7 @@ class Validator:
             manifest_path.write_text(json.dumps(manifest))
             skill.write_text(skill.read_text() + "\nSecond update.\n")
             expect_ok(fx.install(moved, upgrade=True, kit=kit), "upgrade with a legacy absolute root")
-            if "Second update." not in (moved / ".agents/skills/sdlc/SKILL.md").read_text():
+            if "Second update." not in (moved / ".agents/skills/bootstrap/SKILL.md").read_text():
                 raise CheckError("upgrade skipped skills recorded under another clone's absolute path")
 
     def upgrade_keeps_workflows(self) -> None:

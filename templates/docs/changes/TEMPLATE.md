@@ -1,6 +1,6 @@
 # Change NNNN: {title}
 
-> Copy to `NNNN-{slug}.md`. Budget ~80 lines. Delete unused sections and this note.
+> Copy to `NNNN-{slug}.md`. Delete unused sections and this note.
 
 - **Status:** Draft | Approved | Shipped ({merge links}) | Dropped
 - **Specs touched:** {`docs/specs/{area}.md`}
@@ -23,7 +23,7 @@
 
 - [ ] {ID}: {observable outcome} ({unit | integration | end-to-end})
 
-## Real-world check
+## Smoke check
 
 <!-- One or two realistic inputs and what their user must get from each, in the user's words: a
      real page flow, request, caller, data sample, repository, or query. Point to the input (URL,
@@ -43,8 +43,9 @@
 
 - {What this change deliberately does not do}
 
-## Tasks
+## Slices
 
-<!-- The tracker when the project has none; otherwise link the epic. -->
+<!-- One per reviewable PR; one slice needs no list. With a tracker, each becomes an issue after
+     approval and this list links them; without one, tick each in the commit that completes it. -->
 
-- [ ] {task: acceptance criteria IDs, test layer}
+- [ ] {slice: acceptance criteria IDs, test layer}

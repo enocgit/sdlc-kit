@@ -38,7 +38,7 @@ KIT_BASE_DIR = ".sdlc-kit-base"
 # adopter fills one in, it is their document and kit template drift must not
 # be spliced into it. Everything else the kit publishes is living (mergeable)
 # except pinned snapshots, which are decided by their kit source path.
-INSTANCE_DOC_STEMS = {"architecture.md", "security.md"}
+INSTANCE_DOC_STEMS = {"architecture.md", "threat-model.md"}
 INSTANCE_DOC_DIRS = {"specs", "changes", "adr", "contracts"}
 INSTALLED_DIRECTORY_MODE = 0o755
 INSTALLED_REGULAR_MODE = 0o644

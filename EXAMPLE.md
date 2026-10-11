@@ -3,66 +3,53 @@
 TenantPay lets tenants pay rent online through verified property listings. This follows it from an
 empty repository to its first shipped feature. Backticks mark skills, paths, and commands.
 
-## 0. Foundation
+## Bootstrap
 
-The agent fills `docs/context.md`: product, Lifecycle (`team`, no deployed consumers, no real data,
-no traffic), the mobile client as an outside consumer, and two hard constraints. It lists the areas
-`auth` and `payments` in `docs/specs/README.md`, writes ADRs for the stack, the datastore, and the
-auth model, and sketches `docs/architecture.md`, `docs/security.md`, and `docs/test-strategy.md`.
+`bootstrap` fills `docs/context.md`: product, Lifecycle (`team`, no deployed consumers, no real
+data, no traffic), the mobile client as an outside consumer, and two hard constraints. It lists the
+areas `auth` and `payments` in `docs/specs/README.md`, writes ADRs for the stack, the datastore, and
+the auth model, and sketches `docs/architecture.md`, `docs/threat-model.md`, and
+`docs/test-strategy.md`.
 
 It sets `pnpm check` as the check command and wires it into CI. Then it plants a type error, a
 failing test, and a lint violation one at a time, sees `pnpm check` fail at each part, and reverts
-each.
+each. **Gate:** the human approves the foundation; with a protected `main`, it lands through a PR.
 
-**Gate:** approve the foundation. With a protected `main`, it lands through a `plan/0000-foundation`
-PR.
-
-## 1. Plan
+## Plan
 
 The user says, "Tenants should pay rent online." `grilling` asks in rounds, each question with a
 recommended answer, and settles partial payments, failed callbacks, and refunds.
 
-The agent writes `docs/changes/0001-rent-payment.md` (62 lines): the spec delta adds `PAY-1` to
-`PAY-4`, five acceptance criteria, the provider ADR, and the frozen `api/openapi.yaml` slice the
-mobile client needs. Its real-world check, agreed in the interview: in the provider's sandbox, a
-tenant pays a partial month's rent from the payment screen and sees the remaining balance. Payments
-move a trust boundary, so the threat delta is in the proposal and `security-review` runs on it
-before the gate.
+The agent writes `docs/changes/0001-rent-payment.md`: the spec delta adds `PAY-1` to `PAY-4`, five
+acceptance criteria, the provider ADR, and the frozen `api/openapi.yaml` slice the mobile client
+needs. Its smoke check: in the provider's sandbox, a tenant pays a partial month's rent from the
+payment screen and sees the remaining balance. Payments move a trust boundary, so the threat delta
+is in the proposal and `security-review` runs on it. The proposal lists three slices: the payment
+record and provider client, the webhook handler, and the payment screen.
 
-**Gate:** approve the plan. The team shape lands it on `main` before any branch is cut.
+**Gate:** the human approves the plan, which also approves the three slice issues. The team shape
+lands the proposal on `main` before any slice branches.
 
-## 2. Decompose
+## Build
 
-Three GitHub issues under an epic, each one reviewable PR: the payment record and provider client,
-the webhook handler, and the tenant payment screen. Each lists its acceptance criteria with
-requirement IDs and test layers. The agent discloses the order and continues.
+For the webhook slice the agent branches `feat/12-payment-webhook`. The slice is sensitive, so it
+first says what it adds beyond the approved plan: nothing. It writes `PAY-3 rejects an unsigned
+webhook` as an integration test against the test database, sees it fail, and implements the
+handler. It moves `PAY-3` into `docs/specs/payments.md` and updates the webhook row in
+`docs/threat-model.md` on the same branch. The smoke check runs later, with the payment-screen slice
+that completes the flow.
 
-## 3. Build
+## Review
 
-For the webhook task the agent branches `feat/12-payment-webhook`. Because the task is sensitive, it
-stops for approval of what its plan adds beyond the approved proposal: here, nothing. It writes
-`PAY-3 rejects an unsigned webhook` as an integration test against the test database, sees it fail,
-and implements the handler. It moves `PAY-3` into `docs/specs/payments.md` and updates the webhook
-row in `docs/security.md` in the same commit. The real-world check runs later, with the
-payment-screen task that completes the flow.
+The harness has no other model, but `codex exec` is installed, so the agent runs it with
+`code-review` and `security-review`, the diff, the proposal, the payments spec, the contract, and the
+raw check output. It asks for one change: the handler retries on every error, including a bad
+signature. The security record has two findings: one fixed, and rate limiting the webhook goes to
+the production register until there is production traffic. A second round on the new diff approves.
 
-## 4. Review
-
-A fresh subagent loads `code-review` and `security-review` and receives the diff, the proposal, the
-payments spec, and the contract. `code-review` asks for one change: the handler retries on every
-error, including a bad signature. `security-review` records two findings in a 24-line record. It
-fixes one; the other, rate limiting the webhook endpoint, goes to the production register until
-there is production traffic. After the fix, a second round approves.
-
-## 5. Land
+## PR and merge
 
 The agent pushes and opens the PR. "Where to look" points at the signature check and the idempotency
-key, and the proof table maps each criterion to its test. It reports the PR link and that CI is
-running, then stops. The human merges after CI passes.
-
-## 6. Retro
-
-GitHub closes the issue. The first merged CI run's log shows lint, typecheck, and all tests ran,
-matching the local count. One learning qualifies: the provider sends webhook timestamps in seconds, not
-milliseconds. When the third task merges, the agent checks the payments spec against the code and
-marks the proposal Shipped with links to its three PRs.
+key; the proof table maps each criterion to its test and names the reviewer and its model. It
+reports the PR link and that CI is running, then stops. The human merges after CI passes. When the
+payment-screen PR lands, it carries the smoke check output and marks the proposal Shipped.

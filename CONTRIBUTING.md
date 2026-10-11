@@ -8,13 +8,13 @@ and `SKILL.md` files. It has no build step.
 
 - Preserve runtime neutrality. Skill invocation routes project-local → user-global → runtime
   equivalent; a runtime that cannot invoke skills consumes `AGENTS.md` alone.
-- Keep the stage procedure in `skills/sdlc/SKILL.md` itself; agents skip referenced files. Keep the
-  gates and no-compromise rules in `templates/AGENTS.md` too, because some harnesses read only that.
+- Keep the gates, the review order, and the no-compromise rules in `templates/AGENTS.md`; some
+  harnesses read only that file, and agents skip referenced files.
 - Apply the deletion test before adding a rule: keep it only if a current frontier model with no
   instruction would get it wrong.
 - Use `{placeholder}`, not `<placeholder>`; angle brackets break Markdown previews. Keep template
   comments in `<!-- ... -->`.
-- Strengthen existing stages before adding one. Preserve the right-sized paths for fixes and chores.
+- Strengthen an existing step before adding one. Keep bug fixes and chores off the planning path.
 
 ## Add a maintained skill
 
@@ -46,9 +46,8 @@ pinned there; their upstream license ships inside the skill directory.
 
 1. Keep the change focused and reference its issue when one exists.
 2. Update the `Unreleased` section of `CHANGELOG.md` for user-visible changes.
-3. When pipeline behavior changes, update `AGENTS.md`, `templates/AGENTS.md`, the conductor in
-   `skills/sdlc/SKILL.md`, and any affected summaries, walkthroughs, templates, installation docs,
-   and regression checks.
+3. When workflow behavior changes, update `AGENTS.md`, `templates/AGENTS.md`, the affected skills,
+   and any affected summaries, walkthroughs, templates, installation docs, and regression checks.
 4. Install Python 3.10+ and PyYAML, then run `./scripts/validate-kit.sh` as part of the complete
    [verification checklist](./AGENTS.md#verification). The script checks critical installer safety,
    manifests, snapshot pins, and the workflow rules in the files agents read; the linked checklist covers the

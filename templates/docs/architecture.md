@@ -1,6 +1,6 @@
 # Architecture
 
-> STATUS: TEMPLATE — fill at Stage 0 and delete this marker.
+> STATUS: TEMPLATE — fill during bootstrap and delete this marker.
 > Current system shape only. Planned changes live in their change proposal until they ship;
 > decision history lives in `docs/adr/`. Prefer a small diagram or table to prose.
 

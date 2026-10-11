@@ -1,11 +1,11 @@
 ---
 name: Task
-about: One shippable slice of a change
+about: One reviewable slice of a change
 title: ""
 labels: ["task"]
 ---
 
-**Change:** `docs/changes/NNNN-{slug}.md` · **Part of:** #NN · **Depends on:** #NN
+**Change:** `docs/changes/NNNN-{slug}.md` · **Depends on:** #NN
 
 ## Acceptance criteria
 

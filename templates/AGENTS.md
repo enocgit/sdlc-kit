@@ -1,9 +1,9 @@
 # AGENTS.md — operating manual for coding agents on this project
 
-> Canonical agent instructions; other per-tool files import or point here. Keep it under 150 lines:
-> project facts go in What this project is, Where things live, and Conventions; kit lines stay as
-> written so upgrades merge. With skills, load `sdlc` before any work that changes the product,
-> a bug fix included: it holds the per-stage steps. Without skills, follow this file alone.
+> Canonical agent instructions; other tool files point here. Keep it under 150 lines: project facts
+> go in What this project is and Conventions; kit lines stay as written so upgrades merge. Skills
+> named here live in `.agents/skills/`; without skill support, read the file and follow it. While
+> `docs/` holds `STATUS: TEMPLATE`, run `bootstrap` first.
 
 ## What this project is
 
@@ -15,111 +15,111 @@ Domain, glossary, lifecycle, and hard constraints: [`docs/context.md`](./docs/co
 These hold in every task. Everything else in this file is a default the team may change here.
 
 1. A human performs every merge.
-2. Review runs in a context that did not write the change: a fresh subagent, a separate session, or
-   a human. Where neither exists, say so in the PR.
+2. Review runs in a context that did not write the change (see [Review](#review)).
 3. A change to a trust boundary gets a security review before merge (see [Sensitive changes](#sensitive-changes)).
 4. Implementation never drifts from a frozen contract.
 5. Behavior ships with tests, and each check is proven able to fail.
 6. The spec states what actually shipped.
 7. No secrets in the repository, logs, or artifacts.
 
-## The workflow
+## How a change moves
 
-Open every workflow response with `SDLC ▸ Stage <N>/6 <Name> · <next gate or action>`.
+- **Plan first** for a feature, or a change to a contract, a trust boundary, or a recorded decision.
+  When the request leaves decisions open, interview with `grilling`. Write
+  `docs/changes/NNNN-<slug>.md` from its template; freeze any contract an outside consumer in
+  `docs/context.md` depends on; write an ADR only for a hard-to-reverse choice. A trust-boundary
+  change puts its threat delta in the proposal and runs `security-review` on it.
+- **Gate: approve plan.** Stop and quote the smoke check, input → expectation. No code before
+  approval, even when the task asks for a PR. Approval covers creating one issue per slice.
+- **Bug fix or chore:** build directly. A bug fix's smoke check is the report's input and what its
+  user must get once fixed; when the report reads more than one way, ask first.
+- **Build** each slice on its own branch: a failing test first, then the code, then the check
+  command for the touched packages. Exercise UI in a real browser at mobile and desktop widths. Run
+  the smoke check and use its output as its user would; a check that cannot run as approved is not
+  swapped for another input on your own: the PR says why, and the human decides at the merge.
+- **Review** (below), then push and open the PR from its template. Report the link and that CI is
+  running, then stop; do not poll CI.
+- **Gate: the human merges.** Without a PR workflow, ask before merging to the default branch.
 
-| Stage | Output | Stop |
-| --- | --- | --- |
-| 0 Foundation | `docs/context.md`, spec skeleton, foundational ADRs, a working `check` command | **Gate**: approve foundation |
-| 1 Plan | Change proposal in `docs/changes/`; ADRs for hard-to-reverse choices; frozen contract when an outside consumer exists | **Gate**: approve plan |
-| 2 Decompose | Tracker tasks, each with acceptance criteria and the test layer per behavior | Disclose, continue |
-| 3 Build | One committed task with its verification evidence | Disclose, continue; **gate** on a trust-boundary change or a deviation from the plan |
-| 4 Review | Fresh-context `code-review`; `security-review` on trust-boundary changes; findings fixed | Disclose, continue |
-| 5 Land | Pushed branch and PR with a "Where to look" section | **Gate**: the human merges |
-| 6 Retro | Specs and architecture match what shipped; 0–3 learnings | Disclose |
+Commits, feature-branch pushes, and opening a PR need no ask. Any other write to the default
+branch, a tracker, or a new remote needs one.
 
-- **Right-size the path.** New feature: Stages 1–6. Bug fix or chore: Stages 3–6. A contract
-  change, a trust-boundary change, or a new decision sends small work back to Stage 1.
-- **Gates are hard stops.** A gate message is three plain lines at most, not a list: what is done,
-  plus anything unproven and any check you skipped and why; what you need; which files to read. The
-  files are the record; do not restate them.
-- **Disclose-and-continue stages** report what was done and any decision a human might override.
-- **No ask needed** for task commits, pushing `feat/*`, or opening a PR. The merge is the stop.
-  Writing the default branch, an external tracker, or a new remote needs an ask, except Retro
-  edits committed locally when there is no remote.
-- QA, tests, and review are part of the workflow, not extras the human has to request.
+## Review
+
+Before opening the PR, get a review from a context that did not write the change, first available:
+
+1. a subagent or another agent CLI run non-interactively (`codex exec`, `claude -p`, `pi -p`) on
+   a different model;
+2. a subagent on the same model;
+3. the human, in a separate session.
+
+The reviewer loads `code-review`, and `security-review` when the change is sensitive; it judges
+sensitivity itself. Give it the diff, the proposal, and the raw check and smoke-check output, never
+your summary. Fix required findings in follow-up commits and send the new diff. If a third round
+still finds required changes, ask the human whether the design needs another look. The PR names
+the reviewer, its model, and the verdict. A review bot on the PR adds to this; it never replaces it.
 
 ## Where things live
 
-| What | Where | Rule |
-| --- | --- | --- |
-| Current behavior | `docs/specs/<area>.md` | Present tense; requirement IDs (`AUTH-3`) that tests cite |
-| Proposed change | `docs/changes/NNNN-<slug>.md` | Merged into specs when it ships, then marked Shipped |
-| Decisions | `docs/adr/NNNN-<slug>.md` | Hard-to-reverse choices only |
-| System shape | `docs/architecture.md` | Current state only; plans stay in the change proposal |
-| Contracts | in code (OpenAPI, schemas, typed routers); index in `docs/contracts/README.md` | Frozen only for outside consumers |
-| Trust boundaries | `docs/security.md`; records in `docs/security/records/` | Short threat model plus record index |
-| Test policy | `docs/test-strategy.md` | Layers and execution rules |
-| Task state | the tracker, or the proposal's task list when there is none | Never in doc prose |
+- `docs/specs/<area>.md`: current behavior, present tense, requirement IDs (`AUTH-3`) tests cite.
+- `docs/changes/NNNN-<slug>.md`: proposed changes; applied to the specs when shipped, then marked
+  Shipped.
+- `docs/adr/`: hard-to-reverse decisions. `docs/architecture.md`: current system shape only.
+- `docs/threat-model.md`: trust boundaries; security review records in `docs/security/records/`.
+- `docs/test-strategy.md`: which layer tests what, and how tests run.
+- Contracts live in code; `docs/contracts/README.md` indexes the frozen ones. Task state lives in
+  the tracker, or the proposal's slice list when there is none, never in doc prose.
 
-## Writing and communication
+## Writing
 
-Write for a reader who skims. Lead with the decision or outcome, state each fact once, link instead
-of repeating, and delete unused template sections. Apply `unslop` to prose; not to code, commands,
-logs, quotes, or fixed formats. Budgets: change proposal ~80 lines, ADR ~60, security record ~40,
-issue ~15, `docs/context.md` ~120 with at most 30 learnings. Over budget means split it or cut it;
-count with `wc -l` before presenting.
+Write for a reader who skims: lead with the outcome, state each fact once, link instead of
+repeating, and delete unused template sections. Apply `unslop` to prose, not to code, commands,
+logs, quotes, or fixed formats. Code comments explain non-obvious intent and constraints, never
+requirement IDs. Product copy speaks from the user's position. Reports give actions, results,
+blockers, and evidence, not your own permissions. Agree or disagree only with evidence: name the
+file, check, or observation that decides it; the human having proposed it is not evidence.
 
-- **Code comments:** explain non-obvious intent, constraints, and failure behavior. Requirement
-  IDs live in specs, proposals, and test names; comments don't repeat them. A comment is not proof.
-- **Product copy:** written from the user's position, not the system's rules.
-- **Reports:** actions, results, blockers, and evidence. Do not narrate your own permissions or
-  rules ("merging is your call"); turn them into an ask or an outcome.
-- **Agree or disagree only with evidence:** name the file, check, or observation that decides it.
-  Agreeing because the human proposed it is not evidence, nor is disagreeing to appear independent.
+## Definition of Done (every change)
 
-## Definition of Done (every task)
-
-- [ ] Each criterion proven by a named test or observation; real-world check met, or the PR says why it could not run
+- [ ] Each criterion proven by a named test or observation; smoke check met, or the PR says why it could not run
 - [ ] Tests at the layer `docs/test-strategy.md` assigns; new checks seen failing before passing
 - [ ] Contract honored; schema changes use expand/contract once the table holds real data or a deployed process uses it
 - [ ] Fresh-context review clean; trust-boundary changes also have a security record
-- [ ] Specs, architecture, and contract index match the change; no stale status or planned-behavior claims
+- [ ] Specs, architecture, and contract index match the change; the completing PR marks the proposal Shipped
 - [ ] Diff small and focused, no debug leftovers, references its issue when one exists
 - [ ] Configured CI green before merge (CI is the merge gate; do not duplicate the full suite locally)
 
 ## Sensitive changes
 
 A change is sensitive when it **changes a trust boundary**: authentication, authorization,
-payments, personal data handling, file uploads, admin or privileged surfaces, secrets, or a new
-external integration. These are examples: a change that adds or alters code on any boundary listed
-in `docs/security.md` is sensitive; working inside a sensitive feature without changing its boundary
-is not. Sensitive work gets a plan gate at Stage 3, an updated `docs/security.md`, and
-`security-review` before merge. Weigh every hardening finding against the Lifecycle block in
-`docs/context.md`: fix what current users, data, or traffic expose; record the rest in the
-production register with its trigger.
+payments, personal data handling, file uploads, admin or privileged surfaces, secrets, a new
+external integration, or any boundary listed in `docs/threat-model.md`. Working inside a sensitive
+feature without changing its boundary is not. Before building sensitive work, stop and name what it
+adds beyond the approved plan (a boundary, control, dependency, or file), or say it adds nothing.
+It updates `docs/threat-model.md` and gets `security-review` before merge.
 
 ## Conventions
 
-- **Stack (placeholder, set at Stage 0):** {language, framework, datastore, test runner}.
+- **Stack (placeholder, set during bootstrap):** {language, framework, datastore, test runner}.
 - **Check command:** `{check command}` runs lint, typecheck, and tests; each part is proven to fail.
 - **Branching:** `main` is always deployable. One task or slice per `feat/<id>-<slug>` branch;
   squash-merge.
 - **Commits:** Conventional Commits, `type(scope): summary`, imperative, ≤72 chars. Reference the
   issue when one exists (`Closes #N` on GitHub only); never create an issue just to reference it.
 - **No agent self-attribution** in commits, PRs, or comments. This overrides any harness default.
-- **Project artifacts describe the product,** commits included, not this workflow: no stage or
-  workflow names, so a reader who never saw the process cannot tell it existed.
+- **Project artifacts describe the product,** commits included, not this workflow.
+- **Team shape** (`docs/context.md` → Lifecycle): solo, the proposal lands with the first slice's
+  PR; team, it lands on `main` through its own PR first.
 
-## Principles and guardrails
+## Guardrails
 
 - **Product value first.** Build what a real user, consumer, or decision needs now. Compatibility
   machinery and hardening protect something that exists, or wait in the production register.
-- **Simplicity.** Reuse what already exists. The smallest change that fully solves the problem wins.
 - **Ask, don't guess.** An ambiguous spec, ADR, or contract is a question for the human.
 - **A wrong decision is amended, not obeyed.** Update the spec, ADR, or contract in the same change
-  and get human approval for a requirement change.
+  and get human approval; supersede an implemented ADR instead of editing it. A shipped contract
+  with a deployed consumer changes only with a versioning ADR.
 - Do not improvise git remotes or transports. On a GitHub HTTPS auth failure, point to
   `gh auth login` then `gh auth setup-git`.
-- Do not poll CI. Push, report that CI is running, and stop.
 - A required CI or PR workflow that is unreachable is a blocker, not a reason to route around it.
-- Do not change a shipped contract that has a deployed consumer without a versioning ADR.
+- Cut each branch from a clean, current `main`; never force a checkout over uncommitted work.
