@@ -15,7 +15,7 @@ term in the product's files.
 ```bash
 grep -rnE 'STATUS: TEMPLATE|\{[A-Za-z][^}]*\}' docs --exclude=TEMPLATE.md --exclude-dir=changes
 grep -nE '\{[A-Za-z][^}]*\}' AGENTS.md
-grep -rsniE 'stage [0-6]|solo developer' docs src test .github --exclude=TEMPLATE.md
+git grep --untracked -niE 'stage [0-6]|solo developer' -- . ':!AGENTS.md' ':!.agents' ':!*TEMPLATE.md' ':!.sdlc-kit-manifest.json'
 ```
 
 ## New project
