@@ -37,8 +37,8 @@ These hold in every task. Everything else in this file is a default the team may
   command for the touched packages. Exercise UI in a real browser at mobile and desktop widths. Run
   the smoke check and use its output as its user would; a check that cannot run as approved is not
   swapped for another input on your own: the PR says why, and the human decides at the merge.
-- **Review** (below), then push and open the PR from its template. Report the link and that CI is
-  running, then stop; do not poll CI.
+- **Review** (below), then open the PR from its template. Report the link and that CI is running,
+  then stop; do not poll CI.
 - **Gate: the human merges.** Without a PR workflow, ask before merging to the default branch.
 
 Commits, feature-branch pushes, and opening a PR need no ask. Any other write to the default

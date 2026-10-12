@@ -27,8 +27,9 @@
 
 <!-- One or two realistic inputs and what their user must get from each, in the user's words: a
      real page flow, request, caller, data sample, repository, or query. Point to the input (URL,
-     command, path); never commit private data. With no real data yet, use the closest public
-     sample. A change no user can see writes "none: no user-visible change". -->
+     command, path) and name where it runs; if that needs something you cannot start, ask before
+     approval. Never commit private data. With no real data yet, use the closest public sample. A
+     change no user can see writes "none: no user-visible change". -->
 
 - {realistic input} → {what the user must see or get}
 
