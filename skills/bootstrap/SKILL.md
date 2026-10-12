@@ -22,7 +22,7 @@ git grep --untracked -niE 'stage [0-6]|solo developer' -- . ':!AGENTS.md' ':!.ag
 
 Fill `docs/context.md` (product, Lifecycle, outside consumers, hard constraints), set the stack and
 check command in `AGENTS.md`, set `docs/test-strategy.md`, and write only the ADRs a first feature
-cannot start without. The human owns the Lifecycle values; propose them, never set them silently.
+cannot start without. A maintainer owns the Lifecycle values; propose them, never set them silently.
 Describe only what exists; a plan labelled "intended" is still a plan and goes in the first change
 proposal. With no code yet:
 
@@ -52,6 +52,10 @@ count. A check that fails on a clean tree is reported at the gate, not retried u
 CI runs the same command. When the first PR's CI run finishes, read its log: lint, typecheck, and
 tests each ran, and the test count matches the local run. A part that did not run is a bug to fix.
 
+Start the Local run command in `docs/test-strategy.md` and load one page or call one endpoint
+through it. Whatever it cannot reach without secrets you cannot read, live data, or a shared
+database goes under Not covered with where a maintainer checks it; never route around the gap.
+
 ## Gate: approve foundation
 
 Stop with three plain lines: what is done, anything unproven or skipped and why, and which files to
@@ -59,4 +63,4 @@ read. Commit nothing before approval. Then land it on the default branch:
 
 - no remote → commit to the local default branch;
 - remote with an unprotected default branch → commit and push, under the same approval;
-- protected default branch → a branch and PR; the human merges.
+- protected default branch → a branch and PR; a maintainer merges.

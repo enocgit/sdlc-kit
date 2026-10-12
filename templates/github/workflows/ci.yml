@@ -1,4 +1,4 @@
-# The merge gate: the project's check command must pass before a human merges.
+# The merge gate: the project's check command must pass before anything merges.
 # Replace the setup step and CHECK command with your stack's.
 #
 # Pull requests run the packages a change affects (use your build tool's affected filter when it has

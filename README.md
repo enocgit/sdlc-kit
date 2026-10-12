@@ -57,7 +57,7 @@ read [`EXAMPLE.md`](./EXAMPLE.md). Maintainers should read
 
 ## How the workflow works
 
-The kit encodes what model upgrades do not supply: human approval at the decisions that matter, a
+The kit encodes what model upgrades do not supply: a maintainer's approval at the decisions that matter, a
 living record of what the product does, review by a context that did not write the code, and checks
 proven able to fail. It leaves step-by-step procedure to the agent and the harness.
 
@@ -70,7 +70,7 @@ proven able to fail. It leaves step-by-step procedure to the agent and the harne
    available, before the PR opens.
 4. **PR** with a "Where to look" section and a criterion-to-test proof table. **Gate:** you merge.
 
-**Seven rules hold in every project:** a human performs every merge; review runs in a fresh
+**Seven rules hold in every project:** a maintainer performs every merge; review runs in a fresh
 context; trust-boundary changes get a security review; implementation never drifts from a frozen
 contract; behavior ships with tests and each check is proven able to fail; the spec states what
 shipped; no secrets in the repository. Everything else is a default a project may change in its

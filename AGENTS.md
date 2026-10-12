@@ -125,8 +125,8 @@ observation.
 ## Git and release safety
 
 - Keep `main` deployable. Use a short-lived `feat/*` branch for changes.
-- Do not commit, push, or open a pull request unless the user explicitly asks. The human performs every landing merge into the target branch. Local default-branch synchronization via `git merge --ff-only` and unreferenced synthetic merge/integration commits used only for review evidence are not landing merges.
+- Do not commit, push, or open a pull request unless the user explicitly asks. The maintainer performs every landing merge into the target branch. Local default-branch synchronization via `git merge --ff-only` and unreferenced synthetic merge/integration commits used only for review evidence are not landing merges.
 - Do not invent remotes or transports. Surface authentication failures and point to the documented
   one-time fix.
 - Update `CHANGELOG.md` for user-visible changes and review release metadata before publishing.
-- Never treat a green local check as permission to bypass a required review or human decision.
+- Never treat a green local check as permission to bypass a required review or maintainer decision.

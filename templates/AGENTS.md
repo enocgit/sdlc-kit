@@ -14,7 +14,7 @@ Domain, glossary, lifecycle, and hard constraints: [`docs/context.md`](./docs/co
 
 These hold in every task. Everything else in this file is a default the team may change here.
 
-1. A human performs every merge.
+1. A maintainer performs every merge.
 2. Review runs in a context that did not write the change (see [Review](#review)).
 3. A change to a trust boundary gets a security review before merge (see [Sensitive changes](#sensitive-changes)).
 4. Implementation never drifts from a frozen contract.
@@ -24,6 +24,8 @@ These hold in every task. Everything else in this file is a default the team may
 
 ## How a change moves
 
+- **Every task that changes files** ends on its own branch, reviewed, with a PR open; do all of that
+  unasked. Writes to the default branch, a tracker, or a new remote ask first.
 - **Plan first** for a feature, or a change to a contract, a trust boundary, or a recorded decision.
   When the request leaves decisions open, interview with `grilling`. Write
   `docs/changes/NNNN-<slug>.md` from its template; freeze any contract an outside consumer in
@@ -34,29 +36,26 @@ These hold in every task. Everything else in this file is a default the team may
 - **Bug fix or chore:** build directly. A bug fix's smoke check is the report's input and what its
   user must get once fixed; when the report reads more than one way, ask first.
 - **Build** each slice on its own branch: a failing test first, then the code, then the check
-  command for the touched packages. Exercise UI in a real browser at mobile and desktop widths. Run
-  the smoke check and use its output as its user would; a check that cannot run as approved is not
-  swapped for another input on your own: the PR says why, and the human decides at the merge.
+  command for the touched packages. Then, where `docs/test-strategy.md` → Local run says, exercise
+  UI in a real browser at mobile and desktop widths and run the smoke check: not a test, but one
+  look at the running product on realistic input, read as its user would. If Local run names a
+  maintainer, the PR lists the check for them. A check that cannot run as approved is not swapped
+  for another input on your own: the PR says why, and whoever merges decides.
 - **Review** (below), then open the PR from its template. Report the link and that CI is running,
   then stop; do not poll CI.
-- **Gate: the human merges.** Without a PR workflow, ask before merging to the default branch.
-
-Commits, feature-branch pushes, and opening a PR need no ask. Any other write to the default
-branch, a tracker, or a new remote needs one.
+- **Gate: a maintainer merges.** Without a PR workflow, ask before merging to the default branch.
 
 ## Review
 
-Before opening the PR, get a review from a context that did not write the change, first available:
+Before the PR, delegate a review, unasked, to the first available context that did not write it:
 
-1. a subagent or another agent CLI run non-interactively (`codex exec`, `claude -p`, `pi -p`) on
-   a different model;
-2. a subagent on the same model;
-3. the human, in a separate session.
+1. a subagent or headless agent CLI (`codex exec`, `claude -p`, `pi -p`) on a different model;
+2. either of those on the same model.
 
 The reviewer loads `code-review`, and `security-review` when the change is sensitive; it judges
 sensitivity itself. Give it the diff, the proposal, and the raw check and smoke-check output, never
 your summary. Fix required findings in follow-up commits and send the new diff. If a third round
-still finds required changes, ask the human whether the design needs another look. The PR names
+still finds required changes, ask a maintainer whether the design needs another look. The PR names
 the reviewer, its model, and the verdict. A review bot on the PR adds to this; it never replaces it.
 
 ## Where things live
@@ -77,7 +76,7 @@ repeating, and delete unused template sections. Apply `unslop` to prose, not to 
 logs, quotes, or fixed formats. Code comments explain non-obvious intent and constraints, never
 requirement IDs. Product copy speaks from the user's position. Reports give actions, results,
 blockers, and evidence, not your own permissions. Agree or disagree only with evidence: name the
-file, check, or observation that decides it; the human having proposed it is not evidence.
+file, check, or observation that decides it; who proposed it is not evidence.
 
 ## Definition of Done (every change)
 
@@ -115,10 +114,10 @@ It updates `docs/threat-model.md` and gets `security-review` before merge.
 
 - **Product value first.** Build what a real user, consumer, or decision needs now. Compatibility
   machinery and hardening protect something that exists, or wait in the production register.
-- **Ask, don't guess.** An ambiguous spec, ADR, or contract is a question for the human.
+- **Ask, don't guess.** An ambiguous spec, ADR, or contract is a question for a maintainer.
 - **A wrong decision is amended, not obeyed.** Update the spec, ADR, or contract in the same change
-  and get human approval; supersede an implemented ADR instead of editing it. A shipped contract
-  with a deployed consumer changes only with a versioning ADR.
+  and get it approved; supersede an implemented ADR instead of editing it. A shipped contract with
+  a deployed consumer changes only with a versioning ADR.
 - Do not improvise git remotes or transports. On a GitHub HTTPS auth failure, point to
   `gh auth login` then `gh auth setup-git`.
 - A required CI or PR workflow that is unreachable is a blocker, not a reason to route around it.

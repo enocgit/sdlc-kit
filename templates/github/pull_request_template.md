@@ -19,6 +19,6 @@
 | --- | --- |
 | {ID} | {test name or observation} |
 
-- **Smoke check:** <!-- the input, where its output is, and how it met the expectation; why it could not run as approved; or "none" -->
+- **Smoke check:** <!-- the input, where its output is, and how it met the expectation; the steps a maintainer runs before merging; why it could not run as approved; or "none" -->
 - **Review:** <!-- reviewer and model, rounds, verdict; security record link if sensitive -->
 - **CI:** <!-- running / green / not configured -->

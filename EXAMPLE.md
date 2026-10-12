@@ -13,7 +13,7 @@ the auth model, and sketches `docs/architecture.md`, `docs/threat-model.md`, and
 
 It sets `pnpm check` as the check command and wires it into CI. Then it plants a type error, a
 failing test, and a lint violation one at a time, sees `pnpm check` fail at each part, and reverts
-each. **Gate:** the human approves the foundation; with a protected `main`, it lands through a PR.
+each. **Gate:** the maintainer approves the foundation; with a protected `main`, it lands through a PR.
 
 ## Plan
 
@@ -27,7 +27,7 @@ payment screen and sees the remaining balance. Payments move a trust boundary, s
 is in the proposal and `security-review` runs on it. The proposal lists three slices: the payment
 record and provider client, the webhook handler, and the payment screen.
 
-**Gate:** the human approves the plan, which also approves the three slice issues. The team shape
+**Gate:** the maintainer approves the plan, which also approves the three slice issues. The team shape
 lands the proposal on `main` before any slice branches.
 
 ## Build
@@ -51,5 +51,5 @@ the production register until there is production traffic. A second round on the
 
 The agent pushes and opens the PR. "Where to look" points at the signature check and the idempotency
 key; the proof table maps each criterion to its test and names the reviewer and its model. It
-reports the PR link and that CI is running, then stops. The human merges after CI passes. When the
+reports the PR link and that CI is running, then stops. The maintainer merges after CI passes. When the
 payment-screen PR lands, it carries the smoke check output and marks the proposal Shipped.

@@ -28,6 +28,15 @@ they prove (`AUTH-3 rejects an expired session`); source comments don't repeat i
 - One test runner per stack unless an ADR says otherwise.
 - Locally, run the touched packages; CI is the merge gate.
 
+## Local run
+
+Where UI checks and smoke checks run. Agents run what the command covers; a maintainer runs the rest.
+
+- **Command:** `{command}` starts {the app or a UI harness} on {seed data}, with no production
+  secrets or shared database.
+- **Not covered:** {flows that need secrets, live data, or a deployed service; or "none"}, run by a
+  maintainer on {preview deploy or environment}.
+
 ## Deferred
 
 Tests that need deployed consumers, real data, or production traffic wait in the production register

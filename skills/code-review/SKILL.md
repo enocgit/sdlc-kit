@@ -49,9 +49,10 @@ list. Then:
 - **Acceptance criteria:** map each one to the test or observation that proves it.
 - **Smoke check:** read the raw output from the proposal's realistic input as its user would and
   judge it against the stated expectation. A miss is a required finding, and so is a missing run of
-  a check that could run as the proposal states it. A check that cannot run as approved is not a
-  finding: confirm the PR says why, and leave the call to the human at the merge. The author's
-  verdict on the output does not count.
+  a check the project's Local run covers. A check that cannot run as approved is not a finding,
+  nor is one Local run leaves to a maintainer: confirm the PR says why or lists the steps, and
+  leave the call to whoever merges. A passing test is not a smoke check run. The author's verdict
+  on the output does not count.
 - **Checks can fail:** a new test was seen failing first; a new or changed check command fails on a
   planted error.
 - **Missing evidence is a note, not a block.** Apart from the smoke check, an artifact you were not

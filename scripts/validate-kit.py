@@ -294,7 +294,7 @@ class Validator:
         """
         required: dict[str, tuple[str, ...]] = {
             "templates/AGENTS.md": (
-                "1. A human performs every merge.",
+                "1. A maintainer performs every merge.",
                 "2. Review runs in a context that did not write the change",
                 "3. A change to a trust boundary gets a security review before merge",
                 "4. Implementation never drifts from a frozen contract.",
@@ -304,15 +304,17 @@ class Validator:
                 "run `bootstrap` first",
                 "**Gate: approve plan.** Stop and quote the smoke check",
                 "No code before\n  approval, even when the task asks for a PR.",
-                "**Gate: the human merges.**",
+                "**Gate: a maintainer merges.**",
                 "a failing test first",
-                "is not\n  swapped for another input on your own",
-                "Before opening the PR, get a review from a context that did not write the change",
-                "on\n   a different model",
+                "is not swapped\n  for another input on your own",
+                "Before the PR, delegate a review, unasked, to the first available context that did not write it",
+                "(`codex exec`, `claude -p`, `pi -p`) on a different model",
                 "never\nyour summary",
                 "If a third round\nstill finds required changes",
                 "The PR names\nthe reviewer, its model, and the verdict.",
                 "do not poll CI",
+                "ends on its own branch, reviewed, with a PR open; do all of that\n  unasked.",
+                "→ Local run says",
             ),
             "skills/bootstrap/SKILL.md": (
                 "## Gate: approve foundation",
@@ -740,7 +742,7 @@ class Validator:
 
         The adopter file is agent-consumed, so conflict markers must never
         land in it; the conflicted merge goes beside the base snapshot for
-        the human to resolve.
+        the adopter to resolve.
         """
         with Fixture(self.kit) as fx:
             target = fx.target()
