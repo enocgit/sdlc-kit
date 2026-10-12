@@ -32,6 +32,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - `templates/AGENTS.md` fits in 125 lines, leaving 25 of the 150-line budget for project facts. Adopters keep its lines as written so upgrades merge, and put project facts in the project sections.
 - Requirement IDs live in specs, proposals, and test names; code comments no longer repeat them.
 - `docs/test-strategy.md` sets test layers by where bugs surface, plus parallel-safe tests, affected-only pull request runs, and a full run on the default branch.
+- `address-review` reports a fixed ledger: fixed, refuted or declined, deferred, needs your decision, checks, and manual QA only for a fix no automated check covers, leaving out empty sections and dropped comments.
 - `code-review` absorbs `code-simplification` and `definition-of-done-review`. `code-review` and `security-review` are rewritten as kit-owned skills and no longer carry upstream notices.
 - The PR template adds a "Where to look" section and a criterion-to-test proof table. The CI template is stack-neutral and fails until the project sets its check command.
 - Lifecycle records team shape: solo projects land the proposal with the first slice's PR; team projects land it on `main` first.

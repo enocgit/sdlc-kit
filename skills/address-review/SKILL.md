@@ -87,10 +87,15 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
    and cite the durable doc. Do not resolve other people's thread states beyond replying, and never
    merge.
 
-6. **Report the ledger.** Summarize: what was **fixed** (commit refs), what was **refuted** and
-   why, what was **deferred** or **proposed** (issues suggested but not created), and what still
-   **needs the user's decision** at a gate.
-   End with a QA checklist if any fix warrants manual verification.
+6. **Report the ledger**, with only the sections that have entries, in this order:
+   - **Fixed:** comment → commit, and the test that proves it.
+   - **Refuted**, or **declined at your instruction:** comment → one-line reason.
+   - **Deferred** or **proposed:** issues suggested, not created.
+   - **Needs your decision.**
+   - **Checks:** each command and its result.
+   - **Manual QA:** only for a fix no automated check covers.
+
+   Leave out dropped comments and empty sections; don't repeat the triage table's reasoning.
 
 ## Rules
 
