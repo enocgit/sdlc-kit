@@ -27,10 +27,10 @@
 
 <!-- One or two realistic inputs and what their user must get from each, in the user's words: a
      real page flow, request, caller, data sample, repository, or query. Point to the input (URL,
-     command, path). It runs where `docs/test-strategy.md` → Local run covers it, and a maintainer
-     runs it where Local run does not. It is a look at the running product, not a test. Never
-     commit private data. With no real data yet, use the closest public sample. A change no user
-     can see writes "none: no user-visible change". -->
+     request, path), never a test command or fixture: a check CI could pass unattended is a test.
+     It runs where `docs/test-strategy.md` → Local run covers it, and a maintainer runs it where
+     Local run does not. Never commit private data. With no real data yet, use the closest public
+     sample. A change no user can see writes "none: no user-visible change". -->
 
 - {realistic input} → {what the user must see or get}
 

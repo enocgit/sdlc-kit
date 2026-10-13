@@ -30,7 +30,8 @@ they prove (`AUTH-3 rejects an expired session`); source comments don't repeat i
 
 ## Local run
 
-Where UI checks and smoke checks run. Agents run what the command covers; a maintainer runs the rest.
+Where UI checks and smoke checks run: a command that starts something to open, not a test runner.
+Agents run what it covers; a maintainer runs the rest.
 
 - **Command:** `{command}` starts {the app or a UI harness} on {seed data}, with no production
   secrets or shared database.
