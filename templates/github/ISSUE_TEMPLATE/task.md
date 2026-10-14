@@ -5,7 +5,7 @@ title: ""
 labels: ["task"]
 ---
 
-**Change:** `docs/changes/NNNN-{slug}.md` · **Depends on:** #NN
+**Change:** `docs/changes/{slug}.md` · **Depends on:** #NN
 
 ## Acceptance criteria
 

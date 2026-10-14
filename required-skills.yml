@@ -47,7 +47,7 @@ skills:
     kind: local
     sourcePath: skills/code-review
     use: review
-    note: fresh-context review plus readiness against the project's Definition of Done
+    note: fresh-context review plus readiness against the project's rules
   - name: security-review
     kind: local
     sourcePath: skills/security-review

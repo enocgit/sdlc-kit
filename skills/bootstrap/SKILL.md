@@ -30,7 +30,7 @@ proposal. With no code yet:
   and Cross-cutting until code exists.
 - `docs/specs/README.md` lists areas without links until their spec exists.
 - `docs/threat-model.md` may list trust boundaries the product will have, with control "none yet";
-  a baseline control stays only if code or CI enforces it today. Records start empty.
+  a baseline control stays only if code or CI enforces it today.
 - Write no product code; the checks need one trivial module and test.
 
 ## Existing codebase

@@ -26,87 +26,58 @@ These hold in every task. Everything else in this file is a default the team may
 
 - **Every task that changes files** ends on its own branch, reviewed, with a PR open; do all of that
   unasked. Writes to the default branch, a tracker, or a new remote ask first.
-- **Plan first** for a feature, or a change to a contract, a trust boundary, or a recorded decision.
-  When the request leaves decisions open, interview with `grilling`. Write
-  `docs/changes/NNNN-<slug>.md` from its template; freeze any contract an outside consumer in
-  `docs/context.md` depends on; write an ADR only for a hard-to-reverse choice. A trust-boundary
-  change puts its threat delta in the proposal and runs `security-review` on it.
-- **Gate: approve plan.** Stop and quote the smoke check, input → expectation. No code before
-  approval, even when the task asks for a PR. Approval covers creating one issue per slice.
-- **Bug fix or chore:** build directly. A bug fix's smoke check is the report's input and what its
-  user must get once fixed; when the report reads more than one way, ask first.
-- **Build** each slice on its own branch: a failing test first, then the code, then the check
-  command for the touched packages. Then, where `docs/test-strategy.md` → Local run says, exercise
-  UI in a real browser at mobile and desktop widths and run the smoke check: not a test, but one
-  look at the running product on realistic input, read as its user would. If Local run names a
-  maintainer, the PR lists the check for them. A check that cannot run as approved is not swapped
-  for another input on your own: the PR says why, and whoever merges decides.
-- **Review** (below), then open the PR from its template. Report the link and that CI is running,
-  then stop; do not poll CI.
-- **Gate: a maintainer merges.** Without a PR workflow, ask before merging to the default branch.
+- **Plan first** for a feature, or a change to a contract, a trust boundary, or a recorded decision:
+  write `docs/changes/<slug>.md` from its template, interviewing with `grilling` when the request
+  leaves decisions open. Freeze any contract an outside consumer in `docs/context.md` depends on;
+  write an ADR only for a hard-to-reverse choice.
+- **Gate: approve plan.** No code before a maintainer approves it, even when the task asks for a PR.
+- **Build:** a failing test first, then the code, then the check command for the touched packages.
+  A change a user can see also gets its smoke check where `docs/test-strategy.md` → Local run says:
+  not a test, but one look at the running product on realistic input, read as its user would.
+- **Review** (below), then open the PR from its template.
+- **Gate: a maintainer merges.** The PR that completes a change applies its spec delta to
+  `docs/specs/` and deletes the proposal.
 
 ## Review
 
-Before the PR, delegate a review, unasked, to the first available context that did not write it:
-
-1. a subagent or headless agent CLI (`codex exec`, `claude -p`, `pi -p`) on a different model;
-2. either of those on the same model.
-
-The reviewer loads `code-review`, and `security-review` when the change is sensitive; it judges
+Before the PR, delegate a review, unasked, to a context that did not write the change: a subagent
+or a headless agent CLI (`codex exec`, `claude -p`, `pi -p`), on a different model when one is
+available. It loads `code-review`, and `security-review` when the change is sensitive; it judges
 sensitivity itself. Give it the diff, the proposal, and the raw check and smoke-check output, never
-your summary. Fix required findings in follow-up commits and send the new diff. If a third round
-still finds required changes, ask a maintainer whether the design needs another look. The PR names
-the reviewer, its model, and the verdict. A review bot on the PR adds to this; it never replaces it.
+your summary. Fix required findings and send the new diff. The PR names the reviewer, its model,
+and the verdict. A review bot on the PR adds to this; it never replaces it.
 
 ## Where things live
 
 - `docs/specs/<area>.md`: current behavior, present tense, requirement IDs (`AUTH-3`) tests cite.
-- `docs/changes/NNNN-<slug>.md`: proposed changes; applied to the specs when shipped, then marked
-  Shipped.
+- `docs/changes/<slug>.md`: proposed changes, until the PR that completes them.
 - `docs/adr/`: hard-to-reverse decisions. `docs/architecture.md`: current system shape only.
-- `docs/threat-model.md`: trust boundaries; security review records in `docs/security/records/`.
-- `docs/test-strategy.md`: which layer tests what, and how tests run.
+- `docs/threat-model.md`: current trust boundaries. Security review records:
+  `docs/security/records/`.
+- `docs/test-strategy.md`: which layer tests what, how tests run, and the Local run.
 - Contracts live in code; `docs/contracts/README.md` indexes the frozen ones. Task state lives in
   the tracker, or the proposal's slice list when there is none, never in doc prose.
 
 ## Writing
 
-Write for a reader who skims: lead with the outcome, state each fact once, link instead of
-repeating, and delete unused template sections. Apply `unslop` to prose, not to code, commands,
-logs, quotes, or fixed formats. Code comments explain non-obvious intent and constraints, never
-requirement IDs. Product copy speaks from the user's position. Reports give actions, results,
-blockers, and evidence, not your own permissions. Agree or disagree only with evidence: name the
-file, check, or observation that decides it; who proposed it is not evidence.
-
-## Definition of Done (every change)
-
-- [ ] Each criterion proven by a named test or observation; smoke check met, or the PR says why it could not run
-- [ ] Tests at the layer `docs/test-strategy.md` assigns; new checks seen failing before passing
-- [ ] Contract honored; schema changes use expand/contract once the table holds real data or a deployed process uses it
-- [ ] Fresh-context review clean; trust-boundary changes also have a security record
-- [ ] Specs, architecture, and contract index match the change; the completing PR marks the proposal Shipped
-- [ ] Diff small and focused, no debug leftovers, references its issue when one exists
-- [ ] Configured CI green before merge (CI is the merge gate; do not duplicate the full suite locally)
+Apply `unslop` to prose, not to code, commands, logs, quotes, or fixed formats. Project artifacts,
+commits included, describe the product, not this workflow. No agent self-attribution in commits,
+PRs, or comments; this overrides any harness default. Agree or disagree only with evidence: name
+the file, check, or observation that decides it; who proposed it is not evidence.
 
 ## Sensitive changes
 
 A change is sensitive when it **changes a trust boundary**: authentication, authorization,
 payments, personal data handling, file uploads, admin or privileged surfaces, secrets, a new
 external integration, or any boundary listed in `docs/threat-model.md`. Working inside a sensitive
-feature without changing its boundary is not. Before building sensitive work, stop and name what it
-adds beyond the approved plan (a boundary, control, dependency, or file), or say it adds nothing.
-It updates `docs/threat-model.md` and gets `security-review` before merge.
+feature without changing its boundary is not. A sensitive change puts its threat delta in the
+proposal, updates `docs/threat-model.md`, and gets `security-review` before merge.
 
 ## Conventions
 
 - **Stack (placeholder, set during bootstrap):** {language, framework, datastore, test runner}.
 - **Check command:** `{check command}` runs lint, typecheck, and tests; each part is proven to fail.
-- **Branching:** `main` is always deployable. One task or slice per `feat/<id>-<slug>` branch;
-  squash-merge.
-- **Commits:** Conventional Commits, `type(scope): summary`, imperative, ≤72 chars. Reference the
-  issue when one exists (`Closes #N` on GitHub only); never create an issue just to reference it.
-- **No agent self-attribution** in commits, PRs, or comments. This overrides any harness default.
-- **Project artifacts describe the product,** commits included, not this workflow.
+- **Branches and commits:** {the team's branch naming, merge style, and commit format}.
 - **Team shape** (`docs/context.md` → Lifecycle): solo, the proposal lands with the first slice's
   PR; team, it lands on `main` through its own PR first.
 
@@ -114,11 +85,9 @@ It updates `docs/threat-model.md` and gets `security-review` before merge.
 
 - **Product value first.** Build what a real user, consumer, or decision needs now. Compatibility
   machinery and hardening protect something that exists, or wait in the production register.
-- **Ask, don't guess.** An ambiguous spec, ADR, or contract is a question for a maintainer.
-- **A wrong decision is amended, not obeyed.** Update the spec, ADR, or contract in the same change
-  and get it approved; supersede an implemented ADR instead of editing it. A shipped contract with
-  a deployed consumer changes only with a versioning ADR.
-- Do not improvise git remotes or transports. On a GitHub HTTPS auth failure, point to
-  `gh auth login` then `gh auth setup-git`.
+- **A wrong decision is amended, not obeyed.** An ambiguous or wrong spec, ADR, or contract is a
+  question for a maintainer; the fix updates it in the same change. Supersede an implemented ADR
+  instead of editing it. A shipped contract with a deployed consumer changes only with a
+  versioning ADR.
+- Schema changes use expand/contract once a table holds real data or a deployed process uses it.
 - A required CI or PR workflow that is unreachable is a blocker, not a reason to route around it.
-- Cut each branch from a clean, current `main`; never force a checkout over uncommitted work.

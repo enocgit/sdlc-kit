@@ -49,8 +49,7 @@ Rate each finding against current exposure, not worst case:
 ## Record
 
 Write `docs/security/records/YYYY-MM-DD-{slug}.md` (today's UTC date from the system clock), at most
-~40 lines, and add a row to the Records table in `docs/threat-model.md`. Update the trust-boundary
-table there if a boundary moved. A reviewer that cannot write files returns the record, and the
+~40 lines. Update the trust-boundary table in `docs/threat-model.md` if a boundary moved. A reviewer that cannot write files returns the record, and the
 author commits it unchanged.
 
 ```markdown

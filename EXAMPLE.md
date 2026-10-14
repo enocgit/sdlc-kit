@@ -20,20 +20,19 @@ each. **Gate:** the maintainer approves the foundation; with a protected `main`,
 The user says, "Tenants should pay rent online." `grilling` asks in rounds, each question with a
 recommended answer, and settles partial payments, failed callbacks, and refunds.
 
-The agent writes `docs/changes/0001-rent-payment.md`: the spec delta adds `PAY-1` to `PAY-4`, five
+The agent writes `docs/changes/rent-payment.md`: the spec delta adds `PAY-1` to `PAY-4`, five
 acceptance criteria, the provider ADR, and the frozen `api/openapi.yaml` slice the mobile client
 needs. Its smoke check: in the provider's sandbox, a tenant pays a partial month's rent from the
 payment screen and sees the remaining balance. Payments move a trust boundary, so the threat delta
 is in the proposal and `security-review` runs on it. The proposal lists three slices: the payment
 record and provider client, the webhook handler, and the payment screen.
 
-**Gate:** the maintainer approves the plan, which also approves the three slice issues. The team shape
-lands the proposal on `main` before any slice branches.
+**Gate:** the maintainer approves the plan. The team shape lands the proposal on `main` before any
+slice branches.
 
 ## Build
 
-For the webhook slice the agent branches `feat/12-payment-webhook`. The slice is sensitive, so it
-first says what it adds beyond the approved plan: nothing. It writes `PAY-3 rejects an unsigned
+For the webhook slice the agent branches `feat/12-payment-webhook`. It writes `PAY-3 rejects an unsigned
 webhook` as an integration test against the test database, sees it fail, and implements the
 handler. It moves `PAY-3` into `docs/specs/payments.md` and updates the webhook row in
 `docs/threat-model.md` on the same branch. The smoke check runs later, with the payment-screen slice
@@ -51,5 +50,5 @@ the production register until there is production traffic. A second round on the
 
 The agent pushes and opens the PR. "Where to look" points at the signature check and the idempotency
 key; the proof table maps each criterion to its test and names the reviewer and its model. It
-reports the PR link and that CI is running, then stops. The maintainer merges after CI passes. When the
-payment-screen PR lands, it carries the smoke check output and marks the proposal Shipped.
+reports the PR link. The maintainer merges after CI passes. The payment-screen PR, which completes
+the change, carries the smoke check output and deletes the proposal.
