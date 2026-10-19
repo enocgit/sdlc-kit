@@ -375,6 +375,9 @@ class Validator:
             expect_ok(fx.install(target, dry_run=True, kit=kit), "dry run")
             if target.exists():
                 raise CheckError("dry run created a nonexistent target")
+            expect_ok(fx.install(target, dry_run=True, upgrade=True, kit=kit), "dry-run upgrade")
+            if target.exists():
+                raise CheckError("dry-run upgrade created a nonexistent target")
             assert_no_changes(parent, parent_before)
             assert_no_changes(kit, kit_before)
 

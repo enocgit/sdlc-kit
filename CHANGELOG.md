@@ -37,6 +37,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); this project aim
 - The PR template adds a "Where to look" section and a criterion-to-test proof table; its smoke check line applies only to a change a user can see, and it has no CI line. The CI template is stack-neutral and fails until the project sets its check command.
 - `required-skills.yml` records where `AGENTS.md` uses each skill (`use: setup | plan | build | review`) instead of a stage number.
 
+### Fixed
+
+- `install.sh --upgrade --dry-run` no longer creates the skills directory, or a missing target, before reporting.
+
 ### Removed
 
 - Skills: `sdlc` (the conductor), `diagnosing-bugs`, `improve-codebase-architecture`, `brainstorming`, `to-spec`, `documentation-and-adrs`, `writing-plans`, `feature-start`, `project-status`, `ponytail`, `webapp-testing`, `code-simplification`, `definition-of-done-review`.

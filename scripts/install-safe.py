@@ -1107,7 +1107,7 @@ def command_manifest(arguments: argparse.Namespace) -> None:
 def command_upgrade(arguments: argparse.Namespace) -> None:
     kit = Path(arguments.kit)
     target = open_verified_root(Path(arguments.target), create=False)
-    skills_dir = open_verified_root(Path(arguments.skills_dir), create=True)
+    skills_dir = open_verified_root(Path(arguments.skills_dir), create=not arguments.dry_run)
     version = arguments.kit_version or kit_version_of(kit)
     adopt = tuple(arguments.adopt or ())
     resolved = tuple(arguments.resolved or ())
