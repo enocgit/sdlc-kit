@@ -11,7 +11,6 @@
 
 <!-- Rules route on these values; a stale value misroutes them. -->
 
-- **Team shape:** {solo | team}
 - **Tracker:** {GitHub Issues | Linear | Jira | none: tasks live in each change proposal}
 - **Deployed consumers:** {none | internal | external: who}
 - **Real data:** {none | seed only | real rows in {tables}}

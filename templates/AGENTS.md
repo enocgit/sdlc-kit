@@ -24,8 +24,9 @@ These hold in every task. Everything else in this file is a default the team may
 
 ## How a change moves
 
-- **Every task that changes files** ends on its own branch, reviewed, with a PR open; do all of that
-  unasked. Writes to the default branch, a tracker, or a new remote ask first.
+- **A task from an issue or an approved plan** ends on its own branch, reviewed, with a PR open;
+  do all of that unasked. Other edits stay in the working tree until a maintainer asks to ship
+  them; review runs then. Writes to the default branch, a tracker, or a new remote ask first.
 - **Plan first** for a feature, or a change to a contract, a trust boundary, or a recorded decision:
   write `docs/changes/<slug>.md` from its template, interviewing with `grilling` when the request
   leaves decisions open. Freeze any contract an outside consumer in `docs/context.md` depends on;
@@ -35,8 +36,7 @@ These hold in every task. Everything else in this file is a default the team may
   A change a user can see also gets its smoke check where `docs/test-strategy.md` → Local run says:
   not a test, but one look at the running product on realistic input, read as its user would.
 - **Review** (below), then open the PR from its template.
-- **Gate: a maintainer merges.** The PR that completes a change applies its spec delta to
-  `docs/specs/` and deletes the proposal.
+- **Gate: a maintainer merges.**
 
 ## Review
 
@@ -70,16 +70,14 @@ the file, check, or observation that decides it; who proposed it is not evidence
 A change is sensitive when it **changes a trust boundary**: authentication, authorization,
 payments, personal data handling, file uploads, admin or privileged surfaces, secrets, a new
 external integration, or any boundary listed in `docs/threat-model.md`. Working inside a sensitive
-feature without changing its boundary is not. A sensitive change puts its threat delta in the
-proposal, updates `docs/threat-model.md`, and gets `security-review` before merge.
+feature without changing its boundary is not. A sensitive change updates `docs/threat-model.md`
+and gets `security-review` before merge.
 
 ## Conventions
 
 - **Stack (placeholder, set during bootstrap):** {language, framework, datastore, test runner}.
 - **Check command:** `{check command}` runs lint, typecheck, and tests; each part is proven to fail.
 - **Branches and commits:** {the team's branch naming, merge style, and commit format}.
-- **Team shape** (`docs/context.md` → Lifecycle): solo, the proposal lands with the first slice's
-  PR; team, it lands on `main` through its own PR first.
 
 ## Guardrails
 

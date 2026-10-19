@@ -309,7 +309,8 @@ class Validator:
                 "(`codex exec`, `claude -p`, `pi -p`), on a different model when one is\navailable.",
                 "never\nyour summary",
                 "The PR names the reviewer, its model,\nand the verdict.",
-                "ends on its own branch, reviewed, with a PR open; do all of that\n  unasked.",
+                "ends on its own branch, reviewed, with a PR open;\n  do all of that unasked.",
+                "Other edits stay in the working tree until a maintainer asks to ship",
                 "→ Local run says",
             ),
             "skills/bootstrap/SKILL.md": (

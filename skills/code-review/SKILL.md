@@ -46,19 +46,20 @@ Block a change that introduces a defect, weakens an invariant, or makes the stru
 Check the change against the no-compromise rules in the project's `AGENTS.md`. Then:
 
 - **Acceptance criteria:** map each one to the test or observation that proves it.
-- **Smoke check:** for a change a user can see, read the raw output from the proposal's realistic input as its user would and
-  judge it against the stated expectation. A miss is a required finding, and so is a missing run of
-  a check the project's Local run covers. A check that cannot run as approved is not a finding,
-  nor is one Local run leaves to a maintainer: confirm the PR says why or lists the steps, and
-  leave the call to whoever merges. A passing test is not a smoke check run. The author's verdict
+- **Smoke check:** only in the PR that ships what a user sees; elsewhere the PR has no smoke check
+  line, and its absence is not a finding. Read the raw output from the proposal's realistic input
+  as its user would and judge it against the stated expectation. A miss is a required finding, and
+  so is a missing run of a check the project's Local run covers.
+  A check that cannot run as approved is not a finding, nor is one Local run leaves to a
+  maintainer: leave the call to whoever merges. A passing test is not a smoke check run. The author's verdict
   on the output does not count.
 - **Checks can fail:** a new test was seen failing first; a new or changed check command fails on a
   planted error.
 - **Missing evidence is a note, not a block.** Apart from the smoke check, an artifact you were not
   given (a failing-first run, a test count) is a **Consider:** asking the author to put it in the
   PR. Block only when the code or the evidence you have contradicts the claim.
-- **Docs match the code:** specs, architecture, and contract index describe the shipped behavior;
-  the PR that completes a change applies its spec delta and deletes the proposal.
+- **Docs match the code:** specs, architecture, and contract index describe what this PR ships,
+  and a proposal whose last slice ships here is deleted.
   Run a stale-claim scan over changed docs *and source comments that carry current-behavior claims*
   (contract docblocks, module docstrings): search for `TODO`, `PENDING`, `Planned`, `In progress`,
   `Partially implemented`, and template markers. Each hit is deleted, moved to the tracker, or

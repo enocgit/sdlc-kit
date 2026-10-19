@@ -27,8 +27,8 @@ payment screen and sees the remaining balance. Payments move a trust boundary, s
 is in the proposal and `security-review` runs on it. The proposal lists three slices: the payment
 record and provider client, the webhook handler, and the payment screen.
 
-**Gate:** the maintainer approves the plan. The team shape lands the proposal on `main` before any
-slice branches.
+**Gate:** the maintainer approves the plan. The team's convention lands the proposal on `main`
+through its own PR before any slice branches.
 
 ## Build
 
