@@ -32,9 +32,10 @@ These hold in every task. Everything else in this file is a default the team may
   leaves decisions open. Freeze any contract an outside consumer in `docs/context.md` depends on;
   write an ADR only for a hard-to-reverse choice.
 - **Gate: approve plan.** No code before a maintainer approves it, even when the task asks for a PR.
-- **Build:** a failing test first, then the code, then the check command for the touched packages.
-  A change a user can see also gets its smoke check where `docs/test-strategy.md` → Local run says:
-  not a test, but one look at the running product on realistic input, read as its user would.
+- **Build:** behavior starts with a failing test, then the code, then the check command for the
+  touched packages; copy, styling, and layout need no test. A change a user can see also gets its
+  smoke check where `docs/test-strategy.md` → Local run says: not a test, but one look at the
+  running product on realistic input, read as its user would.
 - **Review** (below), then open the PR from its template.
 - **Gate: a maintainer merges.**
 

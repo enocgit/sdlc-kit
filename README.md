@@ -64,8 +64,8 @@ proven able to fail. It leaves step-by-step procedure to the agent and the harne
 1. **Plan** (features, and changes to a contract, trust boundary, or decision): `grilling` settles
    open questions, and the agent writes a change proposal with its spec delta, acceptance criteria,
    and a smoke check on realistic input. **Gate:** you approve the plan.
-2. **Build** each slice on its own branch: a failing test first, then the code, the check command,
-   the smoke check, and the spec update. Bug fixes and chores start here.
+2. **Build** each slice on its own branch: a failing test first for behavior (copy, styling, and
+   layout need none), then the code, the check command, the smoke check, and the spec update. Bug fixes and chores start here.
 3. **Review** in a context that did not write the change, on a different model when one is
    available, before the PR opens.
 4. **PR** with a "Where to look" section and a criterion-to-test proof table. **Gate:** you merge.
