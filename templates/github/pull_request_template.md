@@ -12,11 +12,11 @@
 
 ## Proof
 
-<!-- Each acceptance criterion and the test or observation that proves it. -->
+<!-- Each acceptance criterion and the test or observation that proves it; for a change a user can
+     see, what running it showed, or why it could not run. -->
 
 | Criterion | Proven by |
 | --- | --- |
 | {ID} | {test name or observation} |
 
-- **Smoke check** (only in the PR that ships what a user sees; otherwise delete this line): <!-- the input and what its user saw; the steps a maintainer runs before merging; or why it could not run as approved -->
-- **Review:** <!-- reviewer and model, verdict; security record link if sensitive -->
+- **Review:** <!-- reviewer and model, verdict; security findings and resolutions if sensitive -->

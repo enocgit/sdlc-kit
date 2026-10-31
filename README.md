@@ -7,7 +7,7 @@ in the project.
 The kit installs:
 
 - a project operating manual from `templates/AGENTS.md`, installed as `AGENTS.md`: the rules, the
-  two gates, and how a change moves from plan to merge;
+  plan gate, and how a change moves from plan to PR;
 - templates for specs, change proposals, ADRs, architecture, the threat model, and test strategy; and
 - a few skills installed project-locally for reproducible runs: `bootstrap` for setup, `grilling`
   for planning, `code-review` and `security-review` for the reviewer, plus `address-review`,
@@ -57,23 +57,24 @@ read [`EXAMPLE.md`](./EXAMPLE.md). Maintainers should read
 
 ## How the workflow works
 
-The kit encodes what model upgrades do not supply: a maintainer's approval at the decisions that matter, a
+The kit encodes what model upgrades do not supply: the developer's approval of a plan, a
 living record of what the product does, review by a context that did not write the code, and checks
 proven able to fail. It leaves step-by-step procedure to the agent and the harness.
 
 1. **Plan** (features, and changes to a contract, trust boundary, or decision): `grilling` settles
-   open questions, and the agent writes a change proposal with its spec delta, acceptance criteria,
-   and a smoke check on realistic input. **Gate:** you approve the plan.
-2. **Build** each slice on its own branch: a failing test first for behavior (copy, styling, and
-   layout need none), then the code, the check command, the smoke check, and the spec update. Bug fixes and chores start here.
+   open questions, and the agent writes a change proposal with its spec delta and acceptance
+   criteria. **Gate:** you approve the plan.
+2. **Build:** a failing test first for behavior (copy, styling, and layout need none), then the
+   code, the check command, a look at the running product for a change a user can see, and the spec
+   update. Bug fixes and chores start here.
 3. **Review** in a context that did not write the change, on a different model when one is
    available, before the PR opens.
-4. **PR** with a "Where to look" section and a criterion-to-test proof table. **Gate:** you merge.
+4. **PR** with a "Where to look" section and a criterion-to-test proof table. Who merges is the
+   project's call; protect the branch to require a person.
 
-**Seven rules hold in every project:** a maintainer performs every merge; review runs in a fresh
-context; trust-boundary changes get a security review; implementation never drifts from a frozen
-contract; behavior ships with tests and each check is proven able to fail; the spec states what
-shipped; no secrets in the repository. Everything else is a default a project may change in its
+**Six rules hold in every project:** review runs in a fresh context; trust-boundary changes get a
+security review; implementation never drifts from a frozen contract; behavior ships with tests and
+each check is proven able to fail; the spec states what shipped; no secrets in the repository. Everything else is a default a project may change in its
 `AGENTS.md`.
 
 **What you read instead of the code:** `docs/specs/` states current behavior with requirement IDs

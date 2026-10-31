@@ -256,6 +256,12 @@ open proposals' unticked slices into it. For Linear or Jira, replace these integ
 | Complete slices | `Closes #N` in the PR | Native Git integration or a post-merge update |
 | Name branches | `feat/{issue number}-{slug}` | Tracker key such as `ENG-123` |
 
+### Merges
+
+The manual does not forbid an agent to merge. Protecting the default branch forces every change
+through a pull request, but an agent using your credentials can still merge it. To keep merging to
+a person, give the agent a token without merge permission.
+
 ### CI and tests
 
 Replace the placeholder step in `.github/workflows/ci.yml` with the project's toolchain setup and

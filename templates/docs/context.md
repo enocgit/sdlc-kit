@@ -1,6 +1,6 @@
 # Project context
 
-> STATUS: TEMPLATE — replace this marker and every `{placeholder}` at Stage 0.
+> STATUS: TEMPLATE — replace this marker and every `{placeholder}` during bootstrap.
 > Loaded every session: keep durable facts only, ~120 lines at most. Link detail elsewhere.
 
 ## Product

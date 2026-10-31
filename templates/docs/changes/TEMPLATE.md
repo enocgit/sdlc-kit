@@ -23,17 +23,6 @@
 
 - [ ] {ID}: {observable outcome} ({unit | integration | end-to-end})
 
-## Smoke check
-
-<!-- Only for a change a user can see; otherwise delete this section. One or two realistic inputs
-     and what their user must get from each, in the user's words: a real page flow, request,
-     caller, data sample, repository, or query. Point to the input (URL, request, path), never a
-     test command or fixture: a check CI could pass unattended is a test. It runs where
-     `docs/test-strategy.md` → Local run covers it, and a maintainer runs it where Local run does
-     not. Never commit private data. With no real data yet, use the closest public sample. -->
-
-- {realistic input} → {what the user must see or get}
-
 ## Approach
 
 {The shape of the solution in a few lines. Link ADRs for hard-to-reverse choices.}

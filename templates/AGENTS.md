@@ -1,9 +1,9 @@
 # AGENTS.md — operating manual for coding agents on this project
 
 > Canonical agent instructions; other tool files point here. Keep it under 150 lines: project facts
-> go in What this project is and Conventions; kit lines stay as written so upgrades merge. Skills
-> named here live in `.agents/skills/`; without skill support, read the file and follow it. While
-> `docs/` holds `STATUS: TEMPLATE`, run `bootstrap` first.
+> go in What this project is, Conventions, and Guardrails; kit lines stay as written so upgrades
+> merge. Skills named here live in `.agents/skills/`; without skill support, read the file and
+> follow it. While `docs/` holds `STATUS: TEMPLATE`, run `bootstrap` first.
 
 ## What this project is
 
@@ -14,50 +14,44 @@ Domain, glossary, lifecycle, and hard constraints: [`docs/context.md`](./docs/co
 
 These hold in every task. Everything else in this file is a default the team may change here.
 
-1. A maintainer performs every merge.
-2. Review runs in a context that did not write the change (see [Review](#review)).
-3. A change to a trust boundary gets a security review before merge (see [Sensitive changes](#sensitive-changes)).
-4. Implementation never drifts from a frozen contract.
-5. Behavior ships with tests, and each check is proven able to fail.
-6. The spec states what actually shipped.
-7. No secrets in the repository, logs, or artifacts.
+1. Review runs in a context that did not write the change (see [Review](#review)).
+2. A change to a trust boundary gets a security review before it ships (see [Sensitive changes](#sensitive-changes)).
+3. Implementation never drifts from a frozen contract.
+4. Behavior ships with tests, and each check is proven able to fail.
+5. The spec states what actually shipped.
+6. No secrets in the repository, logs, or artifacts.
 
 ## How a change moves
 
-- **A task from an issue or an approved plan** ends on its own branch, reviewed, with a PR open;
-  do all of that unasked. Other edits stay in the working tree until a maintainer asks to ship
-  them; review runs then. Writes to the default branch, a tracker, or a new remote ask first.
 - **Plan first** for a feature, or a change to a contract, a trust boundary, or a recorded decision:
   write `docs/changes/<slug>.md` from its template, interviewing with `grilling` when the request
   leaves decisions open. Freeze any contract an outside consumer in `docs/context.md` depends on;
   write an ADR only for a hard-to-reverse choice.
-- **Gate: approve plan.** No code before a maintainer approves it, even when the task asks for a PR.
+- **Gate: approve plan.** No code before the developer approves it, even if the task asks for a PR.
 - **Build:** behavior starts with a failing test, then the code, then the check command for the
-  touched packages; copy, styling, and layout need no test. A change a user can see also gets its
-  smoke check where `docs/test-strategy.md` → Local run says: not a test, but one look at the
-  running product on realistic input, read as its user would.
-- **Review** (below), then open the PR from its template.
-- **Gate: a maintainer merges.**
+  touched packages; copy, styling, and layout need no test. Before calling a change a user can see
+  done, look at it running on realistic input (`docs/test-strategy.md` → Local run), or say why
+  you could not.
+- **Review** (below) before any PR or commit to the default branch. Writes to the default branch,
+  a tracker, or a new remote ask first.
 
 ## Review
 
-Before the PR, delegate a review, unasked, to a context that did not write the change: a subagent
-or a headless agent CLI (`codex exec`, `claude -p`, `pi -p`), on a different model when one is
-available. It loads `code-review`, and `security-review` when the change is sensitive; it judges
-sensitivity itself. Give it the diff, the proposal, and the raw check and smoke-check output, never
-your summary. Fix required findings and send the new diff. The PR names the reviewer, its model,
-and the verdict. A review bot on the PR adds to this; it never replaces it.
+Before any PR or commit to the default branch, delegate a review, unasked, to a context that did
+not write the change: a subagent or a headless agent CLI (`codex exec`, `claude -p`, `pi -p`), on a
+different model when one is available. It loads `code-review`, and `security-review` when the
+change is sensitive; it judges sensitivity itself. Give it the diff, the proposal, and the raw check
+output, never your summary. Fix required findings and send the new diff. The PR names the reviewer,
+its model, and the verdict.
 
 ## Where things live
 
 - `docs/specs/<area>.md`: current behavior, present tense, requirement IDs (`AUTH-3`) tests cite.
 - `docs/changes/<slug>.md`: proposed changes, until the PR that completes them.
 - `docs/adr/`: hard-to-reverse decisions. `docs/architecture.md`: current system shape only.
-- `docs/threat-model.md`: current trust boundaries. Security review records:
-  `docs/security/records/`.
+- `docs/threat-model.md`: current trust boundaries and their controls.
 - `docs/test-strategy.md`: which layer tests what, how tests run, and the Local run.
-- Contracts live in code; `docs/contracts/README.md` indexes the frozen ones. Task state lives in
-  the tracker, or the proposal's slice list when there is none, never in doc prose.
+- Contracts live in code; `docs/contracts/README.md` indexes the frozen ones.
 
 ## Writing
 
@@ -72,21 +66,18 @@ A change is sensitive when it **changes a trust boundary**: authentication, auth
 payments, personal data handling, file uploads, admin or privileged surfaces, secrets, a new
 external integration, or any boundary listed in `docs/threat-model.md`. Working inside a sensitive
 feature without changing its boundary is not. A sensitive change updates `docs/threat-model.md`
-and gets `security-review` before merge.
+and gets `security-review` before it ships.
 
 ## Conventions
 
 - **Stack (placeholder, set during bootstrap):** {language, framework, datastore, test runner}.
-- **Check command:** `{check command}` runs lint, typecheck, and tests; each part is proven to fail.
+- **Check command:** `{check command}` runs lint, typecheck, and tests.
 - **Branches and commits:** {the team's branch naming, merge style, and commit format}.
 
 ## Guardrails
 
 - **Product value first.** Build what a real user, consumer, or decision needs now. Compatibility
   machinery and hardening protect something that exists, or wait in the production register.
-- **A wrong decision is amended, not obeyed.** An ambiguous or wrong spec, ADR, or contract is a
-  question for a maintainer; the fix updates it in the same change. Supersede an implemented ADR
-  instead of editing it. A shipped contract with a deployed consumer changes only with a
-  versioning ADR.
-- Schema changes use expand/contract once a table holds real data or a deployed process uses it.
-- A required CI or PR workflow that is unreachable is a blocker, not a reason to route around it.
+- **Ask, don't guess.** An ambiguous or wrong spec, ADR, or contract is a question; the fix updates
+  it in the same change. Supersede an implemented ADR instead of editing it; a shipped contract with
+  a deployed consumer changes only with a versioning ADR.

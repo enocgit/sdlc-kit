@@ -2,9 +2,8 @@
 name: security-review
 description: >
   Structured security review of a change that moves a trust boundary: walks the boundary by
-  weakness class, traces hostile input to sinks, and writes a short findings-and-resolutions
-  record under docs/security/records/. Required before merging a sensitive change; also used on a
-  plan that changes a trust boundary.
+  weakness class, traces hostile input to sinks, and reports findings and resolutions for the PR.
+  Required before a sensitive change ships; also used on a plan that changes a trust boundary.
 ---
 
 # security-review
@@ -46,16 +45,14 @@ Rate each finding against current exposure, not worst case:
 - **Low / hardening:** needs traffic, data, or consumers that do not exist yet. Record it in the
   production register with its trigger; do not expand the diff for it.
 
-## Record
+## Report
 
-Write `docs/security/records/YYYY-MM-DD-{slug}.md` (today's UTC date from the system clock), at most
-~40 lines. Update the trust-boundary table in `docs/threat-model.md` if a boundary moved. A reviewer that cannot write files returns the record, and the
-author commits it unchanged.
+Return the report to the author, who puts it in the PR, or in the proposal for a plan. Check that
+the change updates the trust-boundary table in `docs/threat-model.md` for the boundary it moves.
 
 ```markdown
-# Security review: {change}
+**Security review** of {PR, branch, or proposal} at {commit}
 
-- **Date / subject:** YYYY-MM-DD / {PR, branch, or proposal} at {commit}
 - **Reviewed:** {boundaries and files covered}; **not reviewed:** {and why, or "nothing"}
 
 | # | Finding | Severity | Resolution |
@@ -67,4 +64,4 @@ author commits it unchanged.
 ```
 
 An open High finding blocks merge. Required content you could not read is a gap: say so in the
-record and block rather than reporting clean.
+report and block rather than reporting clean.

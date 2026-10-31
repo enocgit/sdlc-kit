@@ -1,6 +1,6 @@
 # Test strategy
 
-> STATUS: TEMPLATE — set the real tools at Stage 0 and delete this marker.
+> STATUS: TEMPLATE — set the real tools during bootstrap and delete this marker.
 
 Test where a bug would surface. Mocks hide the behavior of databases, auth libraries, and frameworks,
 which is where most real bugs live; unit tests are fastest for logic with many cases.
@@ -22,7 +22,7 @@ they prove (`AUTH-3 rejects an expired session`); source comments don't repeat i
 - Tests are safe to run in parallel: each worker gets its own database or schema.
 - Tests are deterministic: no uncontrolled network, time, or randomness.
 - Test data carries the variation real inputs have (several users, empty and oversized values,
-  messy formatting), not only the minimal case. A gap the smoke check finds becomes a test.
+  messy formatting), not only the minimal case. A gap that running the product finds becomes a test.
 - Pull requests run the packages a change affects; the push to the default branch runs everything.
 - No run repeats the same work: one workflow per check, and a new push cancels the PR's older run.
 - One test runner per stack unless an ADR says otherwise.
@@ -30,13 +30,13 @@ they prove (`AUTH-3 rejects an expired session`); source comments don't repeat i
 
 ## Local run
 
-Where UI checks and smoke checks run: a command that starts something to open, not a test runner.
-Agents run what it covers; a maintainer runs the rest.
+Where an agent looks at a change running: a command that starts something to open, not a test
+runner. What it cannot reach goes under Not covered.
 
 - **Command:** `{command}` starts {the app or a UI harness} on {seed data}, with no production
   secrets or shared database.
-- **Not covered:** {flows that need secrets, live data, or a deployed service; or "none"}, run by a
-  maintainer on {preview deploy or environment}.
+- **Not covered:** {flows that need secrets, live data, or a deployed service; or "none"}, checked on
+  {preview deploy or environment}.
 
 ## Deferred
 

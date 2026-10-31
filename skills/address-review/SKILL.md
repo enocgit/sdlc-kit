@@ -25,7 +25,7 @@ Sensitive changes) get extra care, and comments cite the durable doc
 (spec, ADR, contract) rather than the workflow. Invoking this skill **is** the approval: fixing,
 committing, pushing the PR branch, and posting brief replies proceed without further asks. Only a
 decision reversal, a sensitive-area or contract change, an external issue creation, or a merge
-still gates — a maintainer performs every merge (`AGENTS.md`).
+still stops for the developer.
 
 It is **not** a second `code-review`. `code-review` proactively audits your own diff before you
 push; this skill reactively triages what _reviewers_ already said on an open PR. If a comment
@@ -71,7 +71,7 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
    - **Valid** (trivial or not) → fix it, verify proportionally to the risk, and commit. Follow-up
      commits only — never force-push while review is open: it destroys the reviewer's inline
      comment anchors and the reviewed diff.
-   - **Decision** → **STOP and gate.** Draft the reply, but a maintainer decides the question; apply
+   - **Decision** → **STOP and gate.** Draft the reply, but the developer decides the question; apply
      `AGENTS.md`'s amending rules for the spec, ADR, and contract before any code change,
      and record any deferral in the `docs/context.md` production register. A reply that reopens a
      decision is a decision ask, not a comment reply.
@@ -107,8 +107,7 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
   clear, doc-backed rationale is a first-class outcome, not a failure to "address" it.
 - **Invoking the skill is the approval** for fixes, commits, pushes, and replies. Decision
   reversals, sensitive-area or contract changes, external issue creation, and merges still gate.
-- **The contract is frozen.** Contract changes follow `AGENTS.md` → "A wrong decision is
-  amended, not obeyed"; a change to a shipped contract with a deployed consumer needs a
+- **The contract is frozen.** Contract changes follow `AGENTS.md` → "Ask, don't guess"; a change to a shipped contract with a deployed consumer needs a
   versioning/deprecation ADR, not an inline edit.
 - **No force-push while review is open.** Follow-up commits only; a force-push destroys the
   reviewer's inline-comment anchors and the reviewed diff.

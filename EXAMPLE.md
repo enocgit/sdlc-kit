@@ -13,7 +13,8 @@ the auth model, and sketches `docs/architecture.md`, `docs/threat-model.md`, and
 
 It sets `pnpm check` as the check command and wires it into CI. Then it plants a type error, a
 failing test, and a lint violation one at a time, sees `pnpm check` fail at each part, and reverts
-each. **Gate:** the maintainer approves the foundation; with a protected `main`, it lands through a PR.
+each. **Gate:** the developer approves the foundation; with a protected `main`, it lands through a
+PR.
 
 ## Plan
 
@@ -22,33 +23,33 @@ recommended answer, and settles partial payments, failed callbacks, and refunds.
 
 The agent writes `docs/changes/rent-payment.md`: the spec delta adds `PAY-1` to `PAY-4`, five
 acceptance criteria, the provider ADR, and the frozen `api/openapi.yaml` slice the mobile client
-needs. Its smoke check: in the provider's sandbox, a tenant pays a partial month's rent from the
-payment screen and sees the remaining balance. Payments move a trust boundary, so the threat delta
-is in the proposal and `security-review` runs on it. The proposal lists three slices: the payment
-record and provider client, the webhook handler, and the payment screen.
+needs. Payments move a trust boundary, so the proposal names the threat it opens and
+`security-review` runs on it. The proposal lists three slices: the payment record and provider
+client, the webhook handler, and the payment screen.
 
-**Gate:** the maintainer approves the plan. The team's convention lands the proposal on `main`
-through its own PR before any slice branches.
+**Gate:** the developer approves the plan.
 
 ## Build
 
 For the webhook slice the agent branches `feat/12-payment-webhook`. It writes `PAY-3 rejects an unsigned
 webhook` as an integration test against the test database, sees it fail, and implements the
 handler. It moves `PAY-3` into `docs/specs/payments.md` and updates the webhook row in
-`docs/threat-model.md` on the same branch. The smoke check runs later, with the payment-screen slice
-that completes the flow.
+`docs/threat-model.md` on the same branch. The payment-screen slice later opens the app on the
+provider's sandbox, pays a partial month's rent, and checks that the remaining balance shows.
 
 ## Review
 
 The harness has no other model, but `codex exec` is installed, so the agent runs it with
 `code-review` and `security-review`, the diff, the proposal, the payments spec, the contract, and the
 raw check output. It asks for one change: the handler retries on every error, including a bad
-signature. The security record has two findings: one fixed, and rate limiting the webhook goes to
-the production register until there is production traffic. A second round on the new diff approves.
+signature. The security report, which goes in the PR, has two findings: one fixed, and rate
+limiting the webhook goes to the production register until there is production traffic. A second
+round on the new diff approves.
 
 ## PR and merge
 
 The agent pushes and opens the PR. "Where to look" points at the signature check and the idempotency
 key; the proof table maps each criterion to its test and names the reviewer and its model. It
-reports the PR link. The maintainer merges after CI passes. The payment-screen PR, which completes
-the change, carries the smoke check output and deletes the proposal.
+reports the PR link. The team's protected `main` needs a person to merge, after CI passes. The
+payment-screen PR, which completes the change, says what the sandbox payment showed and deletes the
+proposal.

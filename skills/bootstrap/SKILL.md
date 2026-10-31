@@ -22,8 +22,8 @@ git grep --untracked -niE 'stage [0-6]|solo developer' -- . ':!AGENTS.md' ':!.ag
 
 Fill `docs/context.md` (product, Lifecycle, outside consumers, hard constraints), set the stack and
 check command in `AGENTS.md`, set `docs/test-strategy.md`, and write only the ADRs a first feature
-cannot start without. A maintainer owns the Lifecycle values; propose them, never set them silently.
-Describe only what exists; a plan labelled "intended" is still a plan and goes in the first change
+cannot start without. The developer owns the Lifecycle values; propose them, never set them
+silently. Describe only what exists; a plan labelled "intended" is still a plan and goes in the first change
 proposal. With no code yet:
 
 - `docs/architecture.md` keeps Context and one Parts row for the scaffold; delete Data, Key flows,
@@ -54,7 +54,7 @@ tests each ran, and the test count matches the local run. A part that did not ru
 
 Start the Local run command in `docs/test-strategy.md` and load one page or call one endpoint
 through it. Whatever it cannot reach without secrets you cannot read, live data, or a shared
-database goes under Not covered with where a maintainer checks it; never route around the gap.
+database goes under Not covered with where it gets checked; never route around the gap.
 
 ## Gate: approve foundation
 
@@ -63,4 +63,4 @@ read. Commit nothing before approval. Then land it on the default branch:
 
 - no remote → commit to the local default branch;
 - remote with an unprotected default branch → commit and push, under the same approval;
-- protected default branch → a branch and PR; a maintainer merges.
+- protected default branch → a branch and PR.
