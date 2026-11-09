@@ -20,11 +20,12 @@ git grep --untracked -niE 'stage [0-6]|solo developer' -- . ':!AGENTS.md' ':!.ag
 
 ## New project
 
-Fill `docs/context.md` (product, Lifecycle, outside consumers, hard constraints), set the stack and
-check command in `AGENTS.md`, set `docs/test-strategy.md`, and write only the ADRs a first feature
-cannot start without. The developer owns the Lifecycle values; propose them, never set them
-silently. Describe only what exists; a plan labelled "intended" is still a plan and goes in the first change
-proposal. With no code yet:
+Fill `docs/context.md` (product, Lifecycle, outside consumers, hard constraints), set the stack,
+check command, and library docs in `AGENTS.md`, set `docs/test-strategy.md`, and write only the ADRs
+a first feature cannot start without. Library docs lists the skills the installed dependencies ship,
+then the `llms.txt` or docs URL of each major library that ships none. The developer owns the
+Lifecycle values; propose them, never set them silently. Describe only what exists; a plan labelled
+"intended" is still a plan and goes in the first change proposal. With no code yet:
 
 - `docs/architecture.md` keeps Context and one Parts row for the scaffold; delete Data, Key flows,
   and Cross-cutting until code exists.
@@ -45,9 +46,12 @@ existing CI to run the check command, or every part it runs, in the same change.
 The check covers all the code, tests included. Fix existing failures or report them at the gate;
 excluding code to get a part green is a skipped check. Plant one type error, run the check command,
 see it fail at the typecheck, and revert; repeat for one failing test and one lint violation. One
-plant per run, tripping only its own part. When the command chains named sub-commands
-(`check:api`), a plant may run through the one that covers it; editor or harness diagnostics never
-count. A check that fails on a clean tree is reported at the gate, not retried until it passes.
+plant per run, tripping only its own part. The check also fails on a deprecated API wherever the
+toolchain can report it (a type-aware lint rule, the compiler's deprecation warnings); plant one
+deprecated call, and fix or report the existing uses at the gate. When the command chains named
+sub-commands (`check:api`), a plant may run through the one that covers it; editor or harness
+diagnostics never count. A check that fails on a clean tree is reported at the gate, not retried
+until it passes.
 
 CI runs the same command. When the first PR's CI run finishes, read its log: lint, typecheck, and
 tests each ran, and the test count matches the local run. A part that did not run is a bug to fix.

@@ -17,7 +17,7 @@ Review the committed diff against the target branch (`git diff {target}...HEAD`)
 plus every file it adds or removes. Read the change proposal, the specs it touches, relevant ADRs,
 and any frozen contract. Do not accept the author's summary in place of these artifacts. When a
 finding depends on how a library or framework behaves, confirm it in the installed source, not from
-memory.
+memory. New code that calls an API the installed version marks deprecated is a required finding.
 
 ## The approval standard
 

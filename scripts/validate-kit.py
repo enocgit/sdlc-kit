@@ -302,7 +302,10 @@ class Validator:
                 "6. No secrets in the repository, logs, or artifacts.",
                 "run `bootstrap` first",
                 "**Gate: approve plan.** No code before the developer approves it",
+                "names the\n  built-in features it weighed",
                 "behavior starts with a failing test",
+                "installed version (Conventions → Library docs), not memory.",
+                "- **Library docs:**",
                 "copy, styling, and layout need no test",
                 "look at it running on realistic input",
                 "Before any PR or commit to the default branch, delegate a review, unasked, to a context that did\nnot write the change",
@@ -315,11 +318,13 @@ class Validator:
                 "## Gate: approve foundation",
                 "## Prove the checks",
                 "Commit nothing before approval.",
+                "fails on a deprecated API",
             ),
             "skills/code-review/SKILL.md": (
                 "no reason given is a required finding; a stated reason is not.",
                 "confirm it in the installed source",
                 "Missing evidence is a note, not a block.",
+                "calls an API the installed version marks deprecated is a required finding.",
             ),
         }
         for name, needles in required.items():

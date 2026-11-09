@@ -96,7 +96,7 @@ install, see [Upgrade an existing installation](./INSTALL.md#upgrade-an-existing
   text, or fixed formats.
 - GitHub is the default tracker and PR host, not a requirement. Projects without an external
   tracker keep slices in the change proposal.
-- Templates are stack-neutral. `bootstrap` sets the stack, check command, and test tools.
+- Templates are stack-neutral. `bootstrap` sets the stack, check command, library docs, and test tools.
 - `frontend-design` is pinned byte-for-byte in [`vendor/skills.lock.json`](./vendor/skills.lock.json);
   maintained adaptations name their upstream and ship its license.
 

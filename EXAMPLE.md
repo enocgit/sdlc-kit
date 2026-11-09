@@ -11,10 +11,11 @@ areas `auth` and `payments` in `docs/specs/README.md`, writes ADRs for the stack
 the auth model, and sketches `docs/architecture.md`, `docs/threat-model.md`, and
 `docs/test-strategy.md`.
 
-It sets `pnpm check` as the check command and wires it into CI. Then it plants a type error, a
-failing test, and a lint violation one at a time, sees `pnpm check` fail at each part, and reverts
-each. **Gate:** the developer approves the foundation; with a protected `main`, it lands through a
-PR.
+It sets `pnpm check` as the check command, failing on deprecated APIs too, and wires it into CI.
+Library docs lists the skills the dependencies ship and the auth library's `llms.txt`. Then it
+plants a type error, a failing test, a lint violation, and a deprecated call one at a time, sees
+`pnpm check` fail at each, and reverts each. **Gate:** the developer approves the foundation; with a
+protected `main`, it lands through a PR.
 
 ## Plan
 

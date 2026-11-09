@@ -26,12 +26,14 @@ These hold in every task. Everything else in this file is a default the team may
 - **Plan first** for a feature, or a change to a contract, a trust boundary, or a recorded decision:
   write `docs/changes/<slug>.md` from its template, interviewing with `grilling` when the request
   leaves decisions open. Freeze any contract an outside consumer in `docs/context.md` depends on;
-  write an ADR only for a hard-to-reverse choice.
+  write an ADR only for a hard-to-reverse choice. A plan that touches a framework names the
+  built-in features it weighed (rendering, caching, error handling) before custom code.
 - **Gate: approve plan.** No code before the developer approves it, even if the task asks for a PR.
 - **Build:** behavior starts with a failing test, then the code, then the check command for the
-  touched packages; copy, styling, and layout need no test. Before calling a change a user can see
-  done, look at it running on realistic input (`docs/test-strategy.md` → Local run), or say why
-  you could not.
+  touched packages; copy, styling, and layout need no test. Library APIs follow the docs for the
+  installed version (Conventions → Library docs), not memory. Before calling a change a user can
+  see done, look at it running on realistic input (`docs/test-strategy.md` → Local run), or say
+  why you could not.
 - **Review** (below) before any PR or commit to the default branch. Writes to the default branch,
   a tracker, or a new remote ask first.
 
@@ -72,6 +74,7 @@ and gets `security-review` before it ships.
 
 - **Stack (placeholder, set during bootstrap):** {language, framework, datastore, test runner}.
 - **Check command:** `{check command}` runs lint, typecheck, and tests.
+- **Library docs:** {installed-version docs: skills the packages ship, then `llms.txt` URLs}.
 - **Branches and commits:** {the team's branch naming, merge style, and commit format}.
 
 ## Guardrails
