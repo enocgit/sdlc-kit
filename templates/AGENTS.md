@@ -14,7 +14,7 @@ Domain, glossary, lifecycle, and hard constraints: [`docs/context.md`](./docs/co
 
 These hold in every task. Everything else in this file is a default the team may change here.
 
-1. Review runs in a context that did not write the change (see [Review](#review)).
+1. Review runs in a context that did not write the change; only the developer can waive it (see [Review](#review)).
 2. A change to a trust boundary gets a security review before it ships (see [Sensitive changes](#sensitive-changes)).
 3. Implementation never drifts from a frozen contract.
 4. Behavior ships with tests, and each check is proven able to fail.
@@ -29,23 +29,25 @@ These hold in every task. Everything else in this file is a default the team may
   an outside consumer in `docs/context.md` depends on; write an ADR only for a hard-to-reverse
   choice. A plan that touches a framework names the built-in features it weighed (rendering,
   caching, error handling) before custom code.
-- **Gate: approve plan.** No code before the developer approves it, even if the task asks for a PR.
+- **Gate: approve plan.** With a plan, no code before the developer approves it, even if the task
+  asks for a PR.
 - **Build:** behavior starts with a failing test, then the code, then the check command for the
   touched packages; copy, styling, and layout need no test. Library APIs follow the docs for the
   installed version (Conventions → Library docs), not memory. Before calling a change a user can
   see done, look at it running on realistic input (`docs/test-strategy.md` → Local run), or say
   why you could not.
 - **Review** (below) before any PR or commit to the default branch, unless the developer waives it
-  for that change. Writes to the default branch, a tracker, or a new remote ask first.
+  for that change. Writes to the default branch, issues, or a new remote ask first.
 
 ## Review
 
-Before any PR or commit to the default branch, delegate a review, unasked, to a context that did
-not write the change: a subagent or a headless agent CLI (`codex exec`, `claude -p`, `pi -p`), on a
-different model when one is available. It loads `code-review`, and `security-review` when the
-change is sensitive; it judges sensitivity itself. Give it the diff, the proposal, and the raw check
-output, never your summary. Fix required findings and send the new diff. The PR names the reviewer,
-its model, and the verdict, or says the developer waived review.
+Before any PR or commit to the default branch, unless the developer waives it for that change,
+delegate a review, unasked, to a context that did not write the change: a subagent or a headless
+agent CLI (`codex exec`, `claude -p`, `pi -p`), on a different model when one is available. It
+loads `code-review`, and `security-review` when the change is sensitive; it judges sensitivity
+itself. Give it the diff, the proposal if there is one, and the raw check output,
+never your summary. Fix required findings and send the new diff. The PR names the reviewer, its
+model, and the verdict, or says the developer waived review.
 
 ## Where things live
 
@@ -77,6 +79,7 @@ and gets `security-review` before it ships.
 - **Check command:** `{check command}` runs lint, typecheck, and tests.
 - **Library docs:** {installed-version docs: skills the packages ship, then `llms.txt` URLs}.
 - **Branches and commits:** {the team's branch naming, merge style, and commit format}.
+- **Issues:** {GitHub Issues | Linear | Jira | none}.
 
 ## Guardrails
 

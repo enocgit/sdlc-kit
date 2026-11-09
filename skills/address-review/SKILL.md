@@ -79,8 +79,8 @@ prompts a broader re-audit, that's `code-review`'s job — route back to it.
      doc that settles it ("the frozen data contract 0001 permits null here", not "this is fine").
      Keep it short — the reply posts unseen, so brevity is the safeguard, and it cites the artifact,
      not the pipeline.
-   - **Out of scope** → propose a `task` issue (shaped per `.github/ISSUE_TEMPLATE/task.md`) and
-     **ask before creating it** — an external issue is an outward write. Do not scope-creep the PR.
+   - **Out of scope** → propose an issue and **ask before creating it** — an external issue is an
+     outward write. Do not scope-creep the PR.
 
 5. **Push and post — no bundle ask.** After fixes are validated and committed: push the branch and
    post the replies ("fixed in `<sha>`", refutations, issue pointers) directly. Keep replies brief

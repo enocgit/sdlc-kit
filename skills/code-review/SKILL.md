@@ -14,10 +14,11 @@ Review-only: report findings to the author; do not edit, commit, or land.
 ## Inputs
 
 Review the committed diff against the target branch (`git diff {target}...HEAD`) on a clean tree,
-plus every file it adds or removes. Read the change proposal, the specs it touches, relevant ADRs,
-and any frozen contract. Do not accept the author's summary in place of these artifacts. When a
-finding depends on how a library or framework behaves, confirm it in the installed source, not from
-memory. New code that calls an API the installed version marks deprecated is a required finding.
+plus every file it adds or removes. Read the change proposal if there is one, the specs it touches,
+relevant ADRs, and any frozen contract. Do not accept the author's summary in place of these
+artifacts. When a finding depends on how a library or framework behaves,
+confirm it in the installed source, not from memory. New code that
+calls an API the installed version marks deprecated is a required finding.
 
 ## The approval standard
 
@@ -57,7 +58,7 @@ Check the change against the no-compromise rules in the project's `AGENTS.md`. T
   and a proposal whose last slice ships here is deleted.
   Run a stale-claim scan over changed docs *and source comments that carry current-behavior claims*
   (contract docblocks, module docstrings): search for `TODO`, `PENDING`, `Planned`, `In progress`,
-  `Partially implemented`, and template markers. Each hit is deleted, moved to the tracker, or
+  `Partially implemented`, and template markers. Each hit is deleted, moved to an issue, or
   backed by evidence from this change.
 - **No workflow terms in the product:** changed docs, comments, and the PR body never mention
   the workflow, its gates, or its skills. Rewrite them in product terms.

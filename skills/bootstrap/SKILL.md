@@ -25,7 +25,7 @@ check command, and library docs in `AGENTS.md`, set `docs/test-strategy.md`, and
 a first feature cannot start without. Library docs lists the skills the installed dependencies ship,
 then the `llms.txt` or docs URL of each major library that ships none. The developer owns the
 Lifecycle values; propose them, never set them silently. Describe only what exists; a plan labelled
-"intended" is still a plan and goes in the first change proposal. With no code yet:
+"intended" is still a plan and belongs to the change that builds it, not the docs. With no code yet:
 
 - `docs/architecture.md` keeps Context and one Parts row for the scaffold; delete Data, Key flows,
   and Cross-cutting until code exists.

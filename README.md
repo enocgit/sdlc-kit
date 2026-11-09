@@ -73,7 +73,7 @@ proven able to fail. It leaves step-by-step procedure to the agent and the harne
 4. **PR** with a "Where to look" section and a criterion-to-test proof table. Who merges is the
    project's call; protect the branch to require a person.
 
-**Six rules hold in every project:** review runs in a fresh context; trust-boundary changes get a
+**Six rules hold in every project:** review runs in a fresh context unless the developer waives it; trust-boundary changes get a
 security review; implementation never drifts from a frozen contract; behavior ships with tests and
 each check is proven able to fail; the spec states what shipped; no secrets in the repository. Everything else is a default a project may change in its
 `AGENTS.md`.
@@ -95,8 +95,7 @@ install, see [Upgrade an existing installation](./INSTALL.md#upgrade-an-existing
   skills reads the named skill files directly. The installed `CLAUDE.md` is a one-line `@AGENTS.md` import.
 - The bundled `unslop` adaptation applies to human-facing prose, not to code, commands, logs, quoted
   text, or fixed formats.
-- GitHub is the default tracker and PR host, not a requirement. Projects without an external
-  tracker keep slices in the change proposal.
+- The CI and pull-request templates target GitHub; on another host, adapt them.
 - Templates are stack-neutral. `bootstrap` sets the stack, check command, library docs, and test tools.
 - `frontend-design` is pinned byte-for-byte in [`vendor/skills.lock.json`](./vendor/skills.lock.json);
   maintained adaptations name their upstream and ship its license.
@@ -115,6 +114,6 @@ install, see [Upgrade an existing installation](./INSTALL.md#upgrade-an-existing
 | `vendor/skills.lock.json` | upstream revisions, paths, content hashes, and license notes |
 | `scripts/install-safe.py` | no-clobber publication, install manifest, and `--upgrade` engine |
 | `templates/docs/` | project documentation templates |
-| `templates/github/` | CI, issue, and pull-request templates |
+| `templates/github/` | CI and pull-request templates |
 | `required-skills.yml` | supported-skill manifest and where each skill is used |
 | `scripts/validate-kit.sh` | maintainer validation and install smoke test |

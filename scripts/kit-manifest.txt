@@ -18,6 +18,5 @@ templates/docs/threat-model.md
 templates/docs/specs/README.md
 templates/docs/specs/TEMPLATE.md
 templates/docs/test-strategy.md
-templates/github/ISSUE_TEMPLATE/task.md
 templates/github/pull_request_template.md
 templates/github/workflows/ci.yml

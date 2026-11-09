@@ -32,8 +32,8 @@ client, the webhook handler, and the payment screen.
 
 ## Build
 
-For the webhook slice the agent branches `feat/12-payment-webhook`. It writes `PAY-3 rejects an unsigned
-webhook` as an integration test against the test database, sees it fail, and implements the
+For the webhook slice the agent branches `feat/payment-webhook`. It writes `PAY-3 rejects an
+unsigned webhook` as an integration test against the test database, sees it fail, and implements the
 handler. It moves `PAY-3` into `docs/specs/payments.md` and updates the webhook row in
 `docs/threat-model.md` on the same branch. The payment-screen slice later opens the app on the
 provider's sandbox, pays a partial month's rent, and checks that the remaining balance shows.

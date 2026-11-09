@@ -11,7 +11,7 @@ which is where most real bugs live; unit tests are fastest for logic with many c
 | --- | --- | --- | --- |
 | Pure logic with many cases: policies, matrices, parsers, mappers | Unit | {runner} | One test per case; the full case matrix lives here |
 | Wiring to the database, auth, HTTP, queues, or third parties | Integration, against real infrastructure | {runner} + {test database} | One test per path through the wiring, plus one denial and one failure or rollback; never the full matrix |
-| Critical user journeys | End-to-end | {e2e tool} | A few per change, named in the change proposal |
+| Critical user journeys | End-to-end | {e2e tool} | A few per change, named in the change proposal or the PR |
 
 A task's acceptance criteria name the layer for each behavior. Test names cite the requirement ID
 they prove (`AUTH-3 rejects an expired session`); source comments don't repeat it.

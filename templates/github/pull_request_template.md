@@ -1,6 +1,7 @@
 ## What
 
-<!-- The behavior change in two or three lines. Link the change proposal and issue (`Closes #N` on GitHub). -->
+<!-- The behavior change in two or three lines. Link the change proposal and issue when there is
+     one (`Closes #N` on GitHub). -->
 
 ## Where to look
 

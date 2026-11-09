@@ -244,22 +244,10 @@ one does not make it part of the workflow.
 
 ## 3. Adapt the project
 
-### Tracker
-
-GitHub Issues is the default. Projects without an external tracker keep slices as a checklist in the
-change proposal. `docs/context.md` → Lifecycle names the tracker; adopting one midway moves only the
-open proposals' unticked slices into it. For Linear or Jira, replace these integration points:
-
-| Responsibility | GitHub default | Replacement |
-| --- | --- | --- |
-| Create slice issues | `gh issue create`, after plan approval | Tracker API or CLI |
-| Complete slices | `Closes #N` in the PR | Native Git integration or a post-merge update |
-| Name branches | `feat/{issue number}-{slug}` | Tracker key such as `ENG-123` |
-
 ### Merges
 
-The manual does not forbid an agent to merge. Protecting the default branch forces every change
-through a pull request, but an agent using your credentials can still merge it. To keep merging to
+Who merges is the project's call. Protecting the default branch forces every change through a
+pull request, but an agent using your credentials can still merge it. To keep merging to
 a person, give the agent a token without merge permission.
 
 ### CI and tests
