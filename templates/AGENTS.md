@@ -23,19 +23,20 @@ These hold in every task. Everything else in this file is a default the team may
 
 ## How a change moves
 
-- **Plan first** for a feature, or a change to a contract, a trust boundary, or a recorded decision:
-  write `docs/changes/<slug>.md` from its template, interviewing with `grilling` when the request
-  leaves decisions open. Freeze any contract an outside consumer in `docs/context.md` depends on;
-  write an ADR only for a hard-to-reverse choice. A plan that touches a framework names the
-  built-in features it weighed (rendering, caching, error handling) before custom code.
+- **Plan first** for a feature that spans more than one PR or leaves decisions open, or a change to
+  a contract, a trust boundary, or a recorded decision: write `docs/changes/<slug>.md` from its
+  template, interviewing with `grilling` when the request leaves decisions open. Freeze any contract
+  an outside consumer in `docs/context.md` depends on; write an ADR only for a hard-to-reverse
+  choice. A plan that touches a framework names the built-in features it weighed (rendering,
+  caching, error handling) before custom code.
 - **Gate: approve plan.** No code before the developer approves it, even if the task asks for a PR.
 - **Build:** behavior starts with a failing test, then the code, then the check command for the
   touched packages; copy, styling, and layout need no test. Library APIs follow the docs for the
   installed version (Conventions → Library docs), not memory. Before calling a change a user can
   see done, look at it running on realistic input (`docs/test-strategy.md` → Local run), or say
   why you could not.
-- **Review** (below) before any PR or commit to the default branch. Writes to the default branch,
-  a tracker, or a new remote ask first.
+- **Review** (below) before any PR or commit to the default branch, unless the developer waives it
+  for that change. Writes to the default branch, a tracker, or a new remote ask first.
 
 ## Review
 
@@ -44,7 +45,7 @@ not write the change: a subagent or a headless agent CLI (`codex exec`, `claude 
 different model when one is available. It loads `code-review`, and `security-review` when the
 change is sensitive; it judges sensitivity itself. Give it the diff, the proposal, and the raw check
 output, never your summary. Fix required findings and send the new diff. The PR names the reviewer,
-its model, and the verdict.
+its model, and the verdict, or says the developer waived review.
 
 ## Where things live
 

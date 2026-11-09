@@ -61,14 +61,15 @@ The kit encodes what model upgrades do not supply: the developer's approval of a
 living record of what the product does, review by a context that did not write the code, and checks
 proven able to fail. It leaves step-by-step procedure to the agent and the harness.
 
-1. **Plan** (features, and changes to a contract, trust boundary, or decision): `grilling` settles
+1. **Plan** (features that span more than one PR or leave decisions open, and changes to a
+   contract, trust boundary, or decision): `grilling` settles
    open questions, and the agent writes a change proposal with its spec delta and acceptance
    criteria. **Gate:** you approve the plan.
 2. **Build:** a failing test first for behavior (copy, styling, and layout need none), then the
    code, the check command, a look at the running product for a change a user can see, and the spec
-   update. Bug fixes and chores start here.
+   update. Smaller features, bug fixes, and chores start here.
 3. **Review** in a context that did not write the change, on a different model when one is
-   available, before the PR opens.
+   available, before the PR opens, unless you waive it for that change.
 4. **PR** with a "Where to look" section and a criterion-to-test proof table. Who merges is the
    project's call; protect the branch to require a person.
 

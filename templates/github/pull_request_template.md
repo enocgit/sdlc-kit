@@ -19,4 +19,5 @@
 | --- | --- |
 | {ID} | {test name or observation} |
 
-- **Review:** <!-- reviewer and model, verdict; security findings and resolutions if sensitive -->
+- **Review:** <!-- reviewer and model, verdict, or waived by the developer; security findings and
+  resolutions if sensitive -->
