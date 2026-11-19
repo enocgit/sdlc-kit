@@ -302,7 +302,6 @@ class Validator:
                 "6. No secrets in the repository, logs, or artifacts.",
                 "run `bootstrap` first",
                 "**Gate: approve plan.** With a plan, no code before the developer approves it",
-                "names the built-in features it weighed",
                 "behavior starts with a failing test",
                 "installed version (Conventions → Library docs), not memory.",
                 "- **Library docs:**",
@@ -312,6 +311,7 @@ class Validator:
                 "(`codex exec`, `claude -p`, `pi -p`), on a different model when one is available.",
                 "never your summary",
                 "The PR names the reviewer, its\nmodel, and the verdict, or says the developer waived review.",
+                "The PR body fills\n`.github/pull_request_template.md`.",
                 "unless the developer waives it\n  for that change. Writes to the default branch, issues, or a new remote ask first.",
             ),
             "skills/bootstrap/SKILL.md": (
@@ -322,9 +322,9 @@ class Validator:
             ),
             "skills/code-review/SKILL.md": (
                 "no reason given is a required finding; a stated reason is not.",
-                "confirm it in the installed source",
+                "for the installed version (`AGENTS.md` → Library docs), then the installed source, not from memory.",
                 "Missing evidence is a note, not a block.",
-                "calls an API the installed version marks deprecated is a required finding.",
+                "a deprecated API included, is a required finding.",
             ),
         }
         for name, needles in required.items():

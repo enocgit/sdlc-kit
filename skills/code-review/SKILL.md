@@ -16,9 +16,9 @@ Review-only: report findings to the author; do not edit, commit, or land.
 Review the committed diff against the target branch (`git diff {target}...HEAD`) on a clean tree,
 plus every file it adds or removes. Read the change proposal if there is one, the specs it touches,
 relevant ADRs, and any frozen contract. Do not accept the author's summary in place of these
-artifacts. When a finding depends on how a library or framework behaves,
-confirm it in the installed source, not from memory. New code that
-calls an API the installed version marks deprecated is a required finding.
+artifacts. When a finding depends on how a library or framework behaves, confirm it in the docs
+for the installed version (`AGENTS.md` → Library docs), then the installed source, not from memory.
+New code that uses a library against those docs, a deprecated API included, is a required finding.
 
 ## The approval standard
 
@@ -39,8 +39,6 @@ Block a change that introduces a defect, weakens an invariant, or makes the stru
    every new entry point; queries parameterized; new dependencies trustworthy. Judge sensitivity
    yourself against `docs/threat-model.md`: a change to a listed boundary, or a finding or fix that
    changes a listed control, makes the change sensitive, and `security-review` applies.
-5. **Performance.** N+1 queries, unbounded loops or fetches, missing pagination, work repeated in a
-   hot path.
 
 ## Readiness
 
@@ -51,9 +49,9 @@ Check the change against the no-compromise rules in the project's `AGENTS.md`. T
   no reason given is a required finding; a stated reason is not. A passing test is not a look.
 - **Checks can fail:** a new test was seen failing first; a new or changed check command fails on a
   planted error.
-- **Missing evidence is a note, not a block.** An artifact you were not
-  given (a failing-first run, a test count) is a **Consider:** asking the author to put it in the
-  PR. Block only when the code or the evidence you have contradicts the claim.
+- **Missing evidence is a note, not a block.** An artifact you were not given (a failing-first
+  run, a test count) is a **Consider:** asking the author for it. Block only when the code or the
+  evidence you have contradicts the claim.
 - **Docs match the code:** specs, architecture, and contract index describe what this PR ships,
   and a proposal whose last slice ships here is deleted.
   Run a stale-claim scan over changed docs *and source comments that carry current-behavior claims*

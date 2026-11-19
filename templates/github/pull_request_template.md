@@ -13,8 +13,9 @@
 
 ## Proof
 
-<!-- Each acceptance criterion and the test or observation that proves it; for a change a user can
-     see, what running it showed, or why it could not run. -->
+<!-- Each acceptance criterion and the test that proves it; for a change a user can see, what
+     running it showed, or why it could not run. Leave out commands you ran; CI shows those. No
+     criteria: delete the table. -->
 
 | Criterion | Proven by |
 | --- | --- |

@@ -27,8 +27,7 @@ These hold in every task. Everything else in this file is a default the team may
   a contract, a trust boundary, or a recorded decision: write `docs/changes/<slug>.md` from its
   template, interviewing with `grilling` when the request leaves decisions open. Freeze any contract
   an outside consumer in `docs/context.md` depends on; write an ADR only for a hard-to-reverse
-  choice. A plan that touches a framework names the built-in features it weighed (rendering,
-  caching, error handling) before custom code.
+  choice.
 - **Gate: approve plan.** With a plan, no code before the developer approves it, even if the task
   asks for a PR.
 - **Build:** behavior starts with a failing test, then the code, then the check command for the
@@ -47,7 +46,8 @@ agent CLI (`codex exec`, `claude -p`, `pi -p`), on a different model when one is
 loads `code-review`, and `security-review` when the change is sensitive; it judges sensitivity
 itself. Give it the diff, the proposal if there is one, and the raw check output,
 never your summary. Fix required findings and send the new diff. The PR names the reviewer, its
-model, and the verdict, or says the developer waived review.
+model, and the verdict, or says the developer waived review. The PR body fills
+`.github/pull_request_template.md`.
 
 ## Where things live
 
@@ -83,8 +83,6 @@ and gets `security-review` before it ships.
 
 ## Guardrails
 
-- **Product value first.** Build what a real user, consumer, or decision needs now. Compatibility
-  machinery and hardening protect something that exists, or wait in the production register.
 - **Ask, don't guess.** An ambiguous or wrong spec, ADR, or contract is a question; the fix updates
   it in the same change. Supersede an implemented ADR instead of editing it; a shipped contract with
   a deployed consumer changes only with a versioning ADR.

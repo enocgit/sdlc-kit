@@ -24,8 +24,6 @@ they prove (`AUTH-3 rejects an expired session`); source comments don't repeat i
 - Test data carries the variation real inputs have (several users, empty and oversized values,
   messy formatting), not only the minimal case. A gap that running the product finds becomes a test.
 - Pull requests run the packages a change affects; the push to the default branch runs everything.
-- No run repeats the same work: one workflow per check, and a new push cancels the PR's older run.
-- One test runner per stack unless an ADR says otherwise.
 - Locally, run the touched packages; CI is the merge gate.
 
 ## Local run
